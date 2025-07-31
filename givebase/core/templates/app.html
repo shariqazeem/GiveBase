@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GiveBase - Global Donation Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .givebase-italic {
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60A5FA, #A78BFA, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-border {
+            background: linear-gradient(135deg, #60A5FA, #A78BFA, #EC4899);
+            padding: 1px;
+            border-radius: 12px;
+        }
+        
+        .gradient-border-inner {
+            background: #0A0A0A;
+            border-radius: 11px;
+            height: 100%;
+            width: 100%;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #60A5FA;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #60A5FA, #A78BFA);
+            color: white;
+        }
+        
+        .donation-card {
+            transition: all 0.3s ease;
+        }
+        
+        .donation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(96, 165, 250, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
+            }
+        }
+
+        .user-highlight {
+            background: linear-gradient(135deg, #60A5FA20, #A78BFA20);
+            border: 1px solid #60A5FA50;
+        }
+
+        .pool-card {
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(167, 139, 250, 0.1));
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .social-donation {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(167, 139, 250, 0.1));
+            border: 1px solid rgba(236, 72, 153, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Header -->
+    <header class="bg-gray-900/80 backdrop-blur-lg border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-8">
+                    <h1 class="givebase-italic text-2xl">GiveBase</h1>
+                    <nav class="hidden md:flex space-x-6">
+                        <button onclick="switchTab('donate')" class="tab-btn px-4 py-2 rounded-lg transition-all" data-tab="donate">
+                            <i class="fas fa-heart mr-2"></i>Donate
+                        </button>
+                        <button onclick="switchTab('social')" class="tab-btn px-4 py-2 rounded-lg transition-all" data-tab="social">
+                            <i class="fas fa-users mr-2"></i>Social Feed
+                        </button>
+                        <button onclick="switchTab('leaderboard')" class="tab-btn px-4 py-2 rounded-lg transition-all" data-tab="leaderboard">
+                            <i class="fas fa-trophy mr-2"></i>Leaderboard
+                        </button>
+                        <button onclick="switchTab('my-donations')" class="tab-btn px-4 py-2 rounded-lg transition-all" data-tab="my-donations">
+                            <i class="fas fa-history mr-2"></i>My History
+                        </button>
+                        <button onclick="switchTab('profile')" class="tab-btn px-4 py-2 rounded-lg transition-all" data-tab="profile">
+                            <i class="fas fa-user mr-2"></i>Profile
+                        </button>
+                    </nav>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="networkInfo" class="hidden md:flex items-center space-x-2 px-3 py-1 bg-blue-500/20 rounded-lg">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full pulse-dot"></div>
+                        <span class="text-sm">Base Sepolia</span>
+                    </div>
+                    <div class="relative">
+                        <button id="connectWallet" onclick="handleWalletButton()" class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-6 py-2 rounded-full transition-all">
+                            Connect Wallet
+                        </button>
+                        <!-- Wallet Dropdown Menu -->
+                        <div id="walletDropdown" class="hidden absolute right-0 mt-2 w-64 bg-gray-900 rounded-xl border border-gray-800 shadow-xl">
+                            <div class="p-4">
+                                <div class="text-sm text-gray-400 mb-1">Connected Wallet</div>
+                                <div id="fullAddress" class="font-mono text-xs text-white mb-3 break-all"></div>
+                                <div class="text-sm text-gray-400 mb-1">Balance</div>
+                                <div id="walletBalance" class="text-lg font-bold text-white mb-4">0.0000 ETH</div>
+                                <button onclick="copyAddress()" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-lg mb-2 transition-all">
+                                    <i class="fas fa-copy mr-2"></i>Copy Address
+                                </button>
+                                <button onclick="viewOnExplorer()" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-lg mb-2 transition-all">
+                                    <i class="fas fa-external-link-alt mr-2"></i>View on Explorer
+                                </button>
+                                <button onclick="disconnectWallet()" class="w-full bg-red-500/20 hover:bg-red-500/30 text-red-400 py-2 rounded-lg transition-all">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Disconnect
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+            <div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+                <div class="text-sm text-gray-400">Total Donated</div>
+                <div class="text-2xl font-bold text-blue-400" id="totalDonated">0 ETH</div>
+            </div>
+            <div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+                <div class="text-sm text-gray-400">Active Pools</div>
+                <div class="text-2xl font-bold text-purple-400" id="activePools">0</div>
+            </div>
+            <div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+                <div class="text-sm text-gray-400">Total Donors</div>
+                <div class="text-2xl font-bold text-pink-400" id="totalDonors">0</div>
+            </div>
+            <div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+                <div class="text-sm text-gray-400">Your Points</div>
+                <div class="text-2xl font-bold text-yellow-400" id="userPoints">0</div>
+                <div class="text-xs text-gray-500" id="userRank"></div>
+            </div>
+            <div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+                <div class="text-sm text-gray-400">Tokens Earned</div>
+                <div class="text-2xl font-bold text-green-400" id="userTokens">0 $GIVE</div>
+                <div class="text-xs text-gray-500">Unclaimed</div>
+            </div>
+        </div>
+
+        <!-- Donate Tab -->
+        <div id="donateTab" class="tab-content">
+            <!-- Donation Type Selector -->
+            <div class="flex justify-center mb-8">
+                <div class="bg-gray-900/50 rounded-xl p-1 border border-gray-800">
+                    <button onclick="switchDonationType('pools')" id="poolsTypeBtn" class="donation-type-btn px-6 py-3 rounded-lg transition-all bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                        <i class="fas fa-swimming-pool mr-2"></i>Global Pools
+                    </button>
+                    <button onclick="switchDonationType('social')" id="socialTypeBtn" class="donation-type-btn px-6 py-3 rounded-lg transition-all text-gray-400">
+                        <i class="fas fa-user-friends mr-2"></i>Direct P2P
+                    </button>
+                    <button onclick="switchDonationType('legacy')" id="legacyTypeBtn" class="donation-type-btn px-6 py-3 rounded-lg transition-all text-gray-400">
+                        <i class="fas fa-heart mr-2"></i>Verified Recipients
+                    </button>
+                </div>
+            </div>
+
+            <!-- Global Pools Section -->
+            <div id="poolsSection" class="donation-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4">🌍 Global Donation Pools</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">
+                        Contribute to global causes and earn $GIVE tokens. No verification needed - just donate and make an impact worldwide.
+                    </p>
+                </div>
+                <div id="poolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Loading state -->
+                    <div class="col-span-full flex justify-center py-12">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social P2P Section -->
+            <div id="socialSection" class="donation-section hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4">👥 Direct P2P Donations</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">
+                        Send donations directly to other users. Perfect for Farcaster communities and creator support.
+                    </p>
+                </div>
+                
+                <!-- P2P Donation Form -->
+                <div class="max-w-md mx-auto mb-8">
+                    <div class="gradient-border">
+                        <div class="gradient-border-inner p-6">
+                            <h3 class="text-xl font-bold mb-4">Send Direct Donation</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">Recipient Address or @username</label>
+                                    <input type="text" id="p2pRecipient" placeholder="0x... or @username" 
+                                           class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">Amount (ETH)</label>
+                                    <input type="number" id="p2pAmount" step="0.001" min="0.001" placeholder="0.01"
+                                           class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">Message (optional)</label>
+                                    <input type="text" id="p2pMessage" placeholder="Thanks for being awesome!" maxlength="280"
+                                           class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" id="p2pPublic" checked class="rounded">
+                                    <label for="p2pPublic" class="text-sm text-gray-400">Make donation public (earn social bonus)</label>
+                                </div>
+                                <button onclick="processP2PDonation()" class="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-3 rounded-lg transition-all">
+                                    <span id="p2pDonateButtonText">Send Donation</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Recipients -->
+                <div class="max-w-4xl mx-auto">
+                    <h3 class="text-xl font-bold mb-4">💫 Popular Recipients</h3>
+                    <div id="popularRecipients" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Popular recipients will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legacy Recipients Section -->
+            <div id="legacySection" class="donation-section hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4">❤️ Verified Recipients</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">
+                        Support individuals who have been verified and need immediate help.
+                    </p>
+                </div>
+                <div id="recipientsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Recipients will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Feed Tab -->
+        <div id="socialTab" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6 text-center">🌟 Social Donation Feed</h2>
+            
+            <div class="max-w-2xl mx-auto">
+                <div id="socialFeed" class="space-y-4">
+                    <!-- Loading state -->
+                    <div class="flex justify-center py-12">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                
+                <!-- Load More Button -->
+                <div id="loadMoreSocialContainer" class="text-center mt-6 hidden">
+                    <button onclick="loadMoreSocialFeed()" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-all">
+                        Load More
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Tab -->
+        <div id="leaderboardTab" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6 text-center">🏆 Top Donors Leaderboard</h2>
+            
+            <!-- User Position Card (if not in top 10) -->
+            <div id="userPositionCard" class="hidden mb-6">
+                <div class="gradient-border max-w-2xl mx-auto">
+                    <div class="gradient-border-inner p-4">
+                        <div class="text-center text-sm text-gray-400 mb-2">Your Position</div>
+                        <div id="userPositionInfo" class="flex items-center justify-between">
+                            <!-- User position will be shown here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gradient-border max-w-4xl mx-auto">
+                <div class="gradient-border-inner p-6">
+                    <div id="leaderboardList" class="space-y-3">
+                        <!-- Loading state -->
+                        <div class="flex justify-center py-8">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Donations Tab -->
+        <div id="my-donationsTab" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6">📊 My Donation History</h2>
+            
+            <!-- User Stats -->
+            <div id="userStatsCards" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
+                    <div class="text-3xl font-bold text-blue-400 mb-2" id="userTotalDonated">0 ETH</div>
+                    <div class="text-gray-400">Total Donated</div>
+                </div>
+                <div class="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
+                    <div class="text-3xl font-bold text-purple-400 mb-2" id="userDonationCount">0</div>
+                    <div class="text-gray-400">Total Donations</div>
+                </div>
+                <div class="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
+                    <div class="text-3xl font-bold text-yellow-400 mb-2" id="userTotalPoints">0</div>
+                    <div class="text-gray-400">Points Earned</div>
+                </div>
+                <div class="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
+                    <div class="text-3xl font-bold text-green-400 mb-2" id="userCurrentRank">#--</div>
+                    <div class="text-gray-400">Current Rank</div>
+                </div>
+            </div>
+
+            <!-- Donation History -->
+            <div id="donationHistory" class="space-y-4">
+                <div class="text-center py-8 text-gray-400">
+                    Connect wallet to view your donation history
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div id="loadMoreContainer" class="text-center mt-6 hidden">
+                <button onclick="loadMoreDonations()" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-all">
+                    Load More
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profileTab" class="tab-content hidden">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-center">👤 Your Profile</h2>
+                
+                <!-- Profile Form -->
+                <div class="gradient-border">
+                    <div class="gradient-border-inner p-6">
+                        <div class="space-y-6">
+                            <!-- Basic Info -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">Display Name</label>
+                                    <input type="text" id="profileDisplayName" placeholder="Your name" 
+                                           class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">Farcaster Username</label>
+                                    <input type="text" id="profileFarcaster" placeholder="@username" 
+                                           class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">Bio</label>
+                                <textarea id="profileBio" rows="3" placeholder="Tell us about yourself..." maxlength="280"
+                                          class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">Donation Message</label>
+                                <input type="text" id="profileDonationMessage" placeholder="Thanks for your support! 💙" maxlength="100"
+                                       class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
+                                <div class="text-xs text-gray-500 mt-1">This message shows when people donate to you</div>
+                            </div>
+
+                            <!-- Privacy Settings -->
+                            <div class="border-t border-gray-700 pt-6">
+                                <h3 class="text-lg font-bold mb-4">Privacy Settings</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-medium">Public Profile</div>
+                                            <div class="text-sm text-gray-400">Show your profile on leaderboards</div>
+                                        </div>
+                                        <input type="checkbox" id="profilePublic" class="rounded">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-medium">Accept Donations</div>
+                                            <div class="text-sm text-gray-400">Allow others to send you donations</div>
+                                        </div>
+                                        <input type="checkbox" id="profileAcceptDonations" class="rounded">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Token Rewards Section -->
+                            <div class="border-t border-gray-700 pt-6">
+                                <h3 class="text-lg font-bold mb-4">🪙 Token Rewards</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-black/30 rounded-lg p-4">
+                                        <div class="text-2xl font-bold text-green-400" id="profileTokensEarned">0 $GIVE</div>
+                                        <div class="text-sm text-gray-400">Total Earned</div>
+                                    </div>
+                                    <div class="bg-black/30 rounded-lg p-4">
+                                        <div class="text-2xl font-bold text-yellow-400" id="profileTokensPending">0 $GIVE</div>
+                                        <div class="text-sm text-gray-400">Pending Claim</div>
+                                    </div>
+                                </div>
+                                <button onclick="checkAirdropEligibility()" class="w-full mt-4 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white py-2 rounded-lg transition-all">
+                                    Check Airdrop Eligibility
+                                </button>
+                            </div>
+
+                            <button onclick="updateProfile()" class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 rounded-lg transition-all">
+                                <span id="updateProfileButtonText">Update Profile</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pool Donation Modal -->
+    <div id="poolDonationModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
+        <div class="bg-gray-900 rounded-2xl max-w-md w-full p-6 border border-gray-800">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Donate to Pool</h3>
+                <button onclick="closePoolDonationModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="selectedPool" class="mb-6">
+                <!-- Selected pool info will be shown here -->
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm text-gray-400 mb-2">Donation Amount (ETH)</label>
+                <input type="number" id="poolDonationAmount" step="0.001" min="0.001" placeholder="0.01" 
+                       class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
+                <div class="mt-2 text-sm text-gray-500">
+                    Minimum: 0.001 ETH • Points: <span id="poolEstimatedPoints">0</span> • Tokens: <span id="poolEstimatedTokens">0 $GIVE</span>
+                </div>
+            </div>
+            
+            <button onclick="processPoolDonation()" class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 rounded-lg transition-all">
+                <span id="poolDonateButtonText">Donate Now</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Legacy Donation Modal -->
+    <div id="donationModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
+        <div class="bg-gray-900 rounded-2xl max-w-md w-full p-6 border border-gray-800">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Make a Donation</h3>
+                <button onclick="closeDonationModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="selectedRecipient" class="mb-6">
+                <!-- Selected recipient info will be shown here -->
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm text-gray-400 mb-2">Donation Amount (ETH)</label>
+                <input type="number" id="donationAmount" step="0.001" min="0.001" placeholder="0.01" 
+                       class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
+                <div class="mt-2 text-sm text-gray-500">
+                    Minimum: 0.001 ETH • Points: <span id="estimatedPoints">0</span>
+                </div>
+            </div>
+            
+            <button onclick="processDonation()" class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 rounded-lg transition-all">
+                <span id="donateButtonText">Donate Now</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
+        <div class="bg-gray-900 rounded-2xl max-w-md w-full p-6 border border-gray-800 text-center">
+            <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-check text-3xl text-green-400"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Donation Successful!</h3>
+            <p class="text-gray-400 mb-6">Thank you for your generosity. Your donation has been recorded on the blockchain.</p>
+            <div class="bg-black/50 rounded-lg p-4 mb-6">
+                <div class="text-sm text-gray-400">Transaction Hash</div>
+                <div id="txHash" class="font-mono text-xs break-all text-blue-400"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-black/30 rounded-lg p-3">
+                    <div class="text-lg font-bold text-yellow-400">+<span id="pointsEarned">0</span></div>
+                    <div class="text-xs text-gray-400">Points Earned</div>
+                </div>
+                <div class="bg-black/30 rounded-lg p-3">
+                    <div class="text-lg font-bold text-green-400">+<span id="tokensEarned">0</span></div>
+                    <div class="text-xs text-gray-400">$GIVE Tokens</div>
+                </div>
+            </div>
+            <button onclick="closeSuccessModal()" class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 px-8 rounded-lg transition-all">
+                Continue Giving
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Web3 and contract setup
+        let web3;
+        let userAccount;
+        let selectedRecipientId;
+        let selectedPoolId;
+        let currentPage = 1;
+        let currentSocialPage = 1;
+        let hasMoreDonations = false;
+        let hasMoreSocialFeed = false;
+        let currentDonationType = 'pools';
+        
+        const BASE_SEPOLIA_CHAIN_ID = '0x14A34'; // 84532 in decimal
+        const CONTRACT_ADDRESS = '{{ contract_address }}';
+
+        // Initialize
+        window.addEventListener('load', async () => {
+            // Check if MetaMask is installed
+            if (typeof window.ethereum !== 'undefined') {
+                console.log('MetaMask is installed!');
+                await checkWalletConnection();
+            } else {
+                console.log('MetaMask is not installed');
+                updateConnectButton('Install MetaMask', false);
+            }
+            
+            await loadStats();
+            await loadPools();
+            switchTab('donate');
+            
+            // Update donation amount input listeners
+            document.getElementById('donationAmount').addEventListener('input', updateEstimatedPoints);
+            document.getElementById('poolDonationAmount').addEventListener('input', updatePoolEstimatedRewards);
+            document.getElementById('p2pAmount').addEventListener('input', updateP2PEstimatedRewards);
+        });
+
+        // Handle wallet button click (connect or show dropdown)
+        async function handleWalletButton() {
+            if (typeof window.ethereum === 'undefined') {
+                window.open('https://metamask.io/download/', '_blank');
+                return;
+            }
+
+            if (userAccount) {
+                // Toggle dropdown
+                const dropdown = document.getElementById('walletDropdown');
+                dropdown.classList.toggle('hidden');
+                
+                // Update balance when showing dropdown
+                if (!dropdown.classList.contains('hidden')) {
+                    await updateWalletBalance();
+                }
+            } else {
+                // Connect
+                await connectWallet();
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const walletBtn = document.getElementById('connectWallet');
+            const dropdown = document.getElementById('walletDropdown');
+            
+            if (!walletBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Update wallet balance
+        async function updateWalletBalance() {
+            if (!userAccount || !web3) return;
+            
+            try {
+                const balanceWei = await web3.eth.getBalance(userAccount);
+                const balanceEth = web3.utils.fromWei(balanceWei, 'ether');
+                document.getElementById('walletBalance').textContent = `${parseFloat(balanceEth).toFixed(4)} ETH`;
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+            }
+        }
+
+        // Copy address to clipboard
+        function copyAddress() {
+            if (userAccount) {
+                navigator.clipboard.writeText(userAccount).then(() => {
+                    alert('Address copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                });
+            }
+        }
+
+        // View on block explorer
+        function viewOnExplorer() {
+            if (userAccount) {
+                window.open(`https://sepolia.basescan.org/address/${userAccount}`, '_blank');
+            }
+        }
+
+        // Disconnect wallet
+        function disconnectWallet() {
+            userAccount = null;
+            web3 = null;
+            updateConnectButton('Connect Wallet', false);
+            document.getElementById('networkInfo').classList.add('hidden');
+            document.getElementById('walletDropdown').classList.add('hidden');
+            document.getElementById('userPoints').textContent = '0';
+            document.getElementById('userTokens').textContent = '0 $GIVE';
+            document.getElementById('userRank').textContent = '';
+            
+            // Clear user-specific data
+            resetUserData();
+            
+            console.log('Wallet disconnected');
+        }
+
+        function resetUserData() {
+            // Reset donation history
+            const donationHistory = document.getElementById('donationHistory');
+            donationHistory.innerHTML = '<div class="text-center py-8 text-gray-400">Connect wallet to view your donation history</div>';
+            
+            // Reset user stats
+            document.getElementById('userTotalDonated').textContent = '0 ETH';
+            document.getElementById('userDonationCount').textContent = '0';
+            document.getElementById('userTotalPoints').textContent = '0';
+            document.getElementById('userCurrentRank').textContent = '#--';
+            
+            // Hide user position card
+            document.getElementById('userPositionCard').classList.add('hidden');
+
+            // Reset profile form
+            resetProfileForm();
+        }
+
+        // Update connect button UI
+        function updateConnectButton(text, isConnected) {
+            const connectBtn = document.getElementById('connectWallet');
+            connectBtn.textContent = text;
+            
+            if (isConnected) {
+                connectBtn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'hover:from-blue-600', 'hover:to-purple-600');
+                connectBtn.classList.add('bg-gray-700', 'hover:bg-gray-600');
+            } else {
+                connectBtn.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'hover:from-blue-600', 'hover:to-purple-600');
+                connectBtn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+            }
+        }
+
+        // Wallet connection
+        async function checkWalletConnection() {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                
+                try {
+                    const accounts = await web3.eth.getAccounts();
+                    if (accounts.length > 0) {
+                        userAccount = accounts[0];
+                        await checkAndSwitchNetwork();
+                        updateWalletUI();
+                        await loadUserStats();
+                        await loadUserProfile();
+                    }
+                } catch (error) {
+                    console.error('Error checking wallet connection:', error);
+                }
+            }
+        }
+
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('Please install MetaMask to use GiveBase!');
+                window.open('https://metamask.io/download/', '_blank');
+                return;
+            }
+
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+                
+                if (accounts.length === 0) {
+                    alert('No accounts found. Please check your MetaMask.');
+                    return;
+                }
+                
+                userAccount = accounts[0];
+                web3 = new Web3(window.ethereum);
+                
+                // Check and switch to Base Sepolia
+                await checkAndSwitchNetwork();
+                
+                // Update UI
+                updateWalletUI();
+                
+                // Load user-specific data
+                await loadUserStats();
+                await loadUserProfile();
+                
+                console.log('Connected to wallet:', userAccount);
+                
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                if (error.code === 4001) {
+                    // User rejected the request
+                    alert('Connection cancelled. Please approve the connection in MetaMask.');
+                } else {
+                    alert('Failed to connect wallet. Please try again.');
+                }
+            }
+        }
+
+        async function checkAndSwitchNetwork() {
+            try {
+                const chainId = await web3.eth.getChainId();
+                const currentChainId = '0x' + chainId.toString(16);
+                
+                console.log('Current chain ID:', currentChainId);
+                console.log('Expected chain ID:', BASE_SEPOLIA_CHAIN_ID);
+                
+                if (currentChainId !== BASE_SEPOLIA_CHAIN_ID) {
+                    console.log('Wrong network, switching to Base Sepolia...');
+                    await switchToBaseSepolia();
+                } else {
+                    console.log('Already on Base Sepolia');
+                }
+            } catch (error) {
+                console.error('Error checking network:', error);
+            }
+        }
+
+        async function switchToBaseSepolia() {
+            try {
+                // Try to switch to Base Sepolia
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: BASE_SEPOLIA_CHAIN_ID }],
+                });
+                console.log('Switched to Base Sepolia');
+            } catch (switchError) {
+                // This error code indicates that the chain has not been added to MetaMask
+                if (switchError.code === 4902) {
+                    console.log('Base Sepolia not found, adding network...');
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: BASE_SEPOLIA_CHAIN_ID,
+                                chainName: 'Base Sepolia',
+                                nativeCurrency: {
+                                    name: 'Ethereum',
+                                    symbol: 'ETH',
+                                    decimals: 18
+                                },
+                                rpcUrls: ['https://sepolia.base.org'],
+                                blockExplorerUrls: ['https://sepolia.basescan.org']
+                            }]
+                        });
+                        console.log('Base Sepolia network added successfully');
+                    } catch (addError) {
+                        console.error('Error adding Base Sepolia network:', addError);
+                        alert('Failed to add Base Sepolia network. Please add it manually in MetaMask.');
+                    }
+                } else {
+                    console.error('Error switching network:', switchError);
+                    alert('Failed to switch network. Please switch to Base Sepolia manually in MetaMask.');
+                }
+            }
+        }
+
+        function updateWalletUI() {
+            if (userAccount) {
+                const shortAddress = `${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                updateConnectButton(shortAddress, true);
+                document.getElementById('networkInfo').classList.remove('hidden');
+                
+                // Update dropdown info
+                document.getElementById('fullAddress').textContent = userAccount;
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            console.log('Switching to tab:', tabName, 'User account:', userAccount);
+            
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'bg-gradient-to-r', 'from-blue-500', 'to-purple-500');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+            
+            // Add active class to button
+            const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('tab-active');
+            }
+            
+            // Load tab-specific data
+            if (tabName === 'leaderboard') {
+                console.log('Loading leaderboard...');
+                loadLeaderboard();
+            } else if (tabName === 'my-donations') {
+                console.log('Loading my donations, user:', userAccount);
+                if (userAccount) {
+                    loadUserDonations();
+                } else {
+                    console.log('No user account, showing connect wallet message');
+                    const historyDiv = document.getElementById('donationHistory');
+                    historyDiv.innerHTML = '<div class="text-center py-8 text-gray-400">Connect wallet to view your donation history</div>';
+                }
+            } else if (tabName === 'social') {
+                loadSocialFeed();
+            } else if (tabName === 'profile') {
+                if (userAccount) {
+                    loadUserProfile();
+                }
+            }
+        }
+
+        // Donation type switching
+        function switchDonationType(type) {
+            currentDonationType = type;
+            
+            // Hide all sections
+            document.querySelectorAll('.donation-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.donation-type-btn').forEach(btn => {
+                btn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'text-white');
+                btn.classList.add('text-gray-400');
+            });
+            
+            // Show selected section
+            if (type === 'pools') {
+                document.getElementById('poolsSection').classList.remove('hidden');
+                document.getElementById('poolsTypeBtn').classList.add('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'text-white');
+                document.getElementById('poolsTypeBtn').classList.remove('text-gray-400');
+                loadPools();
+            } else if (type === 'social') {
+                document.getElementById('socialSection').classList.remove('hidden');
+                document.getElementById('socialTypeBtn').classList.add('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'text-white');
+                document.getElementById('socialTypeBtn').classList.remove('text-gray-400');
+                loadPopularRecipients();
+            } else if (type === 'legacy') {
+                document.getElementById('legacySection').classList.remove('hidden');
+                document.getElementById('legacyTypeBtn').classList.add('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'text-white');
+                document.getElementById('legacyTypeBtn').classList.remove('text-gray-400');
+                loadRecipients();
+            }
+        }
+
+        // Load donation pools
+        async function loadPools() {
+            try {
+                const response = await fetch('/api/pools/');
+                const data = await response.json();
+                
+                const grid = document.getElementById('poolsGrid');
+                grid.innerHTML = '';
+                
+                if (data.pools.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400">No active pools yet. Check back soon!</div>';
+                    return;
+                }
+                
+                data.pools.forEach(pool => {
+                    const card = document.createElement('div');
+                    card.className = 'donation-card pool-card rounded-xl p-6';
+                    card.innerHTML = `
+                        <div class="text-center">
+                            <div class="text-4xl mb-3">${pool.emoji}</div>
+                            <h3 class="text-xl font-bold mb-2">${pool.name}</h3>
+                            <p class="text-gray-400 text-sm mb-4">${pool.description}</p>
+                            
+                            <div class="mb-4">
+                                <div class="text-2xl font-bold text-blue-400 mb-1">${parseFloat(pool.total_raised).toFixed(4)} ETH</div>
+                                <div class="text-sm text-gray-500">${pool.donor_count} donors</div>
+                            </div>
+                            
+                            <div class="bg-gray-800 rounded-full h-2 mb-4 overflow-hidden">
+                                <div class="progress-bar bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full" 
+                                     style="width: ${pool.progress_percentage}%"></div>
+                            </div>
+                            
+                            <button onclick="openPoolDonationModal(${pool.id})" 
+                                    class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-2 rounded-lg transition-all">
+                                Donate to Pool
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+                
+            } catch (error) {
+                console.error('Error loading pools:', error);
+                const grid = document.getElementById('poolsGrid');
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-red-400">Error loading pools. Please try again.</div>';
+            }
+        }
+
+        // Load popular recipients for P2P
+        async function loadPopularRecipients() {
+            try {
+                const response = await fetch('/api/user-profile/?popular=true');
+                const data = await response.json();
+                
+                const grid = document.getElementById('popularRecipients');
+                grid.innerHTML = '';
+                
+                // Mock popular recipients for now
+                const mockRecipients = [
+                    { address: '0x1234...5678', display_name: '@alice', total_received: '0.5', avatar_url: '' },
+                    { address: '0x2345...6789', display_name: '@bob', total_received: '0.3', avatar_url: '' },
+                    { address: '0x3456...7890', display_name: '@charlie', total_received: '0.2', avatar_url: '' }
+                ];
+                
+                mockRecipients.forEach(recipient => {
+                    const card = document.createElement('div');
+                    card.className = 'social-donation rounded-lg p-4 cursor-pointer hover:bg-opacity-20 transition-all';
+                    card.onclick = () => fillP2PForm(recipient.address, recipient.display_name);
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">${recipient.display_name.charAt(1).toUpperCase()}</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-medium">${recipient.display_name}</div>
+                                <div class="text-xs text-gray-400">${recipient.total_received} ETH received</div>
+                            </div>
+                            <button class="bg-pink-500/20 text-pink-400 px-3 py-1 rounded-full text-xs">
+                                Donate
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+                
+            } catch (error) {
+                console.error('Error loading popular recipients:', error);
+            }
+        }
+
+        function fillP2PForm(address, displayName) {
+            document.getElementById('p2pRecipient').value = displayName || address;
+        }
+
+        // Load legacy recipients
+        async function loadRecipients() {
+            try {
+                const response = await fetch('/api/recipients/');
+                const data = await response.json();
+                
+                const grid = document.getElementById('recipientsGrid');
+                grid.innerHTML = '';
+                
+                if (data.recipients.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400">No verified recipients yet. Check back soon!</div>';
+                    return;
+                }
+                
+                // Only show legacy recipients (not pools)
+                const legacyRecipients = data.recipients.filter(r => !r.is_pool);
+                
+                if (legacyRecipients.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400">No verified recipients yet. Check back soon!</div>';
+                    return;
+                }
+                
+                legacyRecipients.forEach(recipient => {
+                    const progress = Math.min((parseFloat(recipient.raised_amount) / parseFloat(recipient.goal_amount)) * 100, 100);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'donation-card gradient-border';
+                    card.innerHTML = `
+                        <div class="gradient-border-inner p-6 h-full flex flex-col">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 bg-${getCategoryColor(recipient.category)}-500/20 text-${getCategoryColor(recipient.category)}-400 rounded-full text-sm">
+                                    ${getCategoryIcon(recipient.category)} ${recipient.category}
+                                </span>
+                                <div class="text-right">
+                                    <div class="text-xs text-gray-500">Urgency</div>
+                                    <div class="text-${getUrgencyColor(recipient.urgency_level || 3)}-400 font-bold">${'★'.repeat(recipient.urgency_level || 3)}</div>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-xl font-bold mb-2">${recipient.name}</h3>
+                            ${recipient.location ? `<div class="text-xs text-gray-500 mb-2">📍 ${recipient.location}</div>` : ''}
+                            <p class="text-gray-400 text-sm mb-4 flex-grow">${recipient.description.substring(0, 150)}...</p>
+                            
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>Raised: ${parseFloat(recipient.raised_amount).toFixed(4)} ETH</span>
+                                    <span>Goal: ${parseFloat(recipient.goal_amount).toFixed(4)} ETH</span>
+                                </div>
+                                <div class="bg-gray-800 rounded-full h-3 overflow-hidden">
+                                    <div class="progress-bar bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full" 
+                                         style="width: ${progress}%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">${progress.toFixed(1)}% funded</div>
+                            </div>
+                            
+                            <button onclick="openDonationModal(${recipient.id})" 
+                                    class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-2 rounded-lg transition-all">
+                                Donate Now
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+                
+            } catch (error) {
+                console.error('Error loading recipients:', error);
+            }
+        }
+
+        // Load platform stats
+        async function loadStats() {
+            try {
+                const url = userAccount ? `/api/stats/?user=${userAccount}` : '/api/stats/';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                document.getElementById('totalDonated').textContent = `${parseFloat(data.total_donated).toFixed(4)} ETH`;
+                document.getElementById('activePools').textContent = data.active_pools || '0';
+                document.getElementById('totalDonors').textContent = data.total_donors;
+                document.getElementById('userPoints').textContent = data.user_points || '0';
+                
+                // Show user rank if available
+                if (data.user_stats && data.user_stats.rank) {
+                    document.getElementById('userRank').textContent = `Rank #${data.user_stats.rank}`;
+                }
+
+                // Show user tokens if available
+                if (data.user_stats && data.user_stats.tokens_earned) {
+                    document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $GIVE`;
+                }
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load user stats
+        async function loadUserStats() {
+            if (!userAccount) return;
+            
+            try {
+                const response = await fetch(`/api/stats/?user=${userAccount}`);
+                const data = await response.json();
+                
+                document.getElementById('userPoints').textContent = data.user_points || '0';
+                
+                if (data.user_stats && data.user_stats.rank) {
+                    document.getElementById('userRank').textContent = `Rank #${data.user_stats.rank}`;
+                }
+
+                if (data.user_stats && data.user_stats.tokens_earned) {
+                    document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $GIVE`;
+                }
+                
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+
+        // Load user profile
+        async function loadUserProfile() {
+            if (!userAccount) return;
+            
+            try {
+                const response = await fetch(`/api/user-profile/?address=${userAccount}`);
+                const data = await response.json();
+                
+                if (data.exists !== false) {
+                    // Fill profile form
+                    document.getElementById('profileDisplayName').value = data.display_name || '';
+                    document.getElementById('profileFarcaster').value = data.farcaster_username || '';
+                    document.getElementById('profileBio').value = data.bio || '';
+                    document.getElementById('profileDonationMessage').value = data.donation_message || '';
+                    document.getElementById('profilePublic').checked = data.is_public !== false;
+                    document.getElementById('profileAcceptDonations').checked = data.accepts_donations !== false;
+                    
+                    // Update token info
+                    document.getElementById('profileTokensEarned').textContent = `${parseFloat(data.tokens_earned || 0).toFixed(2)} $GIVE`;
+                    
+                    // Calculate pending tokens
+                    const tokensEarned = parseFloat(data.tokens_earned || 0);
+                    const tokensClaimed = parseFloat(data.tokens_claimed || 0);
+                    const pending = tokensEarned - tokensClaimed;
+                    document.getElementById('profileTokensPending').textContent = `${pending.toFixed(2)} $GIVE`;
+                } else {
+                    // Set defaults for new user
+                    document.getElementById('profilePublic').checked = true;
+                    document.getElementById('profileAcceptDonations').checked = true;
+                    document.getElementById('profileDonationMessage').value = 'Thanks for your support! 💙';
+                }
+                
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+
+        function resetProfileForm() {
+            document.getElementById('profileDisplayName').value = '';
+            document.getElementById('profileFarcaster').value = '';
+            document.getElementById('profileBio').value = '';
+            document.getElementById('profileDonationMessage').value = 'Thanks for your support! 💙';
+            document.getElementById('profilePublic').checked = true;
+            document.getElementById('profileAcceptDonations').checked = true;
+            document.getElementById('profileTokensEarned').textContent = '0 $GIVE';
+            document.getElementById('profileTokensPending').textContent = '0 $GIVE';
+        }
+
+        // Update user profile
+        async function updateProfile() {
+            if (!userAccount) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+
+            const updateBtn = document.getElementById('updateProfileButtonText');
+            updateBtn.textContent = 'Updating...';
+
+            try {
+                const profileData = {
+                    wallet_address: userAccount,
+                    display_name: document.getElementById('profileDisplayName').value,
+                    farcaster_username: document.getElementById('profileFarcaster').value,
+                    bio: document.getElementById('profileBio').value,
+                    donation_message: document.getElementById('profileDonationMessage').value,
+                    is_public_profile: document.getElementById('profilePublic').checked,
+                    accepts_donations: document.getElementById('profileAcceptDonations').checked
+                };
+
+                const response = await fetch('/api/update-profile/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Profile updated successfully!');
+                } else {
+                    alert('Error updating profile: ' + data.error);
+                }
+
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Failed to update profile. Please try again.');
+            } finally {
+                updateBtn.textContent = 'Update Profile';
+            }
+        }
+
+        // Check airdrop eligibility
+        async function checkAirdropEligibility() {
+            if (!userAccount) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/airdrop-eligibility/?address=${userAccount}`);
+                const data = await response.json();
+
+                let message = `🪙 Airdrop Eligibility Check\n\n`;
+                message += `Eligible: ${data.eligible ? '✅ YES' : '❌ NO'}\n`;
+                message += `Total Points: ${data.total_points}\n`;
+                message += `Base Tokens: ${data.base_tokens} $GIVE\n`;
+                message += `Multiplier: ${data.multiplier}x\n`;
+                message += `Final Tokens: ${data.final_tokens} $GIVE\n`;
+                message += `Current Rank: #${data.rank || 'N/A'}\n\n`;
+                message += `Bonus Reason: ${data.reason}`;
+
+                alert(message);
+
+            } catch (error) {
+                console.error('Error checking airdrop eligibility:', error);
+                alert('Failed to check eligibility. Please try again.');
+            }
+        }
+
+        // Load social feed
+        async function loadSocialFeed(page = 1) {
+            try {
+                const response = await fetch(`/api/social-feed/?page=${page}&limit=20`);
+                const data = await response.json();
+                
+                const feed = document.getElementById('socialFeed');
+                
+                if (page === 1) {
+                    feed.innerHTML = '';
+                }
+                
+                if (data.feed.length === 0 && page === 1) {
+                    feed.innerHTML = '<div class="text-center py-8 text-gray-400">No public donations yet. Be the first to share your generosity!</div>';
+                    return;
+                }
+                
+                data.feed.forEach(donation => {
+                    const feedItem = document.createElement('div');
+                    feedItem.className = 'social-donation rounded-lg p-4';
+                    feedItem.innerHTML = `
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">${donation.donor.display_name ? donation.donor.display_name.charAt(0).toUpperCase() : 'A'}</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="font-medium">${donation.donor.display_name || donation.donor.address.substring(0, 8) + '...'}</span>
+                                    <span class="text-gray-400">donated</span>
+                                    <span class="font-bold text-blue-400">${parseFloat(donation.amount).toFixed(4)} ETH</span>
+                                    <span class="text-gray-400">to</span>
+                                    <span class="font-medium">${donation.recipient.display_name || donation.recipient.address.substring(0, 8) + '...'}</span>
+                                    ${donation.frame_interaction ? '<span class="bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full text-xs">Frame</span>' : ''}
+                                </div>
+                                ${donation.message ? `<div class="text-gray-300 text-sm mb-2">"${donation.message}"</div>` : ''}
+                                <div class="flex items-center justify-between text-xs text-gray-500">
+                                    <span>${donation.time_ago}</span>
+                                    <div class="flex items-center space-x-4">
+                                        <span class="text-yellow-400">+${donation.points_earned} pts</span>
+                                        <a href="https://sepolia.basescan.org/tx/${donation.tx_hash}" target="_blank" class="text-blue-400 hover:text-blue-300">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    feed.appendChild(feedItem);
+                });
+                
+                // Handle pagination
+                const loadMoreContainer = document.getElementById('loadMoreSocialContainer');
+                if (data.pagination && data.pagination.has_next) {
+                    loadMoreContainer.classList.remove('hidden');
+                    hasMoreSocialFeed = true;
+                    currentSocialPage = page;
+                } else {
+                    loadMoreContainer.classList.add('hidden');
+                    hasMoreSocialFeed = false;
+                }
+                
+            } catch (error) {
+                console.error('Error loading social feed:', error);
+                const feed = document.getElementById('socialFeed');
+                feed.innerHTML = '<div class="text-center py-8 text-red-400">Error loading social feed. Please try again.</div>';
+            }
+        }
+
+        function loadMoreSocialFeed() {
+            if (hasMoreSocialFeed) {
+                loadSocialFeed(currentSocialPage + 1);
+            }
+        }
+
+        // Load leaderboard
+        async function loadLeaderboard() {
+            try {
+                const url = userAccount ? `/api/leaderboard/?user=${userAccount}` : '/api/leaderboard/';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const list = document.getElementById('leaderboardList');
+                list.innerHTML = '';
+                
+                if (data.leaderboard.length === 0) {
+                    list.innerHTML = '<div class="text-center py-8 text-gray-400">Be the first to donate and claim the top spot!</div>';
+                    return;
+                }
+                
+                data.leaderboard.forEach((donor, index) => {
+                    const rankColor = index === 0 ? 'yellow' : index === 1 ? 'gray' : index === 2 ? 'orange' : 'blue';
+                    
+                    const row = document.createElement('div');
+                    row.className = `flex items-center justify-between p-4 rounded-lg ${donor.is_current_user ? 'user-highlight' : 'bg-black/30'}`;
+                    row.innerHTML = `
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl font-bold text-${rankColor}-400">#${donor.rank}</span>
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">${donor.display_name ? donor.display_name.charAt(0).toUpperCase() : 'A'}</span>
+                            </div>
+                            <div>
+                                <div class="font-medium">${donor.display_name || donor.ens_name || (donor.address.substring(0, 6) + '...' + donor.address.substring(38))}</div>
+                                <div class="text-xs text-gray-500">${donor.donation_count} donations</div>
+                            </div>
+                            ${donor.is_current_user ? '<span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">You</span>' : ''}
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-${rankColor}-400">${donor.total_points} pts</div>
+                            <div class="text-sm text-gray-400">${parseFloat(donor.total_donated).toFixed(4)} ETH</div>
+                        </div>
+                    `;
+                    list.appendChild(row);
+                });
+                
+                // Show user position card if user is not in top 100
+                if (userAccount && data.user_position && !data.user_position.is_current_user) {
+                    const userPos = data.user_position;
+                    const userPositionCard = document.getElementById('userPositionCard');
+                    const userPositionInfo = document.getElementById('userPositionInfo');
+                    
+                    userPositionInfo.innerHTML = `
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl font-bold text-blue-400">#${userPos.rank}</span>
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">${userPos.display_name ? userPos.display_name.charAt(0).toUpperCase() : 'Y'}</span>
+                            </div>
+                            <div>
+                                <div class="font-medium">${userPos.display_name || userPos.ens_name || (userPos.address.substring(0, 6) + '...' + userPos.address.substring(38))}</div>
+                                <div class="text-xs text-gray-500">${userPos.donation_count} donations</div>
+                            </div>
+                            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">You</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-blue-400">${userPos.total_points} pts</div>
+                            <div class="text-sm text-gray-400">${parseFloat(userPos.total_donated).toFixed(4)} ETH</div>
+                        </div>
+                    `;
+                    
+                    userPositionCard.classList.remove('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+            }
+        }
+
+        // Load user donations
+        async function loadUserDonations(page = 1) {
+            if (!userAccount) {
+                resetUserData();
+                return;
+            }
+
+            try {
+                console.log('Loading user donations for:', userAccount, 'page:', page);
+                const response = await fetch(`/api/user-donations/?user=${userAccount}&page=${page}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('User donations data:', data);
+                
+                // Check if we have the expected data structure
+                if (!data.user_stats) {
+                    console.error('Missing user_stats in response');
+                    throw new Error('Invalid response format');
+                }
+                
+                // Update user stats cards
+                const stats = data.user_stats;
+                document.getElementById('userTotalDonated').textContent = `${parseFloat(stats.total_donated || 0).toFixed(4)} ETH`;
+                document.getElementById('userDonationCount').textContent = stats.donation_count || 0;
+                document.getElementById('userTotalPoints').textContent = stats.total_points || 0;
+                
+                // Get user rank
+                if (stats.rank) {
+                    document.getElementById('userCurrentRank').textContent = `#${stats.rank}`;
+                } else {
+                    document.getElementById('userCurrentRank').textContent = '#--';
+                }
+                
+                const historyDiv = document.getElementById('donationHistory');
+                
+                if (page === 1) {
+                    // Clear existing donations for first page
+                    historyDiv.innerHTML = '';
+                }
+                
+                // Check if we have donations array
+                if (!data.donations || !Array.isArray(data.donations)) {
+                    console.error('Missing or invalid donations array');
+                    historyDiv.innerHTML = '<div class="text-center py-8 text-gray-400">Error loading donation history. Please try again.</div>';
+                    return;
+                }
+                
+                if (data.donations.length === 0 && page === 1) {
+                    historyDiv.innerHTML = '<div class="text-center py-8 text-gray-400">No donations yet. Make your first donation to appear here!</div>';
+                    return;
+                }
+                
+                // Add donations
+                data.donations.forEach(donation => {
+                    const donationCard = document.createElement('div');
+                    donationCard.className = 'bg-gray-900/50 rounded-xl p-4 border border-gray-800';
+                    
+                    let typeIcon = '📍';
+                    let typeBadge = '';
+                    let recipientInfo = donation.recipient_name || 'Unknown Recipient';
+                    
+                    if (donation.type === 'pool') {
+                        typeIcon = donation.emoji || '🌍';
+                        typeBadge = '<span class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full text-xs ml-2">Pool</span>';
+                    } else if (donation.type === 'social') {
+                        typeIcon = '👤';
+                        typeBadge = '<span class="bg-pink-500/20 text-pink-400 px-2 py-1 rounded-full text-xs ml-2">P2P</span>';
+                        if (donation.frame_interaction) {
+                            typeBadge += '<span class="bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full text-xs ml-1">Frame</span>';
+                        }
+                    } else if (donation.type === 'legacy') {
+                        typeIcon = '❤️';
+                        typeBadge = '<span class="bg-gray-500/20 text-gray-400 px-2 py-1 rounded-full text-xs ml-2">Legacy</span>';
+                    }
+                    
+                    donationCard.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">${typeIcon}</span>
+                                <div>
+                                    <h4 class="font-bold">${recipientInfo}</h4>
+                                    <div class="flex items-center">
+                                        <span class="px-2 py-1 bg-${getCategoryColor(donation.recipient_category || 'medical')}-500/20 text-${getCategoryColor(donation.recipient_category || 'medical')}-400 rounded-full text-xs">
+                                            ${getCategoryIcon(donation.recipient_category || 'medical')} ${donation.recipient_category || 'donation'}
+                                        </span>
+                                        ${typeBadge}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-blue-400">${parseFloat(donation.amount || 0).toFixed(4)} ETH</div>
+                                <div class="text-sm text-yellow-400">+${donation.points_earned || 0} pts</div>
+                            </div>
+                        </div>
+                        ${donation.message ? `<div class="text-sm text-gray-300 mb-2 italic">"${donation.message}"</div>` : ''}
+                        <div class="flex justify-between items-center text-sm text-gray-400">
+                            <span>${donation.time_ago || 'Unknown time'}</span>
+                            ${donation.tx_hash ? `<a href="https://sepolia.basescan.org/tx/${donation.tx_hash}" target="_blank" class="text-blue-400 hover:text-blue-300">
+                                View Transaction <i class="fas fa-external-link-alt ml-1"></i>
+                            </a>` : '<span class="text-gray-500">No transaction hash</span>'}
+                        </div>
+                    `;
+                    historyDiv.appendChild(donationCard);
+                });
+                
+                // Handle pagination
+                const loadMoreContainer = document.getElementById('loadMoreContainer');
+                if (data.pagination && data.pagination.has_next) {
+                    loadMoreContainer.classList.remove('hidden');
+                    hasMoreDonations = true;
+                    currentPage = page;
+                } else {
+                    loadMoreContainer.classList.add('hidden');
+                    hasMoreDonations = false;
+                }
+                
+            } catch (error) {
+                console.error('Error loading user donations:', error);
+                const historyDiv = document.getElementById('donationHistory');
+                
+                if (error.message.includes('404') || error.message.includes('HTTP error! status: 404')) {
+                    historyDiv.innerHTML = '<div class="text-center py-8 text-gray-400">API endpoint not found. Please check your backend configuration.</div>';
+                } else if (error.message.includes('Failed to fetch')) {
+                    historyDiv.innerHTML = '<div class="text-center py-8 text-gray-400">Cannot connect to server. Please check your backend is running.</div>';
+                } else {
+                    historyDiv.innerHTML = `<div class="text-center py-8 text-gray-400">Error loading donations: ${error.message}</div>`;
+                }
+                
+                // Reset stats to default values on error
+                document.getElementById('userTotalDonated').textContent = '0 ETH';
+                document.getElementById('userDonationCount').textContent = '0';
+                document.getElementById('userTotalPoints').textContent = '0';
+                document.getElementById('userCurrentRank').textContent = '#--';
+            }
+        }
+
+        function loadMoreDonations() {
+            if (hasMoreDonations) {
+                loadUserDonations(currentPage + 1);
+            }
+        }
+
+        // Pool donation modal
+        function openPoolDonationModal(poolId) {
+            if (!userAccount) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+            
+            selectedPoolId = poolId;
+            document.getElementById('poolDonationModal').classList.remove('hidden');
+            
+            // Load pool details
+            fetch('/api/pools/')
+                .then(res => res.json())
+                .then(data => {
+                    const pool = data.pools.find(p => p.id === poolId);
+                    if (pool) {
+                        document.getElementById('selectedPool').innerHTML = `
+                            <div class="bg-black/50 rounded-lg p-4 text-center">
+                                <div class="text-4xl mb-2">${pool.emoji}</div>
+                                <h4 class="font-bold text-xl mb-2">${pool.name}</h4>
+                                <p class="text-sm text-gray-400 mb-3">${pool.description}</p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <div class="text-gray-500">Total Raised</div>
+                                        <div class="font-bold text-blue-400">${parseFloat(pool.total_raised).toFixed(4)} ETH</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-500">Donors</div>
+                                        <div class="font-bold text-purple-400">${pool.donor_count}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        function closePoolDonationModal() {
+            document.getElementById('poolDonationModal').classList.add('hidden');
+            document.getElementById('poolDonationAmount').value = '';
+            selectedPoolId = null;
+        }
+
+        function updatePoolEstimatedRewards() {
+            const amount = parseFloat(document.getElementById('poolDonationAmount').value) || 0;
+            const points = Math.max(Math.floor(amount * 1000), 0);
+            const tokens = Math.max((amount * 100), 0); // 100 tokens per ETH base rate
+            document.getElementById('poolEstimatedPoints').textContent = points;
+            document.getElementById('poolEstimatedTokens').textContent = tokens.toFixed(1);
+        }
+
+        // Process pool donation
+        async function processPoolDonation() {
+            const amount = document.getElementById('poolDonationAmount').value;
+            
+            if (!amount || parseFloat(amount) < 0.001) {
+                alert('Minimum donation is 0.001 ETH');
+                return;
+            }
+            
+            if (!selectedPoolId) return;
+            
+            const donateBtn = document.getElementById('poolDonateButtonText');
+            donateBtn.textContent = 'Processing...';
+            
+            try {
+                // Check user balance first
+                const balanceWei = await web3.eth.getBalance(userAccount);
+                const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
+                const donationAmount = parseFloat(amount);
+                
+                // Account for gas fees (roughly 0.0001 ETH for simple transfer)
+                if (balanceEth < donationAmount + 0.0001) {
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
+                    donateBtn.textContent = 'Donate Now';
+                    return;
+                }
+                
+                // Get pool wallet
+                const response = await fetch('/api/pools/');
+                const data = await response.json();
+                const pool = data.pools.find(p => p.id === selectedPoolId);
+                
+                if (!pool) {
+                    alert('Pool not found');
+                    donateBtn.textContent = 'Donate Now';
+                    return;
+                }
+                
+                // Send transaction directly to pool wallet
+                const amountWei = web3.utils.toWei(amount, 'ether');
+                
+                console.log('Sending pool donation:', {
+                    from: userAccount,
+                    to: pool.wallet_address,
+                    value: amountWei
+                });
+                
+                const tx = await web3.eth.sendTransaction({
+                    from: userAccount,
+                    to: pool.wallet_address,
+                    value: amountWei,
+                    gas: 21000, // Standard gas limit for ETH transfer
+                });
+                
+                console.log('Pool donation successful:', tx);
+                
+                // Record donation in backend
+                await fetch('/api/donate-to-pool/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        donor_address: userAccount,
+                        pool_id: selectedPoolId,
+                        amount: amount,
+                        tx_hash: tx.transactionHash,
+                        block_number: tx.blockNumber,
+                    }),
+                });
+                
+                // Show success
+                document.getElementById('txHash').textContent = tx.transactionHash;
+                document.getElementById('pointsEarned').textContent = Math.floor(parseFloat(amount) * 1000);
+                document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100).toFixed(1);
+                
+                closePoolDonationModal();
+                document.getElementById('successModal').classList.remove('hidden');
+                
+                // Refresh data
+                await loadStats();
+                await loadPools();
+                await loadUserStats();
+                
+            } catch (error) {
+                console.error('Pool donation error:', error);
+                
+                if (error.code === 4001) {
+                    alert('Transaction cancelled by user.');
+                } else if (error.code === -32000) {
+                    alert('Insufficient funds for gas. You need Base Sepolia ETH to pay for transaction fees.');
+                } else if (error.message && error.message.includes('insufficient funds')) {
+                    alert('Insufficient ETH balance. Please add more Base Sepolia ETH to your wallet.');
+                } else {
+                    alert('Transaction failed. Please try again. Error: ' + (error.message || 'Unknown error'));
+                }
+            } finally {
+                donateBtn.textContent = 'Donate Now';
+            }
+        }
+
+        // P2P donation functions
+        function updateP2PEstimatedRewards() {
+            const amount = parseFloat(document.getElementById('p2pAmount').value) || 0;
+            const isPublic = document.getElementById('p2pPublic').checked;
+            const basePoints = Math.max(Math.floor(amount * 1000), 0);
+            const points = isPublic ? Math.floor(basePoints * 1.2) : basePoints; // 20% bonus for public
+            // Update UI to show estimated points
+        }
+
+        async function processP2PDonation() {
+            const recipient = document.getElementById('p2pRecipient').value.trim();
+            const amount = document.getElementById('p2pAmount').value;
+            const message = document.getElementById('p2pMessage').value.trim();
+            const isPublic = document.getElementById('p2pPublic').checked;
+            
+            if (!recipient) {
+                alert('Please enter a recipient address or username');
+                return;
+            }
+            
+            if (!amount || parseFloat(amount) < 0.001) {
+                alert('Minimum donation is 0.001 ETH');
+                return;
+            }
+            
+            const donateBtn = document.getElementById('p2pDonateButtonText');
+            donateBtn.textContent = 'Processing...';
+            
+            try {
+                // Check user balance first
+                const balanceWei = await web3.eth.getBalance(userAccount);
+                const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
+                const donationAmount = parseFloat(amount);
+                
+                if (balanceEth < donationAmount + 0.0001) {
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
+                    donateBtn.textContent = 'Send Donation';
+                    return;
+                }
+                
+                // Parse recipient (could be address or username)
+                let recipientAddress = recipient;
+                let recipientUsername = '';
+                
+                if (recipient.startsWith('@')) {
+                    recipientUsername = recipient;
+                    // For now, you'd need to resolve username to address
+                    // This would require a lookup API
+                    alert('Username resolution not yet implemented. Please use wallet address.');
+                    donateBtn.textContent = 'Send Donation';
+                    return;
+                } else if (!recipient.startsWith('0x') || recipient.length !== 42) {
+                    alert('Please enter a valid Ethereum address (0x...)');
+                    donateBtn.textContent = 'Send Donation';
+                    return;
+                }
+                
+                // Send transaction
+                const amountWei = web3.utils.toWei(amount, 'ether');
+                
+                const tx = await web3.eth.sendTransaction({
+                    from: userAccount,
+                    to: recipientAddress,
+                    value: amountWei,
+                    gas: 21000,
+                });
+                
+                console.log('P2P donation successful:', tx);
+                
+                // Record donation in backend
+                await fetch('/api/donate-to-user/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        donor_address: userAccount,
+                        recipient_address: recipientAddress,
+                        recipient_username: recipientUsername,
+                        amount: amount,
+                        message: message,
+                        tx_hash: tx.transactionHash,
+                        block_number: tx.blockNumber,
+                        is_public: isPublic,
+                        frame_interaction: false,
+                    }),
+                });
+                
+                // Show success
+                document.getElementById('txHash').textContent = tx.transactionHash;
+                const basePoints = Math.floor(parseFloat(amount) * 1000);
+                const finalPoints = isPublic ? Math.floor(basePoints * 1.2) : basePoints;
+                document.getElementById('pointsEarned').textContent = finalPoints;
+                document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100 * (isPublic ? 1.2 : 1)).toFixed(1);
+                
+                // Clear form
+                document.getElementById('p2pRecipient').value = '';
+                document.getElementById('p2pAmount').value = '';
+                document.getElementById('p2pMessage').value = '';
+                
+                document.getElementById('successModal').classList.remove('hidden');
+                
+                // Refresh data
+                await loadStats();
+                await loadUserStats();
+                
+            } catch (error) {
+                console.error('P2P donation error:', error);
+                
+                if (error.code === 4001) {
+                    alert('Transaction cancelled by user.');
+                } else if (error.code === -32000) {
+                    alert('Insufficient funds for gas. You need Base Sepolia ETH to pay for transaction fees.');
+                } else if (error.message && error.message.includes('insufficient funds')) {
+                    alert('Insufficient ETH balance. Please add more Base Sepolia ETH to your wallet.');
+                } else {
+                    alert('Transaction failed. Please try again. Error: ' + (error.message || 'Unknown error'));
+                }
+            } finally {
+                donateBtn.textContent = 'Send Donation';
+            }
+        }
+
+        // Legacy donation modal
+        function openDonationModal(recipientId) {
+            if (!userAccount) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+            
+            selectedRecipientId = recipientId;
+            document.getElementById('donationModal').classList.remove('hidden');
+            
+            // Load recipient details
+            fetch('/api/recipients/')
+                .then(res => res.json())
+                .then(data => {
+                    const recipient = data.recipients.find(r => r.id === recipientId && !r.is_pool);
+                    if (recipient) {
+                        document.getElementById('selectedRecipient').innerHTML = `
+                            <div class="bg-black/50 rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold">${recipient.name}</h4>
+                                    <span class="px-2 py-1 bg-${getCategoryColor(recipient.category)}-500/20 text-${getCategoryColor(recipient.category)}-400 rounded-full text-xs">
+                                        ${getCategoryIcon(recipient.category)} ${recipient.category}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-2">${recipient.description}</p>
+                                ${recipient.location ? `<div class="text-xs text-gray-500 mb-2">📍 ${recipient.location}</div>` : ''}
+                                <div class="text-xs">
+                                    <span class="text-gray-500">Wallet:</span> 
+                                    <span class="font-mono">${recipient.wallet_address.substring(0, 10)}...${recipient.wallet_address.substring(32)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        function closeDonationModal() {
+            document.getElementById('donationModal').classList.add('hidden');
+            document.getElementById('donationAmount').value = '';
+            selectedRecipientId = null;
+        }
+
+        function updateEstimatedPoints() {
+            const amount = parseFloat(document.getElementById('donationAmount').value) || 0;
+            const points = Math.max(Math.floor(amount * 1000), 0);
+            document.getElementById('estimatedPoints').textContent = points;
+        }
+
+        // Process legacy donation
+        async function processDonation() {
+            const amount = document.getElementById('donationAmount').value;
+            
+            if (!amount || parseFloat(amount) < 0.001) {
+                alert('Minimum donation is 0.001 ETH');
+                return;
+            }
+            
+            if (!selectedRecipientId) return;
+            
+            const donateBtn = document.getElementById('donateButtonText');
+            donateBtn.textContent = 'Processing...';
+            
+            try {
+                // Check user balance first
+                const balanceWei = await web3.eth.getBalance(userAccount);
+                const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
+                const donationAmount = parseFloat(amount);
+                
+                // Account for gas fees (roughly 0.0001 ETH for simple transfer)
+                if (balanceEth < donationAmount + 0.0001) {
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
+                    donateBtn.textContent = 'Donate Now';
+                    return;
+                }
+                
+                // Get recipient wallet
+                const response = await fetch('/api/recipients/');
+                const data = await response.json();
+                const recipient = data.recipients.find(r => r.id === selectedRecipientId && !r.is_pool);
+                
+                if (!recipient) {
+                    alert('Recipient not found');
+                    donateBtn.textContent = 'Donate Now';
+                    return;
+                }
+                
+                // Send transaction directly to recipient wallet
+                const amountWei = web3.utils.toWei(amount, 'ether');
+                
+                console.log('Sending transaction:', {
+                    from: userAccount,
+                    to: recipient.wallet_address,
+                    value: amountWei
+                });
+                
+                const tx = await web3.eth.sendTransaction({
+                    from: userAccount,
+                    to: recipient.wallet_address,
+                    value: amountWei,
+                    gas: 21000, // Standard gas limit for ETH transfer
+                });
+                
+                console.log('Transaction successful:', tx);
+                
+                // Record donation in backend
+                await fetch('/api/record-donation/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        donor_address: userAccount,
+                        recipient_id: selectedRecipientId,
+                        amount: amount,
+                        tx_hash: tx.transactionHash,
+                        block_number: tx.blockNumber,
+                    }),
+                });
+                
+                // Show success
+                document.getElementById('txHash').textContent = tx.transactionHash;
+                document.getElementById('pointsEarned').textContent = Math.floor(parseFloat(amount) * 1000);
+                document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100).toFixed(1);
+                
+                closeDonationModal();
+                document.getElementById('successModal').classList.remove('hidden');
+                
+                // Refresh data
+                await loadStats();
+                await loadRecipients();
+                await loadUserStats();
+                
+            } catch (error) {
+                console.error('Donation error:', error);
+                
+                if (error.code === 4001) {
+                    alert('Transaction cancelled by user.');
+                } else if (error.code === -32000) {
+                    alert('Insufficient funds for gas. You need Base Sepolia ETH to pay for transaction fees.');
+                } else if (error.message && error.message.includes('insufficient funds')) {
+                    alert('Insufficient ETH balance. Please add more Base Sepolia ETH to your wallet.');
+                } else {
+                    alert('Transaction failed. Please try again. Error: ' + (error.message || 'Unknown error'));
+                }
+            } finally {
+                donateBtn.textContent = 'Donate Now';
+            }
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            
+            // Refresh current tab data
+            const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
+            if (activeTab === 'my-donations') {
+                loadUserDonations();
+            } else if (activeTab === 'leaderboard') {
+                loadLeaderboard();
+            } else if (activeTab === 'social') {
+                loadSocialFeed();
+            }
+            
+            // Refresh donate tab content based on current type
+            if (activeTab === 'donate') {
+                if (currentDonationType === 'pools') {
+                    loadPools();
+                } else if (currentDonationType === 'legacy') {
+                    loadRecipients();
+                }
+            }
+        }
+
+        // Helper functions
+        function getCategoryColor(category) {
+            const colors = {
+                'homeless': 'blue',
+                'student': 'purple',
+                'medical': 'pink',
+                'emergency': 'red',
+                'community': 'green',
+                'creators': 'yellow',
+                'development': 'indigo',
+                'user': 'pink',
+                'donation': 'blue'
+            };
+            return colors[category] || 'gray';
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'homeless': '🏠',
+                'student': '🎓',
+                'medical': '🏥',
+                'emergency': '🚨',
+                'community': '🏘️',
+                'creators': '🎨',
+                'development': '⚡',
+                'user': '👤',
+                'donation': '💝'
+            };
+            return icons[category] || '📍';
+        }
+
+        function getUrgencyColor(level) {
+            if (level >= 5) return 'red';
+            if (level >= 4) return 'orange';
+            if (level >= 3) return 'yellow';
+            if (level >= 2) return 'blue';
+            return 'gray';
+        }
+
+        // Listen for account changes
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    userAccount = accounts[0];
+                    updateWalletUI();
+                    loadUserStats();
+                    loadUserProfile();
+                    
+                    // Refresh current tab if it's user-specific
+                    const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
+                    if (activeTab === 'my-donations') {
+                        loadUserDonations();
+                    } else if (activeTab === 'leaderboard') {
+                        loadLeaderboard();
+                    } else if (activeTab === 'profile') {
+                        loadUserProfile();
+                    }
+                } else {
+                    // User disconnected all accounts
+                    disconnectWallet();
+                }
+            });
+
+            // Listen for chain changes
+            window.ethereum.on('chainChanged', (chainId) => {
+                console.log('Chain changed to:', chainId);
+                // Reload the page to avoid any state inconsistencies
+                window.location.reload();
+            });
+        }
+
+        // Mobile menu toggle (if needed)
+        function toggleMobileMenu() {
+            const nav = document.querySelector('nav');
+            nav.classList.toggle('hidden');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Alt + 1-5 for quick tab switching
+            if (e.altKey && !e.ctrlKey && !e.shiftKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        switchTab('donate');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        switchTab('social');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        switchTab('leaderboard');
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        switchTab('my-donations');
+                        break;
+                    case '5':
+                        e.preventDefault();
+                        switchTab('profile');
+                        break;
+                }
+            }
+            
+            // Escape to close modals
+            if (e.key === 'Escape') {
+                document.getElementById('donationModal').classList.add('hidden');
+                document.getElementById('poolDonationModal').classList.add('hidden');
+                document.getElementById('successModal').classList.add('hidden');
+                document.getElementById('walletDropdown').classList.add('hidden');
+            }
+        });
+
+        // Auto-refresh data every 30 seconds when tab is active
+        let refreshInterval;
+        
+        function startAutoRefresh() {
+            refreshInterval = setInterval(() => {
+                if (!document.hidden) {
+                    loadStats();
+                    
+                    const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
+                    if (activeTab === 'social') {
+                        // Refresh social feed silently
+                        loadSocialFeed(1);
+                    } else if (activeTab === 'leaderboard') {
+                        loadLeaderboard();
+                    }
+                }
+            }, 30000); // 30 seconds
+        }
+        
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        }
+        
+        // Start auto-refresh when page is visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoRefresh();
+            } else {
+                startAutoRefresh();
+            }
+        });
+        
+        // Start auto-refresh on load
+        startAutoRefresh();
+
+        // Error handling for failed API calls
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            // Don't show error to user for network issues, just log them
+        });
+
+        // Add loading states for better UX
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = '<div class="flex justify-center py-8"><div class="loading-spinner"></div></div>';
+            }
+        }
+        
+        function hideLoading(elementId, fallbackContent = '') {
+            const element = document.getElementById(elementId);
+            if (element && element.innerHTML.includes('loading-spinner')) {
+                element.innerHTML = fallbackContent;
+            }
+        }
+
+        // Initialize tooltips or help text if needed
+        function initializeHelpers() {
+            // Add help tooltips for complex features
+            const helpElements = document.querySelectorAll('[data-help]');
+            helpElements.forEach(element => {
+                element.addEventListener('mouseenter', (e) => {
+                    // Show tooltip
+                });
+                element.addEventListener('mouseleave', (e) => {
+                    // Hide tooltip
+                });
+            });
+        }
+
+        // Call helpers initialization
+        setTimeout(initializeHelpers, 1000);
+
+        console.log('🌟 GiveBase Global Donation Platform initialized!');
+        console.log('💡 Use Alt+1-5 for quick tab navigation');
+        console.log('🔧 Press F12 to open developer tools for debugging');
+    </script>
+</body>
+</html>
