@@ -1,650 +1,921 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GiveBase - Verified Giving, Onchain</title>
+    <title>GiveBase - Global Donation Ecosystem | Earn $GIVE Tokens</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gray-50': '#fafafa',
+                        'gray-100': '#f5f5f5',
+                        'gray-200': '#e5e5e5',
+                        'gray-300': '#d4d4d4',
+                        'gray-400': '#a3a3a3',
+                        'gray-500': '#737373',
+                        'gray-600': '#525252',
+                        'gray-700': '#404040',
+                        'gray-800': '#262626',
+                        'gray-900': '#171717',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
         * {
             font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
         }
-        
-        .givebase-italic {
-            font-family: 'Inter', sans-serif;
-            font-style: italic;
-            font-weight: 700;
-            background: linear-gradient(135deg, #60A5FA, #A78BFA, #EC4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
         }
-        
-        .navbar-hidden {
-            transform: translateY(-100%);
-            opacity: 0;
-        }
-        
-        .navbar-visible {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        .gradient-border {
-            background: linear-gradient(135deg, #60A5FA, #A78BFA, #EC4899);
-            padding: 1px;
-            border-radius: 12px;
-        }
-        
-        .gradient-border-inner {
-            background: #0A0A0A;
-            border-radius: 11px;
-            height: 100%;
-            width: 100%;
-        }
-        
+
+        /* Enhanced Animations */
         .floating {
-            animation: floating 6s ease-in-out infinite;
+            animation: floating 8s ease-in-out infinite;
         }
-        
+
         @keyframes floating {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-10px) rotate(1deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(0deg);
+            }
+
+            75% {
+                transform: translateY(-10px) rotate(-1deg);
+            }
         }
-        
+
         .fade-in-up {
-            animation: fadeInUp 0.8s ease-out forwards;
+            animation: fadeInUp 1s ease-out forwards;
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(50px);
         }
-        
+
         @keyframes fadeInUp {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
-        .glow-effect {
-            box-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
+
+        .slide-in-left {
+            animation: slideInLeft 1s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-50px);
         }
-        
-        .card-hover {
-            transition: all 0.3s ease;
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-        
-        .card-hover:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+        .slide-in-right {
+            animation: slideInRight 1s ease-out forwards;
+            opacity: 0;
+            transform: translateX(50px);
         }
-        
-        .pulse-glow {
-            animation: pulseGlow 2s infinite;
+
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-        
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(96, 165, 250, 0.4); }
-            50% { box-shadow: 0 0 40px rgba(96, 165, 250, 0.8); }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #000000 0%, #404040 50%, #000000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .tech-grid {
-            background-image: 
-                linear-gradient(rgba(96, 165, 250, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(96, 165, 250, 0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
+
+        .gradient-text-white {
+            background: linear-gradient(135deg, #ffffff 0%, #a3a3a3 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .launch-button {
+
+        /* Premium Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-glass-card {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .dark-glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Buttons */
+        .primary-button {
+            background: linear-gradient(135deg, #000000 0%, #262626 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #60A5FA, #A78BFA, #EC4899);
-            transition: all 0.3s ease;
         }
-        
-        .launch-button::before {
+
+        .primary-button:before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
         }
-        
-        .launch-button:hover::before {
-            width: 300px;
-            height: 300px;
+
+        .primary-button:hover:before {
+            left: 100%;
         }
-        
-        .stats-card {
-            background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(167, 139, 250, 0.1));
+
+        .primary-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #262626 0%, #404040 100%);
+        }
+
+        .secondary-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .secondary-button:hover {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* Navigation */
+        .nav-blur {
+            backdrop-filter: blur(30px);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Geometric Patterns */
+        .geometric-bg {
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(0, 0, 0, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
+        }
+
+        .grid-pattern {
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Pool Cards */
+        .pool-card {
+            background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pool-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #000000, #404040, #000000);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .pool-card:hover:before {
+            transform: scaleX(1);
+        }
+
+        .pool-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            background: linear-gradient(90deg, #000000, #404040);
+            transition: width 0.8s ease;
+        }
+
+        /* Stats Enhancement */
+        .stats-card {
+            background: linear-gradient(145deg, #fafafa 0%, #f5f5f5 100%);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .token-highlight {
+            background: linear-gradient(145deg, #000000 0%, #262626 100%);
+            color: white;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
+
+        .token-highlight:hover {
+            background: linear-gradient(145deg, #262626 0%, #404040 100%);
         }
-        
-        .shimmer {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite;
+
+        /* Logo Enhancement */
+        .logo {
+            font-weight: 800;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #000000 0%, #404040 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        /* Micro Interactions */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Dark Section */
+        .dark-section {
+            background: linear-gradient(135deg, #000000 0%, #171717 50%, #000000 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #000000, #404040);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #262626, #525252);
+        }
+
+        /* Enhanced Typography */
+        .hero-text {
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle-text {
+            font-weight: 400;
+            line-height: 1.6;
+            letter-spacing: 0.01em;
         }
     </style>
 </head>
-<body class="bg-black text-white overflow-x-hidden">
-    <!-- Initial Large Logo -->
-    <div id="heroLogo" class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-700">
-        <h1 class="givebase-italic text-4xl md:text-5xl">GiveBase</h1>
-    </div>
 
-    <!-- Sticky Navbar (Hidden Initially) -->
-    <nav id="stickyNav" class="fixed top-0 left-0 right-0 z-40 bg-black/80 backdrop-blur-lg border-b border-gray-800 navbar-hidden transition-all duration-500">
+<body class="bg-white text-gray-900 overflow-x-hidden">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur transition-all duration-300">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <h1 class="givebase-italic text-2xl">GiveBase</h1>
+            <div class="flex justify-between items-center h-20">
+                <div class="logo">GiveBase</div>
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#vision" class="text-gray-300 hover:text-white transition-colors">Vision</a>
-                    <a href="#recipients" class="text-gray-300 hover:text-white transition-colors">Recipients</a>
-                    <a href="#how-it-works" class="text-gray-300 hover:text-white transition-colors">How It Works</a>
-                    <a href="#airdrops" class="text-gray-300 hover:text-white transition-colors">Earn Rewards</a>
+                    <a href="#ecosystem"
+                        class="text-gray-600 hover:text-black transition-all duration-300 font-medium hover-lift">Ecosystem</a>
+                    <a href="#pools"
+                        class="text-gray-600 hover:text-black transition-all duration-300 font-medium hover-lift">Global
+                        Pools</a>
+                    <a href="#tokenomics"
+                        class="text-gray-600 hover:text-black transition-all duration-300 font-medium hover-lift">$GIVE
+                        Token</a>
+                    <a href="#roadmap"
+                        class="text-gray-600 hover:text-black transition-all duration-300 font-medium hover-lift">Roadmap</a>
                 </div>
+                <button onclick="launchDapp()"
+                    class="primary-button px-6 py-3 rounded-xl text-white font-semibold text-sm">
+                    Launch App
+                </button>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="min-h-screen flex flex-col justify-center items-center px-6 relative tech-grid">
-        <!-- Base and Farcaster Logos -->
-        <div class="absolute top-20 right-8 flex flex-col items-center space-y-4">
-            <div class="text-center">
-                <div class="text-sm text-gray-400 mb-2">Built on</div>
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold text-sm">B</span>
-                    </div>
-                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                        <i class="fab fa-creative-commons text-white text-sm"></i>
-                    </div>
-                </div>
-                <div class="text-xs text-gray-500 mt-1">Base • Farcaster</div>
-            </div>
-        </div>
-
-        <div class="text-center mt-20 fade-in-up" style="animation-delay: 0.3s;">
-            <h2 class="text-6xl md:text-8xl font-black mb-6 leading-tight">
-                <span class="block">Verified</span>
-                <span class="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Giving</span>
-                <span class="block">Onchain</span>
-            </h2>
-            
-            <div class="max-w-2xl mx-auto mb-12 fade-in-up" style="animation-delay: 0.6s;">
-                <p class="text-xl text-gray-400 leading-relaxed">
-                    Transparent donations to verified individuals. 
-                    <br>
-                    <span class="text-white font-medium">Earn $GIVEBASE airdrops. Track impact. All onchain.</span>
-                </p>
+    <section class="min-h-screen flex flex-col justify-center items-center px-6 relative geometric-bg">
+        <div class="absolute inset-0 grid-pattern opacity-30"></div>
+        <div class="text-center z-10 max-w-6xl mx-auto relative">
+            <!-- Protocol Badge -->
+            <div class="inline-flex items-center space-x-3 glass-card rounded-full px-6 py-3 mb-8 fade-in-up">
+                <div class="w-2 h-2 bg-black rounded-full animate-pulse"></div>
+                <span class="text-sm font-mono text-gray-700 font-medium">GLOBAL DONATION PROTOCOL • BASE
+                    BLOCKCHAIN</span>
             </div>
 
-            <button onclick="launchDapp()" class="launch-button text-white font-bold py-5 px-12 rounded-full text-xl transition-all transform hover:scale-105 fade-in-up relative z-10" style="animation-delay: 0.9s;">
-                <span class="relative z-10 flex items-center space-x-3">
-                    <i class="fas fa-rocket"></i>
-                    <span>Launch Dapp</span>
+            <!-- Main Heading -->
+            <h1 class="hero-text text-6xl md:text-8xl lg:text-9xl font-black mb-8 fade-in-up"
+                style="animation-delay: 0.2s;">
+                <span class="block text-black">The Future of</span>
+                <span class="block gradient-text">
+                    Giving is Here
                 </span>
-            </button>
+            </h1>
 
-            <!-- Stats Preview -->
-            <div class="mt-16 grid grid-cols-3 gap-6 max-w-3xl mx-auto fade-in-up" style="animation-delay: 1.2s;">
-                <div class="stats-card rounded-xl p-4 text-center">
-                    <div class="text-2xl font-bold text-blue-400">$0</div>
-                    <div class="text-sm text-gray-400">Total Donated</div>
+            <!-- Subtitle -->
+            <div class="subtitle-text text-xl md:text-2xl text-gray-600 mb-12 fade-in-up max-w-4xl mx-auto"
+                style="animation-delay: 0.4s;">
+                <p class="mb-4">Global donation pools • Direct P2P giving • Earn $GIVE tokens</p>
+                <p class="font-mono text-black font-semibold">No verification needed. Instant impact. Pure Web3.</p>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-16 fade-in-up"
+                style="animation-delay: 0.6s;">
+                <button onclick="launchDapp()"
+                    class="primary-button px-12 py-5 rounded-xl text-white font-bold text-lg flex items-center space-x-3 hover-lift">
+                    <i class="fas fa-rocket"></i>
+                    <span>Start Donating</span>
+                </button>
+                <a href="#ecosystem"
+                    class="secondary-button px-12 py-5 rounded-xl font-bold text-lg flex items-center space-x-3 hover-lift">
+                    <i class="fas fa-play-circle text-black"></i>
+                    <span>Learn More</span>
+                </a>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto fade-in-up"
+                style="animation-delay: 0.8s;">
+                <div class="stats-card rounded-2xl p-6 text-center hover-lift">
+                    <div class="text-3xl font-black text-black mb-2">$0</div>
+                    <div class="text-sm text-gray-500 font-medium">Total Donated</div>
                 </div>
-                <div class="stats-card rounded-xl p-4 text-center">
-                    <div class="text-2xl font-bold text-purple-400">0</div>
-                    <div class="text-sm text-gray-400">Lives Impacted</div>
+                <div class="stats-card rounded-2xl p-6 text-center hover-lift">
+                    <div class="text-3xl font-black text-black mb-2">4</div>
+                    <div class="text-sm text-gray-500 font-medium">Global Pools</div>
                 </div>
-                <div class="stats-card rounded-xl p-4 text-center">
-                    <div class="text-2xl font-bold text-pink-400">0</div>
-                    <div class="text-sm text-gray-400">Active Donors</div>
+                <div class="stats-card rounded-2xl p-6 text-center hover-lift">
+                    <div class="text-3xl font-black text-black mb-2">0</div>
+                    <div class="text-sm text-gray-500 font-medium">Active Donors</div>
+                </div>
+                <div class="token-highlight rounded-2xl p-6 text-center hover-lift">
+                    <div class="text-3xl font-black text-white mb-2">∞</div>
+                    <div class="text-sm text-gray-300 font-medium">$GIVE Rewards</div>
                 </div>
             </div>
         </div>
 
-        <!-- Floating elements -->
-        <div class="absolute top-1/4 left-10 floating" style="animation-delay: 0s;">
-            <div class="w-3 h-3 bg-blue-500 rounded-full opacity-60"></div>
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-10 floating opacity-20">
+            <div class="w-20 h-20 border-2 border-black rounded-full"></div>
         </div>
-        <div class="absolute top-1/3 right-20 floating" style="animation-delay: 2s;">
-            <div class="w-2 h-2 bg-purple-500 rounded-full opacity-40"></div>
+        <div class="absolute bottom-20 right-10 floating opacity-20" style="animation-delay: -2s;">
+            <div class="w-16 h-16 bg-black rounded-xl rotate-45"></div>
         </div>
-        <div class="absolute bottom-1/4 left-1/4 floating" style="animation-delay: 4s;">
-            <div class="w-4 h-4 bg-pink-500 rounded-full opacity-50"></div>
+        <div class="absolute top-1/2 left-20 floating opacity-20" style="animation-delay: -4s;">
+            <div class="w-12 h-12 border-2 border-black rounded-xl"></div>
         </div>
     </section>
 
-    <!-- Vision Section -->
-    <section id="vision" class="py-32 px-6 bg-gradient-to-b from-black to-gray-900">
-        <div class="max-w-6xl mx-auto">
+    <!-- Ecosystem Section -->
+    <section id="ecosystem" class="py-32 px-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto">
             <div class="text-center mb-20 fade-in-up">
-                <h2 class="text-5xl font-bold mb-6">🌍 <span class="givebase-italic">GiveBase</span> Vision</h2>
-                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
-                    An onchain donation platform built on Base that empowers users to donate transparently to the truly needy, 
-                    earn $GIVEBASE airdrops, and track real-world impact — all onchain.
+                <h2 class="text-5xl md:text-7xl font-black mb-8 text-black hero-text">
+                    Global Donation Ecosystem
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
+                    Three ways to give. One mission: Making the world better through transparent,
+                    decentralized donations on Base blockchain.
                 </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="gradient-border card-hover fade-in-up" style="animation-delay: 0.2s;">
-                    <div class="gradient-border-inner p-8 h-full">
-                        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6">
-                            <i class="fas fa-shield-alt text-2xl text-white"></i>
+                <!-- Global Pools -->
+                <div class="glass-card rounded-3xl p-8 slide-in-left" style="animation-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-globe text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-black">🌍 Global Pools</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Donate to verified global causes. No KYC required.
+                        Instant impact with automatic token rewards.
+                    </p>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">🚨 Emergency Fund</span>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4">Onchain Transparency</h3>
-                        <p class="text-gray-400">Every donation tracked on Base blockchain. No middlemen, no hidden fees, just direct impact you can verify.</p>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">🏘️ Community Projects</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">🎨 Creator Support</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">⚡ Platform Development</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gradient-border card-hover fade-in-up" style="animation-delay: 0.4s;">
-                    <div class="gradient-border-inner p-8 h-full">
-                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
-                            <i class="fas fa-heart text-2xl text-white"></i>
+                <!-- Direct P2P -->
+                <div class="glass-card rounded-3xl p-8 fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-black">👥 Direct P2P</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Send donations directly to other users. Perfect for
+                        Farcaster communities and creator support.
+                    </p>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">Instant wallet-to-wallet</span>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4">Real World Impact</h3>
-                        <p class="text-gray-400">Support homeless individuals, students in crisis, and medical emergencies with verified proof of need.</p>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">Social proof rewards</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">Public donation feed</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">Frame integration ready</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gradient-border card-hover fade-in-up" style="animation-delay: 0.6s;">
-                    <div class="gradient-border-inner p-8 h-full">
-                        <div class="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 rounded-2xl flex items-center justify-center mb-6">
-                            <i class="fas fa-coins text-2xl text-white"></i>
+                <!-- Verified Recipients -->
+                <div class="glass-card rounded-3xl p-8 slide-in-right" style="animation-delay: 0.6s;">
+                    <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-heart text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-black">❤️ Verified Recipients</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Support individuals verified through our community-driven
+                        process. Real stories, real impact.
+                    </p>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">Community verification</span>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4">Earn $GIVEBASE</h3>
-                        <p class="text-gray-400">Get rewarded for your generosity. Earn airdrop points with every donation and climb the leaderboard.</p>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">Medical emergencies</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">Student support</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-black"></i>
+                            <span class="font-medium">Homeless assistance</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Recipients Section -->
-    <section id="recipients" class="py-32 px-6">
+    <!-- Global Pools Section -->
+    <section id="pools" class="py-32 px-6">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-20 fade-in-up">
-                <h2 class="text-5xl font-bold mb-6">🎯 Who We <span class="text-blue-400">Help</span></h2>
-                <p class="text-xl text-gray-400">Three high-impact groups verified through community validation</p>
+                <h2 class="text-5xl md:text-7xl font-black mb-8 hero-text">
+                    <span class="gradient-text">
+                        Global Impact Pools
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
+                    No verification needed. Donate instantly to global causes and earn $GIVE tokens automatically.
+                </p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <!-- Homeless Individuals -->
-                <div class="bg-gray-900/50 rounded-3xl p-8 border border-gray-800 card-hover fade-in-up" style="animation-delay: 0.2s;">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="w-20 h-20 bg-blue-500/20 rounded-2xl flex items-center justify-center">
-                            <i class="fas fa-home text-3xl text-blue-400"></i>
-                        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Emergency Fund -->
+                <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="text-6xl mb-6 floating">🚨</div>
+                    <h3 class="text-xl font-bold mb-3 text-black">Emergency Fund</h3>
+                    <p class="text-gray-600 text-sm mb-6 leading-relaxed">Help those in urgent need worldwide</p>
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                        <div class="text-3xl font-black text-black">0.0000 ETH</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">10% allocation</div>
                     </div>
-                    <h3 class="text-3xl font-bold mb-4">Homeless Individuals</h3>
-                    <p class="text-gray-400 mb-6">Verified through community shelters and geo-tagged evidence. Direct support for basic needs, temporary shelter, and path to stability.</p>
-                    <div class="bg-black/50 rounded-2xl p-6 border border-gray-700">
-                        <ul class="space-y-3 text-sm">
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-blue-400"></i>
-                                <span>Shelter verification</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-blue-400"></i>
-                                <span>Photo/video proof</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-blue-400"></i>
-                                <span>Community attestation</span>
-                            </li>
-                        </ul>
+                    <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                        <div class="progress-bar h-3 rounded-full" style="width: 0%"></div>
                     </div>
+                    <div class="text-xs text-gray-500 font-medium">0 donors</div>
                 </div>
 
-                <!-- Students in Crisis -->
-                <div class="bg-gray-900/50 rounded-3xl p-8 border border-gray-800 card-hover fade-in-up" style="animation-delay: 0.4s;">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="w-20 h-20 bg-purple-500/20 rounded-2xl flex items-center justify-center">
-                            <i class="fas fa-graduation-cap text-3xl text-purple-400"></i>
-                        </div>
+
+                <!-- Community Projects -->
+                <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="text-6xl mb-6 floating" style="animation-delay: -1s;">🏘️</div>
+                    <h3 class="text-xl font-bold mb-3 text-black">Community Projects</h3>
+                    <p class="text-gray-600 text-sm mb-6 leading-relaxed">Fund community initiatives</p>
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                        <div class="text-3xl font-black text-black">0.0000 ETH</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">30% allocation</div>
                     </div>
-                    <h3 class="text-3xl font-bold mb-4">Students in Financial Crisis</h3>
-                    <p class="text-gray-400 mb-6">Supporting education access for those lacking basic tech, tuition fees, or transportation to continue their studies.</p>
-                    <div class="bg-black/50 rounded-2xl p-6 border border-gray-700">
-                        <ul class="space-y-3 text-sm">
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-purple-400"></i>
-                                <span>School verification</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-purple-400"></i>
-                                <span>Academic records</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-purple-400"></i>
-                                <span>Financial proof</span>
-                            </li>
-                        </ul>
+                    <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                        <div class="progress-bar h-3 rounded-full" style="width: 0%"></div>
                     </div>
+                    <div class="text-xs text-gray-500 font-medium">0 donors</div>
                 </div>
 
-                <!-- Medical Emergencies -->
-                <div class="bg-gray-900/50 rounded-3xl p-8 border border-gray-800 card-hover fade-in-up" style="animation-delay: 0.6s;">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="w-20 h-20 bg-pink-500/20 rounded-2xl flex items-center justify-center">
-                            <i class="fas fa-heartbeat text-3xl text-pink-400"></i>
-                        </div>
+                <!-- Creator Support -->
+                <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="text-6xl mb-6 floating" style="animation-delay: -2s;">🎨</div>
+                    <h3 class="text-xl font-bold mb-3 text-black">Creator Support</h3>
+                    <p class="text-gray-600 text-sm mb-6 leading-relaxed">Support content creators</p>
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                        <div class="text-3xl font-black text-black">0.0000 ETH</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">20% allocation</div>
                     </div>
-                    <h3 class="text-3xl font-bold mb-4">Medical Emergency Cases</h3>
-                    <p class="text-gray-400 mb-6">Life-critical medical needs for those without insurance or support systems. Every second counts.</p>
-                    <div class="bg-black/50 rounded-2xl p-6 border border-gray-700">
-                        <ul class="space-y-3 text-sm">
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-pink-400"></i>
-                                <span>Hospital verification</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-pink-400"></i>
-                                <span>Medical documentation</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <i class="fas fa-check-circle text-pink-400"></i>
-                                <span>Urgency assessment</span>
-                            </li>
-                        </ul>
+                    <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                        <div class="progress-bar h-3 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 font-medium">0 donors</div>
+                </div>
+
+                <!-- Platform Development -->
+                <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="text-6xl mb-6 floating" style="animation-delay: -3s;">⚡</div>
+                    <h3 class="text-xl font-bold mb-3 text-black">Platform Development</h3>
+                    <p class="text-gray-600 text-sm mb-6 leading-relaxed">Improve GiveBase platform</p>
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                        <div class="text-3xl font-black text-black">0.0000 ETH</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">40% allocation</div>
+
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                            <div class="progress-bar h-3 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500 font-medium">0 donors</div>
+                    </div>
+
+                </div>
+            </div>
+
+                <!-- Pool Benefits -->
+                <div class="mt-20 text-center fade-in-up" style="animation-delay: 0.5s;">
+                    <h3 class="text-4xl font-black mb-12 gradient-text hero-text">
+                        Why Global Pools?
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                        <div class="glass-card rounded-3xl p-8 hover-lift">
+                            <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                                <i class="fas fa-zap text-2xl text-white"></i>
+                            </div>
+                            <h4 class="font-bold text-xl mb-4 text-black">Instant Impact</h4>
+                            <p class="text-gray-600 leading-relaxed">No verification delays. Donate and make immediate
+                                global impact.</p>
+                        </div>
+                        <div class="glass-card rounded-3xl p-8 hover-lift">
+                            <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                                <i class="fas fa-coins text-2xl text-white"></i>
+                            </div>
+                            <h4 class="font-bold text-xl mb-4 text-black">Auto Token Rewards</h4>
+                            <p class="text-gray-600 leading-relaxed">Earn $GIVE tokens automatically with every
+                                donation.</p>
+                        </div>
+                        <div class="glass-card rounded-3xl p-8 hover-lift">
+                            <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                                <i class="fas fa-globe text-2xl text-white"></i>
+                            </div>
+                            <h4 class="font-bold text-xl mb-4 text-black">Global Reach</h4>
+                            <p class="text-gray-600 leading-relaxed">Support worldwide causes from anywhere, anytime.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section id="how-it-works" class="py-32 px-6 bg-gradient-to-b from-black to-gray-900">
-        <div class="max-w-6xl mx-auto">
+    <!-- Tokenomics Section -->
+    <section id="tokenomics" class="py-32 px-6 dark-section text-white relative">
+        <div class="max-w-7xl mx-auto relative z-10">
             <div class="text-center mb-20 fade-in-up">
-                <h2 class="text-5xl font-bold mb-6">🔍 How We <span class="text-purple-400">Verify</span></h2>
-                <p class="text-xl text-gray-400">Multi-layer verification for complete trust</p>
-            </div>
-
-            <div class="relative">
-                <!-- Timeline line -->
-                <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 hidden md:block"></div>
-
-                <!-- Step 1 -->
-                <div class="flex flex-col md:flex-row items-center mb-16 fade-in-up" style="animation-delay: 0.2s;">
-                    <div class="md:w-1/2 md:text-right md:pr-8">
-                        <div class="gradient-border inline-block">
-                            <div class="gradient-border-inner p-6">
-                                <h3 class="text-2xl font-bold mb-3">1. Application Portal</h3>
-                                <p class="text-gray-400">Recipients submit detailed requests with photo/video evidence, wallet address, and written explanation of their need.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center z-10 my-8 md:my-0">
-                        <i class="fas fa-file-alt text-2xl"></i>
-                    </div>
-                    <div class="md:w-1/2 md:pl-8"></div>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="flex flex-col md:flex-row items-center mb-16 fade-in-up" style="animation-delay: 0.4s;">
-                    <div class="md:w-1/2 md:pr-8"></div>
-                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center z-10 my-8 md:my-0">
-                        <i class="fas fa-users text-2xl"></i>
-                    </div>
-                    <div class="md:w-1/2 md:text-left md:pl-8">
-                        <div class="gradient-border inline-block">
-                            <div class="gradient-border-inner p-6">
-                                <h3 class="text-2xl font-bold mb-3">2. Community Voting</h3>
-                                <p class="text-gray-400">Farcaster and Base communities vote on applications, providing social proof and preventing fraud.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="flex flex-col md:flex-row items-center mb-16 fade-in-up" style="animation-delay: 0.6s;">
-                    <div class="md:w-1/2 md:text-right md:pr-8">
-                        <div class="gradient-border inline-block">
-                            <div class="gradient-border-inner p-6">
-                                <h3 class="text-2xl font-bold mb-3">3. Partner Verification</h3>
-                                <p class="text-gray-400">NGOs, shelters, schools, and hospitals provide final verification layer for approved recipients.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center z-10 my-8 md:my-0">
-                        <i class="fas fa-check-double text-2xl"></i>
-                    </div>
-                    <div class="md:w-1/2 md:pl-8"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Airdrops Section -->
-    <section id="airdrops" class="py-32 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-20 fade-in-up">
-                <h2 class="text-5xl font-bold mb-6">🎁 Earn <span class="text-pink-400">$GIVEBASE</span></h2>
-                <p class="text-xl text-gray-400">Get rewarded for making a difference</p>
+                <h2 class="text-5xl md:text-7xl font-black mb-8 hero-text">
+                    <span class="gradient-text-white">
+                        $GIVE Token Economy
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-4xl mx-auto subtitle-text">
+                    Get rewarded for your generosity. The more you give, the more you earn.
+                </p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Points System -->
-                <div class="bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-3xl p-8 border border-blue-500/30 fade-in-up" style="animation-delay: 0.2s;">
-                    <h3 class="text-3xl font-bold mb-6 flex items-center">
-                        <i class="fas fa-star text-yellow-400 mr-3"></i>
-                        Airdrop Points System
-                    </h3>
+                <!-- Token Distribution -->
+                <div class="dark-glass-card rounded-3xl p-10 slide-in-left" style="animation-delay: 0.2s;">
+                    <h3 class="text-3xl font-bold mb-10 text-center text-white">Token Distribution</h3>
                     <div class="space-y-4">
-                        <div class="bg-black/30 rounded-xl p-4 flex justify-between items-center">
-                            <span>Donate $1 USD</span>
-                            <span class="text-blue-400 font-bold">+10 Points</span>
+                        <div
+                            class="flex items-center justify-between p-6 bg-gray-800 rounded-2xl border border-gray-700 hover-lift">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-white rounded-full"></div>
+                                <span class="font-medium">Community Rewards</span>
+                            </div>
+                            <span class="text-white font-bold text-lg">40%</span>
                         </div>
-                        <div class="bg-black/30 rounded-xl p-4 flex justify-between items-center">
-                            <span>Donate 0.1 ETH</span>
-                            <span class="text-purple-400 font-bold">+100 Points</span>
+                        <div
+                            class="flex items-center justify-between p-6 bg-gray-800 rounded-2xl border border-gray-700 hover-lift">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-gray-400 rounded-full"></div>
+                                <span class="font-medium">Team & Development</span>
+                            </div>
+                            <span class="text-gray-400 font-bold text-lg">25%</span>
                         </div>
-                        <div class="bg-black/30 rounded-xl p-4 flex justify-between items-center">
-                            <span>Donate 1 ETH</span>
-                            <span class="text-pink-400 font-bold">+1,000 Points</span>
+                        <div
+                            class="flex items-center justify-between p-6 bg-gray-800 rounded-2xl border border-gray-700 hover-lift">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <span class="font-medium">Liquidity & Treasury</span>
+                            </div>
+                            <span class="text-gray-300 font-bold text-lg">20%</span>
                         </div>
-                        <div class="bg-black/30 rounded-xl p-4 flex justify-between items-center border border-yellow-500/50">
-                            <span>Verify a Recipient</span>
-                            <span class="text-yellow-400 font-bold">+50 Bonus Points</span>
+                        <div
+                            class="flex items-center justify-between p-6 bg-gray-800 rounded-2xl border border-gray-700 hover-lift">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-gray-500 rounded-full"></div>
+                                <span class="font-medium">Farcaster Integration</span>
+                            </div>
+                            <span class="text-gray-500 font-bold text-lg">10%</span>
+                        </div>
+                        <div
+                            class="flex items-center justify-between p-6 bg-gray-800 rounded-2xl border border-gray-700 hover-lift">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-gray-600 rounded-full"></div>
+                                <span class="font-medium">Advisors & Partnerships</span>
+                            </div>
+                            <span class="text-gray-600 font-bold text-lg">5%</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Leaderboard Preview -->
-                <div class="bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-3xl p-8 border border-purple-500/30 fade-in-up" style="animation-delay: 0.4s;">
-                    <h3 class="text-3xl font-bold mb-6 flex items-center">
-                        <i class="fas fa-trophy text-yellow-400 mr-3"></i>
-                        Top Donors Leaderboard
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="bg-black/30 rounded-xl p-4 flex items-center space-x-4">
-                            <span class="text-2xl font-bold text-yellow-400">#1</span>
-                            <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full shimmer"></div>
-                            <span class="font-mono text-sm">0x0000...0000</span>
-                            <span class="ml-auto text-yellow-400 font-bold">--- Points</span>
+                <!-- Earning Mechanism -->
+                <div class="dark-glass-card rounded-3xl p-10 slide-in-right" style="animation-delay: 0.4s;">
+                    <h3 class="text-3xl font-bold mb-10 text-center text-white">How to Earn $GIVE</h3>
+                    <div class="space-y-6">
+                        <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-bold text-xl text-white">Base Rate</h4>
+                                <span class="text-white font-mono font-bold text-lg">1 ETH = 100 $GIVE</span>
+                            </div>
+                            <p class="text-gray-300 leading-relaxed">Automatic token rewards for every donation</p>
                         </div>
-                        <div class="bg-black/30 rounded-xl p-4 flex items-center space-x-4">
-                            <span class="text-2xl font-bold text-gray-400">#2</span>
-                            <div class="w-10 h-10 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full shimmer"></div>
-                            <span class="font-mono text-sm">0x0000...0000</span>
-                            <span class="ml-auto text-gray-400 font-bold">--- Points</span>
-                        </div>
-                        <div class="bg-black/30 rounded-xl p-4 flex items-center space-x-4">
-                            <span class="text-2xl font-bold text-orange-400">#3</span>
-                            <div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full shimmer"></div>
-                            <span class="font-mono text-sm">0x0000...0000</span>
-                            <span class="ml-auto text-orange-400 font-bold">--- Points</span>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-400 mt-6 text-center">Be the first to claim your spot!</p>
-                </div>
-            </div>
 
-            <!-- Why It Works -->
-            <div class="mt-20 text-center fade-in-up" style="animation-delay: 0.6s;">
-                <h3 class="text-3xl font-bold mb-8">🚀 Why GiveBase Will <span class="text-blue-400">Succeed</span></h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-                    <div class="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
-                        <i class="fas fa-link text-3xl text-blue-400 mb-4"></i>
-                        <h4 class="font-bold mb-2">Onchain Trust</h4>
-                        <p class="text-sm text-gray-400">No middlemen, full transparency</p>
-                    </div>
-                    <div class="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
-                        <i class="fas fa-gamepad text-3xl text-purple-400 mb-4"></i>
-                        <h4 class="font-bold mb-2">Gamified Giving</h4>
-                        <p class="text-sm text-gray-400">Leaderboards & rewards</p>
-                    </div>
-                    <div class="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
-                        <i class="fas fa-chart-line text-3xl text-pink-400 mb-4"></i>
-                        <h4 class="font-bold mb-2">Real Impact</h4>
-                        <p class="text-sm text-gray-400">Verified meaningful change</p>
-                    </div>
-                    <div class="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
-                        <i class="fas fa-users text-3xl text-yellow-400 mb-4"></i>
-                        <h4 class="font-bold mb-2">Base Culture</h4>
-                        <p class="text-sm text-gray-400">Real users, real utility</p>
+                        <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-bold text-xl text-white">Social Bonus</h4>
+                                <span class="text-gray-400 font-mono font-bold text-lg">+20% $GIVE</span>
+                            </div>
+                            <p class="text-gray-300 leading-relaxed">Extra rewards for public P2P donations</p>
+                        </div>
+
+                        <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-bold text-xl text-white">Frame Interaction</h4>
+                                <span class="text-gray-300 font-mono font-bold text-lg">+20% $GIVE</span>
+                            </div>
+                            <p class="text-gray-300 leading-relaxed">Bonus for Farcaster frame donations</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Call to Action Section -->
-    <section class="py-32 px-6 relative overflow-hidden">
-        <div class="absolute inset-0 tech-grid opacity-30"></div>
-        <div class="max-w-4xl mx-auto text-center relative z-10">
-            <h2 class="text-5xl md:text-7xl font-bold mb-8 fade-in-up">
-                Ready to Make a 
-                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
-                    Difference?
+    <!-- Roadmap Section -->
+    <section id="roadmap" class="py-32 px-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20 fade-in-up">
+                <h2 class="text-5xl md:text-7xl font-black mb-8 text-black hero-text">
+                    Development Roadmap
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
+                    Building the future of decentralized giving, one milestone at a time.
+                </p>
+            </div>
+
+            <div class="relative">
+                <!-- Timeline Line -->
+                <div class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-black rounded-full"></div>
+
+                <div class="space-y-16">
+                    <!-- Phase 1 -->
+                    <div class="flex items-center justify-center">
+                        <div class="w-1/2 pr-8 text-right fade-in-up" style="animation-delay: 0.1s;">
+                            <div class="glass-card rounded-3xl p-8">
+                                <h3 class="text-2xl font-bold mb-4 text-black">Phase 1: Foundation</h3>
+                                <p class="text-gray-600 mb-4 leading-relaxed">Launch core donation platform with global
+                                    pools and P2P functionality</p>
+                                <div class="inline-block bg-black text-white px-4 py-2 rounded-full text-sm font-bold">
+                                    Q1 2024</div>
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 bg-black rounded-full border-4 border-white shadow-lg z-10"></div>
+                        <div class="w-1/2 pl-8"></div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="flex items-center justify-center">
+                        <div class="w-1/2 pr-8"></div>
+                        <div class="w-8 h-8 bg-gray-300 rounded-full border-4 border-white shadow-lg z-10"></div>
+                        <div class="w-1/2 pl-8 fade-in-up" style="animation-delay: 0.2s;">
+                            <div class="glass-card rounded-3xl p-8">
+                                <h3 class="text-2xl font-bold mb-4 text-black">Phase 2: Token Launch</h3>
+                                <p class="text-gray-600 mb-4 leading-relaxed">Deploy $GIVE token with reward mechanisms
+                                    and community governance</p>
+                                <div
+                                    class="inline-block bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm font-bold">
+                                    Q2 2024</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="flex items-center justify-center">
+                        <div class="w-1/2 pr-8 text-right fade-in-up" style="animation-delay: 0.3s;">
+                            <div class="glass-card rounded-3xl p-8">
+                                <h3 class="text-2xl font-bold mb-4 text-black">Phase 3: Farcaster Integration</h3>
+                                <p class="text-gray-600 mb-4 leading-relaxed">Full Farcaster frames integration and
+                                    social features</p>
+                                <div
+                                    class="inline-block bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm font-bold">
+                                    Q3 2024</div>
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 bg-gray-300 rounded-full border-4 border-white shadow-lg z-10"></div>
+                        <div class="w-1/2 pl-8"></div>
+                    </div>
+
+                    <!-- Phase 4 -->
+                    <div class="flex items-center justify-center">
+                        <div class="w-1/2 pr-8"></div>
+                        <div class="w-8 h-8 bg-gray-300 rounded-full border-4 border-white shadow-lg z-10"></div>
+                        <div class="w-1/2 pl-8 fade-in-up" style="animation-delay: 0.4s;">
+                            <div class="glass-card rounded-3xl p-8">
+                                <h3 class="text-2xl font-bold mb-4 text-black">Phase 4: Global Expansion</h3>
+                                <p class="text-gray-600 mb-4 leading-relaxed">Multi-chain support and global
+                                    verification network</p>
+                                <div
+                                    class="inline-block bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm font-bold">
+                                    Q4 2024</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 px-6 dark-section text-white relative">
+        <div class="max-w-7xl mx-auto text-center relative z-10">
+            <h2 class="text-5xl md:text-7xl font-black mb-8 hero-text fade-in-up">
+                <span class="gradient-text-white">
+                    Ready to Make Impact?
                 </span>
             </h2>
-            <p class="text-xl text-gray-400 mb-12 fade-in-up" style="animation-delay: 0.2s;">
-                Join the revolution of transparent, verified giving on Base.
-                <br>
-                Every donation matters. Every point counts.
+            <p class="text-xl text-gray-300 mb-12 max-w-3xl mx-auto subtitle-text fade-in-up"
+                style="animation-delay: 0.2s;">
+                Join the future of giving. Start donating, earn rewards, and make a real difference in the world.
             </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 fade-in-up" style="animation-delay: 0.4s;">
-                <button onclick="launchDapp()" class="launch-button text-white font-bold py-5 px-12 rounded-full text-xl transition-all transform hover:scale-105 relative">
-                    <span class="relative z-10 flex items-center space-x-3">
-                        <i class="fas fa-rocket"></i>
-                        <span>Launch Dapp</span>
-                    </span>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 fade-in-up"
+                style="animation-delay: 0.4s;">
+                <button onclick="launchDapp()"
+                    class="primary-button px-12 py-5 rounded-xl text-white font-bold text-lg flex items-center space-x-3 hover-lift">
+                    <i class="fas fa-rocket"></i>
+                    <span>Launch App</span>
                 </button>
-                <a href="#vision" class="text-gray-400 hover:text-white transition-colors flex items-center space-x-2">
-                    <i class="fas fa-book-open"></i>
-                    <span>Learn More</span>
+                <a href="#ecosystem"
+                    class="bg-white bg-opacity-10 border-2 border-white border-opacity-20 px-12 py-5 rounded-xl font-bold text-lg flex items-center space-x-3 hover:bg-opacity-20 transition-all duration-300 hover-lift">
+                    <i class="fas fa-book text-white"></i>
+                    <span>Read Docs</span>
                 </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 py-16 px-6">
+    <footer class="py-16 px-6 bg-black text-white">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12">
-                <h3 class="givebase-italic text-3xl mb-4">GiveBase</h3>
-                <p class="text-gray-400">Verified Giving, Onchain</p>
-                <p class="text-sm text-gray-500 mt-2">Built for humanity on Base</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                <div>
-                    <h4 class="font-bold mb-4 text-white">Platform</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#vision" class="hover:text-white transition-colors">Vision</a></li>
-                        <li><a href="#recipients" class="hover:text-white transition-colors">Recipients</a></li>
-                        <li><a href="#how-it-works" class="hover:text-white transition-colors">Verification</a></li>
-                        <li><a href="#airdrops" class="hover:text-white transition-colors">Rewards</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4 text-white">Community</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Farcaster</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">X (Twitter)</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Discord</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Telegram</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4 text-white">Resources</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Apply as Recipient</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Partner with Us</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4 text-white">Connect</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
-                            <i class="fab fa-x-twitter text-sm"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
-                            <i class="fab fa-discord text-sm"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
-                            <i class="fab fa-telegram text-sm"></i>
-                        </a>
-                    </div>
-                    <div class="mt-6">
-                        <p class="text-sm text-gray-400 mb-2">Minimum Donation</p>
-                        <p class="text-xl font-bold text-white">$1 USD</p>
-                    </div>
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="logo text-white mb-8 md:mb-0">GiveBase</div>
+                <div class="flex items-center space-x-8">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors hover-lift">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors hover-lift">
+                        <i class="fab fa-discord text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors hover-lift">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
                 </div>
             </div>
-            
-            <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
-                <p>&copy; 2025 GiveBase. Making giving transparent, one block at a time.</p>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">© 2024 GiveBase. Building the future of decentralized giving.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Launch Dapp function
         function launchDapp() {
             // Replace with your actual dapp URL
             window.location.href = '/app';
         }
 
-        // Navbar scroll logic
-        window.addEventListener('scroll', () => {
-            const heroLogo = document.getElementById('heroLogo');
-            const stickyNav = document.getElementById('stickyNav');
-            const scrollY = window.scrollY;
-
-            if (scrollY > 200) {
-                heroLogo.style.transform = 'translate(-50%, -100px)';
-                heroLogo.style.opacity = '0';
-                stickyNav.classList.remove('navbar-hidden');
-                stickyNav.classList.add('navbar-visible');
-            } else {
-                heroLogo.style.transform = 'translate(-50%, 0)';
-                heroLogo.style.opacity = '1';
-                stickyNav.classList.remove('navbar-visible');
-                stickyNav.classList.add('navbar-hidden');
-            }
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
         });
 
-        // Intersection Observer for fade-in animations
+        // Enhanced scroll animations
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -658,71 +929,20 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.fade-in-up').forEach(el => {
+        document.querySelectorAll('.fade-in-up, .slide-in-left, .slide-in-right').forEach(el => {
             el.style.animationPlayState = 'paused';
             observer.observe(el);
         });
 
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Add particle effect on mouse move (optional enhancement)
-        document.addEventListener('mousemove', (e) => {
-            const x = e.clientX;
-            const y = e.clientY;
-            
-            // Create subtle glow effect that follows mouse
-            const glow = document.createElement('div');
-            glow.style.position = 'fixed';
-            glow.style.left = x + 'px';
-            glow.style.top = y + 'px';
-            glow.style.width = '4px';
-            glow.style.height = '4px';
-            glow.style.background = 'rgba(96, 165, 250, 0.4)';
-            glow.style.borderRadius = '50%';
-            glow.style.pointerEvents = 'none';
-            glow.style.transform = 'translate(-50%, -50%)';
-            glow.style.transition = 'all 1s ease-out';
-            glow.style.zIndex = '1';
-            
-            document.body.appendChild(glow);
-            
-            setTimeout(() => {
-                glow.style.opacity = '0';
-                glow.style.transform = 'translate(-50%, -50%) scale(3)';
-            }, 10);
-            
-            setTimeout(() => {
-                glow.remove();
-            }, 1000);
-        });
-
-        // Animate stats on scroll
-        let statsAnimated = false;
-        const animateStats = () => {
-            if (statsAnimated) return;
-            
-            const statsSection = document.querySelector('.stats-card');
-            const rect = statsSection.getBoundingClientRect();
-            
-            if (rect.top < window.innerHeight && rect.bottom > 0) {
-                statsAnimated = true;
-                // Add animation logic here when you have real stats
+        // Navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                nav.style.borderBottomColor = 'rgba(0, 0, 0, 0.1)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.9)';
+                nav.style.borderBottomColor = 'rgba(0, 0, 0, 0.08)';
             }
-        };
-
-        window.addEventListener('scroll', animateStats);
+        });
     </script>
-</body>
-</html>
