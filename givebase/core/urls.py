@@ -34,8 +34,7 @@ urlpatterns = [
     path('api/recipients/', views.recipients, name='recipients'),
     path('api/record-donation/', views.record_donation, name='record_donation'),
     
-    # FUTURE FARCASTER ENDPOINTS (commented out until implemented)
-    # path('frames/donate/', views.donation_frame, name='donation_frame'),
-    # path('frames/profile/<str:username>/', views.profile_frame, name='profile_frame'),
-    # path('frames/leaderboard/', views.leaderboard_frame, name='leaderboard_frame'),
+    path('api/farcaster-recipients/', views.farcaster_recipients, name='farcaster_recipients'),
+    path('api/farcaster-stats/', views.farcaster_stats, name='farcaster_stats'),
+    path('api/record-farcaster-donation/', views.record_farcaster_donation, name='record_farcaster_donation'),
 ]

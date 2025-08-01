@@ -7,6 +7,7 @@ from .models import (
     TokenReward, Recipient, Donation, DonorProfile
 )
 
+
 # Custom admin actions
 def activate_pools(modeladmin, request, queryset):
     queryset.update(is_active=True)

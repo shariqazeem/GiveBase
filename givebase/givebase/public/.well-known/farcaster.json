@@ -1,0 +1,18 @@
+{
+  "miniapp": {
+    "version": "1",
+    "name": "GiveBase",
+    "iconUrl": "https://yourdomain.com/logo.png",
+    "homeUrl": "https://yourdomain.com/farcaster-mini-app",
+    "splashImageUrl": "https://yourdomain.com/splash.png", 
+    "splashBackgroundColor": "#ffffff",
+    "subtitle": "Help people in need",
+    "description": "Donate to verified individuals using crypto. Make a real difference in someone's life.",
+    "primaryCategory": "social",
+    "tags": ["donations", "charity", "crypto", "help"],
+    "requiredChains": ["eip155:8453"],
+    "requiredCapabilities": [
+      "wallet.getEthereumProvider"
+    ]
+  }
+}

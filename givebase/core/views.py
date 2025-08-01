@@ -917,3 +917,176 @@ def get_multiplier_reason(profile, frame_donations):
         reasons.append("Frame User (1.2x)")
     
     return " + ".join(reasons) if reasons else "Base multiplier"
+
+
+# Add these new endpoints to your existing views.py
+
+# FARCASTER MINI APP SPECIFIC ENDPOINTS
+
+def farcaster_recipients(request):
+    """API endpoint specifically for Farcaster mini app - simplified data"""
+    page = int(request.GET.get('page', 1))
+    limit = int(request.GET.get('limit', 10))
+    category = request.GET.get('category', 'all')
+    
+    # Get pools and legacy recipients
+    pools = DonationPool.objects.filter(is_active=True)
+    legacy_recipients = Recipient.objects.filter(is_verified=True, is_active=True)
+    
+    all_recipients = []
+    
+    # Add pools as recipients (simplified for mini app)
+    for pool in pools:
+        if category == 'all' or pool.pool_type == category:
+            all_recipients.append({
+                'id': pool.id,
+                'name': pool.name,
+                'category': pool.pool_type,
+                'description': pool.description,
+                'goal_amount': 10000,  # Pools have ongoing goals
+                'raised_amount': float(pool.total_raised),
+                'donor_count': pool.donor_count,
+                'urgency_level': 3,
+                'location': 'Global',
+                'wallet_address': pool.wallet_address,
+                'created_at': pool.created_at.isoformat(),
+            })
+    
+    # Add legacy recipients
+    for recipient in legacy_recipients:
+        if category == 'all' or recipient.category == category:
+            all_recipients.append({
+                'id': recipient.id,
+                'name': recipient.name,
+                'category': recipient.category,
+                'description': recipient.description,
+                'goal_amount': float(recipient.goal_amount),
+                'raised_amount': float(recipient.raised_amount),
+                'donor_count': recipient.donations.count(),
+                'urgency_level': 4,  # Legacy recipients are more urgent
+                'location': 'Various',
+                'wallet_address': recipient.wallet_address,
+                'created_at': recipient.created_at.isoformat(),
+            })
+    
+    # Paginate
+    paginator = Paginator(all_recipients, limit)
+    try:
+        recipients_page = paginator.page(page)
+    except:
+        recipients_page = paginator.page(1)
+    
+    return JsonResponse({
+        'recipients': list(recipients_page),
+        'pagination': {
+            'current_page': recipients_page.number,
+            'total_pages': paginator.num_pages,
+            'has_next': recipients_page.has_next(),
+        }
+    })
+
+def farcaster_stats(request):
+    """Simplified stats for Farcaster mini app"""
+    # Calculate totals
+    pool_raised = DonationPool.objects.aggregate(Sum('total_raised'))['total_raised__sum'] or 0
+    legacy_raised = Recipient.objects.aggregate(Sum('raised_amount'))['raised_amount__sum'] or 0
+    
+    pool_goals = DonationPool.objects.count() * 10000  # Assume 10k goal per pool
+    legacy_goals = Recipient.objects.aggregate(Sum('goal_amount'))['goal_amount__sum'] or 0
+    
+    total_donors = UserProfile.objects.filter(total_donated__gt=0).count()
+    active_recipients = DonationPool.objects.filter(is_active=True).count() + Recipient.objects.filter(is_active=True).count()
+    
+    return JsonResponse({
+        'total_needed': int(pool_goals + float(legacy_goals)),
+        'total_raised': int(pool_raised + float(legacy_raised)),
+        'active_recipients': active_recipients,
+        'total_donors': total_donors,
+    })
+
+@csrf_exempt
+def record_farcaster_donation(request):
+    """Record donation from Farcaster mini app"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            # Validate required fields
+            required_fields = ['donor_address', 'recipient_id', 'amount_usd', 'amount_eth', 'tx_hash']
+            for field in required_fields:
+                if field not in data:
+                    return JsonResponse({'error': f'Missing field: {field}'}, status=400)
+            
+            # Check for duplicate transaction
+            if (PoolDonation.objects.filter(tx_hash=data['tx_hash']).exists() or
+                Donation.objects.filter(tx_hash=data['tx_hash']).exists()):
+                return JsonResponse({'error': 'Donation already recorded'}, status=400)
+            
+            recipient_id = data['recipient_id']
+            donor_address = data['donor_address'].lower()
+            amount_eth = Decimal(str(data['amount_eth']))
+            amount_usd = data['amount_usd']
+            
+            # Try to find as pool first
+            try:
+                pool = DonationPool.objects.get(id=recipient_id)
+                
+                # Create pool donation
+                donation = PoolDonation.objects.create(
+                    donor_address=donor_address,
+                    pool=pool,
+                    amount=amount_eth,
+                    tx_hash=data['tx_hash'],
+                    block_number=data.get('block_number'),
+                    points_earned=calculate_points(amount_eth)
+                )
+                
+                # Update pool stats
+                pool.total_raised += amount_eth
+                pool.donor_count = pool.donations.values('donor_address').distinct().count()
+                pool.save()
+                
+                recipient_type = 'pool'
+                
+            except DonationPool.DoesNotExist:
+                # Try legacy recipient
+                try:
+                    recipient = Recipient.objects.get(id=recipient_id)
+                    
+                    # Create legacy donation
+                    donation = Donation.objects.create(
+                        donor_address=donor_address,
+                        recipient=recipient,
+                        amount=amount_eth,
+                        tx_hash=data['tx_hash'],
+                        block_number=data.get('block_number'),
+                        points_earned=calculate_points(amount_eth)
+                    )
+                    
+                    # Update recipient raised amount
+                    recipient.raised_amount += amount_eth
+                    recipient.save()
+                    
+                    recipient_type = 'legacy'
+                    
+                except Recipient.DoesNotExist:
+                    return JsonResponse({'error': 'Recipient not found'}, status=404)
+            
+            # Update user profile
+            points_earned = calculate_points(amount_eth)
+            update_user_profile(donor_address, amount_eth, points_earned, is_donor=True)
+            
+            # Create token reward
+            create_token_reward(donor_address, points_earned, f'{recipient_type}_donation', data['tx_hash'])
+            
+            return JsonResponse({
+                'success': True,
+                'donation_id': donation.id,
+                'points_earned': points_earned,
+                'recipient_type': recipient_type,
+            })
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
