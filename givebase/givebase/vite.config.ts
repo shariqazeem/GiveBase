@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    allowedHosts: ['ton-close-ou-so.trycloudflare.com'], // 👈 Add this line
+    allowedHosts: ['indoor-bw-link-wanting.trycloudflare.com'], // 👈 Add this line
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
