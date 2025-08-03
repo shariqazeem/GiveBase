@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GiveBase - Help People in Need</title>
+    <title>Umanity - Help People in Need</title>
     
     <!-- Farcaster Mini App Meta Tags -->
-    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://yourdomain.com/api/miniapp-image","button":{"title":"💙 Help People","action":{"type":"launch_miniapp","url":"https://yourdomain.com/farcaster-mini-app","name":"GiveBase","splashImageUrl":"https://yourdomain.com/logo.png","splashBackgroundColor":"#ffffff"}}}' />
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://yourdomain.com/api/miniapp-image","button":{"title":"💙 Help People","action":{"type":"launch_miniapp","url":"https://yourdomain.com/farcaster-mini-app","name":"Umanity","splashImageUrl":"https://yourdomain.com/logo.png","splashBackgroundColor":"#ffffff"}}}' />
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -312,7 +312,7 @@
             <div id="splashScreen" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
                 <div class="text-center">
                     <div class="text-6xl mb-4">💙</div>
-                    <h1 class="text-3xl font-black mb-2">GiveBase</h1>
+                    <h1 class="text-3xl font-black mb-2">Umanity</h1>
                     <p class="text-gray-600">Loading your dashboard...</p>
                     <div class="loading-spinner mx-auto mt-6"></div>
                 </div>
@@ -330,7 +330,7 @@
                     <div class="px-4 py-3">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3">
-                                <h1 class="text-2xl font-black">GiveBase</h1>
+                                <h1 class="text-2xl font-black">Umanity</h1>
                                 <span class="text-xs bg-black text-white px-2 py-1 rounded-full font-medium">Beta</span>
                             </div>
                             <button id="walletButton" class="secondary-button px-4 py-2 rounded-full text-sm font-medium flex items-center space-x-2">
@@ -524,9 +524,9 @@
 
             <!-- Donation Bottom Sheet -->
             <div id="donationSheet" class="bottom-sheet">
-                <div class="p-6">
+                <div class="sheet-content p-6">
                     <!-- Sheet Handle -->
-                    <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
+                    <div class="sheet-handle w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6 cursor-grab"></div>
                     
                     <!-- Recipient Info -->
                     <div id="sheetRecipientInfo" class="mb-6">
@@ -535,14 +535,20 @@
 
                     <!-- Amount Selection -->
                     <div class="mb-6">
-                        <h3 class="font-bold mb-3">Select Amount</h3>
+                        <h3 class="font-bold mb-3">Select Amount (ETH)</h3>
                         <div class="grid grid-cols-4 gap-2 mb-4">
-                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="5">$5</button>
-                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="10">$10</button>
-                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="25">$25</button>
-                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="50">$50</button>
+                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.001">0.001</button>
+                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.005">0.005</button>
+                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.01">0.01</button>
+                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.02">0.02</button>
                         </div>
-                        <input type="number" id="customAmount" placeholder="Custom amount" class="form-input w-full px-4 py-3 rounded-xl">
+                        <div class="relative">
+                            <input type="number" id="customAmount" placeholder="Custom amount in ETH" step="0.0001" min="0.0001" class="form-input w-full px-4 py-3 rounded-xl pr-20">
+                            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-600">ETH</span>
+                        </div>
+                        <div class="mt-2 text-center">
+                            <span class="text-sm text-gray-600">≈ $<span id="usdEquivalent">0.00</span> USD</span>
+                        </div>
                     </div>
 
                     <!-- Message -->
@@ -594,7 +600,7 @@
         // Initialize app
         async function initializeApp() {
             try {
-                console.log('Initializing GiveBase Mini App...');
+                console.log('Initializing Umanity Mini App...');
                 
                 // Load initial data
                 await Promise.all([
@@ -1037,32 +1043,39 @@
             document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
             document.getElementById('customAmount').value = '';
             document.getElementById('donationMessage').value = '';
+            document.getElementById('usdEquivalent').textContent = '0.00';
             
-            document.getElementById('donationSheet').classList.add('open');
+            const sheet = document.getElementById('donationSheet');
+            sheet.style.transform = '';
+            sheet.classList.add('open');
         }
 
         // Close donation sheet
         function closeDonationSheet() {
-            document.getElementById('donationSheet').classList.remove('open');
+            const sheet = document.getElementById('donationSheet');
+            sheet.classList.remove('open');
+            sheet.style.transform = '';
             selectedRecipient = null;
+            // Reset USD display
+            document.getElementById('usdEquivalent').textContent = '0.00';
         }
 
         // Process donation
         async function processDonation() {
             if (!selectedRecipient || !farcasterProvider) return;
             
-            // Get amount
+            // Get amount in ETH
             const customAmount = parseFloat(document.getElementById('customAmount').value) || 0;
             const selectedBtn = document.querySelector('.amount-btn.selected');
             const presetAmount = selectedBtn ? parseFloat(selectedBtn.dataset.amount) : 0;
-            const usdAmount = Math.max(customAmount, presetAmount);
+            const ethAmount = Math.max(customAmount, presetAmount);
             
-            if (usdAmount < 1) {
-                alert('Minimum donation is $1');
+            if (ethAmount < 0.0001) {
+                alert('Minimum donation is 0.0001 ETH');
                 return;
             }
             
-            const ethAmount = usdAmount / ethPrice;
+            const usdAmount = ethAmount * ethPrice;
             const message = document.getElementById('donationMessage').value;
             
             const donateBtn = document.getElementById('donateBtn');
@@ -1181,12 +1194,15 @@
                     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
                     e.target.classList.add('selected');
                     document.getElementById('customAmount').value = '';
+                    updateUSDEquivalent(parseFloat(e.target.dataset.amount));
                 });
             });
             
-            // Custom amount
-            document.getElementById('customAmount').addEventListener('input', () => {
+            // Custom amount with USD conversion
+            document.getElementById('customAmount').addEventListener('input', (e) => {
                 document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+                const ethValue = parseFloat(e.target.value) || 0;
+                updateUSDEquivalent(ethValue);
             });
             
             // Donate button
@@ -1209,9 +1225,60 @@
                 }
             });
             
-            // Sheet backdrop close
-            document.getElementById('donationSheet').addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) {
+            // Bottom sheet swipe to close
+            let sheetStartY = 0;
+            let sheetCurrentY = 0;
+            let isDragging = false;
+            const sheet = document.getElementById('donationSheet');
+            const sheetContent = sheet.querySelector('.sheet-content');
+            const sheetHandle = sheet.querySelector('.sheet-handle');
+            
+            // Handle drag start
+            const handleDragStart = (e) => {
+                isDragging = true;
+                sheetStartY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                sheet.style.transition = 'none';
+            };
+            
+            // Handle drag move
+            const handleDragMove = (e) => {
+                if (!isDragging) return;
+                
+                sheetCurrentY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                const translateY = Math.max(0, sheetCurrentY - sheetStartY);
+                
+                sheet.style.transform = `translateY(${translateY}px)`;
+            };
+            
+            // Handle drag end
+            const handleDragEnd = (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                const translateY = sheetCurrentY - sheetStartY;
+                sheet.style.transition = '';
+                
+                // If dragged more than 100px or 25% of sheet height, close it
+                if (translateY > 100 || translateY > sheet.offsetHeight * 0.25) {
+                    closeDonationSheet();
+                } else {
+                    sheet.style.transform = '';
+                }
+            };
+            
+            // Touch events for sheet handle
+            sheetHandle.addEventListener('touchstart', handleDragStart, { passive: true });
+            document.addEventListener('touchmove', handleDragMove, { passive: true });
+            document.addEventListener('touchend', handleDragEnd);
+            
+            // Mouse events for sheet handle (desktop testing)
+            sheetHandle.addEventListener('mousedown', handleDragStart);
+            document.addEventListener('mousemove', handleDragMove);
+            document.addEventListener('mouseup', handleDragEnd);
+            
+            // Click outside to close
+            sheet.addEventListener('click', (e) => {
+                if (e.target === sheet) {
                     closeDonationSheet();
                 }
             });
@@ -1221,7 +1288,7 @@
             let isPulling = false;
             
             document.addEventListener('touchstart', (e) => {
-                if (window.scrollY === 0) {
+                if (window.scrollY === 0 && !sheet.classList.contains('open')) {
                     startY = e.touches[0].clientY;
                     isPulling = true;
                 }
@@ -1245,6 +1312,12 @@
                 document.getElementById('pullToRefresh').classList.remove('active');
                 isPulling = false;
             });
+        }
+
+        // Update USD equivalent display
+        function updateUSDEquivalent(ethAmount) {
+            const usdAmount = ethAmount * ethPrice;
+            document.getElementById('usdEquivalent').textContent = usdAmount.toFixed(2);
         }
 
         // Switch tab
