@@ -2,8 +2,8 @@
   "miniapp": {
     "version": "1",
     "name": "Umanity",
-    "iconUrl": "https://umanity.xyz/logo.png",
-    "homeUrl": "https://umanity.xyz/farcaster-mini-app",
+    "iconUrl": "https://umanity.xyz/icon.png",
+    "homeUrl": "https://miniapp.umanity.xyz/",
     "splashImageUrl": "https://umanity.xyz/splash.png", 
     "splashBackgroundColor": "#ffffff",
     "subtitle": "Help people in need",
