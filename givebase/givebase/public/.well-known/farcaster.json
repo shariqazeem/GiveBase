@@ -13,12 +13,11 @@
     "requiredChains": ["eip155:8453"],
     "requiredCapabilities": [
       "wallet.getEthereumProvider"
-    ],
-    
-    "accountAssociation": {
+    ]
+  },
+  "accountAssociation": {
     "header": "eyJmaWQiOjExMDA0MjYsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg4N0Y3MjZmMTRGOTAxQjQ4NDZGMzMyMzYzYjJjNDEzM2NiZWM0MGRGIn0",
     "payload": "eyJkb21haW4iOiJtaW5pYXBwLnVtYW5pdHkueHl6In0",
     "signature": "MHgxMzg5ZjdmNzhlOTBmMTBlMGI1YWQ2MGEzY2Q0ODg5ZjEzOTJhMGU1YTUyZGJlZTFjMzk3YTc3MGNkZDIwMjEzNzZjN2M5MDlkMjRkNjRjNWZiMDE0N2VkYzhiMWY3ZDA1NWM0ZjQ3ZGFiNjNjMGE2ODFmZjhlMGIxNjJiMjNhNzFj"
-  }
   }
 }
