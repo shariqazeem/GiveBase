@@ -1,17 +1,33 @@
-# settings.py - Fixed Configuration
-
 import os
 from pathlib import Path
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-4_y5-6^!9ark)#&0q=kjq7$i=nn0m5w96dd%v$)&wgy1cm36^m'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# PRODUCTION: Turn off debug
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']  # Allow all hosts for development
+# Allow only your domains in production
+ALLOWED_HOSTS = [
+    "umanity.xyz",
+    "www.umanity.xyz",
+    "miniapp.umanity.xyz",
+    "127.0.0.1",  # Optional for local testing
+    "localhost"
+]
+
+# CSRF: Trusted Origins for HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    "https://umanity.xyz",
+    "https://www.umanity.xyz",
+    "https://miniapp.umanity.xyz",
+]
+
+# Use secure cookies in production
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -21,12 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',  # Move corsheaders before core
+    'corsheaders',
     'core',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # MUST be first
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,7 +71,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'givebase.wsgi.application'
 
-# Database
+# SQLite for now — consider PostgreSQL for production
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -89,16 +105,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# CORS Configuration - Fixed
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
-CORS_ALLOW_CREDENTIALS = True
+# CORS for production
+CORS_ALLOWED_ORIGINS = [
+    "https://umanity.xyz",
+    "https://www.umanity.xyz",
+    "https://miniapp.umanity.xyz",
+    "https://warpcast.com",
+    "https://client.warpcast.com",
+]
 
-# For production, use this instead:
-# CORS_ALLOWED_ORIGINS = [
-#     "https://yourdomain.com",
-#     "https://warpcast.com",
-#     "https://client.warpcast.com", 
-# ]
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -121,5 +137,4 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
