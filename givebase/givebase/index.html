@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Umanity - Help People in Need</title>
-    
+
     <!-- Farcaster Mini App Meta Tags -->
-    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://yourdomain.com/api/miniapp-image","button":{"title":"💙 Help People","action":{"type":"launch_miniapp","url":"https://yourdomain.com/farcaster-mini-app","name":"Umanity","splashImageUrl":"https://yourdomain.com/logo.png","splashBackgroundColor":"#ffffff"}}}' />
-    
+    <meta name="fc:miniapp"
+        content='{"version":"1","imageUrl":"https://yourdomain.com/api/miniapp-image","button":{"title":"💙 Help People","action":{"type":"launch_miniapp","url":"https://yourdomain.com/farcaster-mini-app","name":"Umanity","splashImageUrl":"https://yourdomain.com/logo.png","splashBackgroundColor":"#ffffff"}}}' />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script>
@@ -137,8 +139,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Urgency Indicators */
@@ -156,8 +163,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
         }
 
         /* Slide up animation */
@@ -166,6 +180,7 @@
                 transform: translateY(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -187,9 +202,17 @@
 
         /* Swipe hint */
         @keyframes swipeHint {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-10px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
         }
 
         .swipe-hint {
@@ -215,7 +238,7 @@
 
         /* Stats card gradient */
         .stats-gradient {
-            background: linear-gradient(135deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.01) 100%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0%, rgba(0, 0, 0, 0.01) 100%);
         }
 
         /* Floating action button */
@@ -280,8 +303,13 @@
         }
 
         @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
 
         /* Hide scrollbar but keep functionality */
@@ -300,11 +328,12 @@
         }
     </style>
 </head>
+
 <body class="bg-white text-gray-900">
     <div id="app"></div>
-    
+
     <script type="module">
-        import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
+        import { sdk } from '@farcaster/miniapp-sdk'
 
         // Create the main app HTML structure
         document.getElementById('app').innerHTML = `
@@ -601,28 +630,28 @@
         async function initializeApp() {
             try {
                 console.log('Initializing Umanity Mini App...');
-                
+
                 // Load initial data
                 await Promise.all([
                     loadRecipients(),
                     loadStats(),
                     fetchETHPrice()
                 ]);
-                
+
                 // Show main content
                 document.getElementById('splashScreen').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
-                
+
                 // Initialize SDK
                 await sdk.actions.ready();
                 console.log('✅ SDK ready!');
-                
+
                 // Initialize wallet
                 await initializeWallet();
-                
+
                 // Set up event listeners
                 setupEventListeners();
-                
+
             } catch (error) {
                 console.error('Init error:', error);
                 // Still show app
@@ -636,19 +665,19 @@
             try {
                 farcasterProvider = await sdk.wallet.getEthereumProvider();
                 console.log('✅ Wallet provider obtained');
-                
+
                 // Check if already connected
-                const accounts = await farcasterProvider.request({ 
-                    method: 'eth_accounts' 
+                const accounts = await farcasterProvider.request({
+                    method: 'eth_accounts'
                 });
-                
+
                 if (accounts && accounts.length > 0) {
                     userAccount = accounts[0];
                     isConnected = true;
                     updateWalletUI();
                     loadUserProfile();
                 }
-                
+
                 // Listen for account changes
                 farcasterProvider.on('accountsChanged', (accounts) => {
                     if (accounts.length > 0) {
@@ -662,7 +691,7 @@
                         updateWalletUI();
                     }
                 });
-                
+
             } catch (error) {
                 console.error('Wallet init error:', error);
             }
@@ -679,7 +708,7 @@
                 const accounts = await farcasterProvider.request({
                     method: 'eth_requestAccounts'
                 });
-                
+
                 if (accounts && accounts.length > 0) {
                     userAccount = accounts[0];
                     isConnected = true;
@@ -700,7 +729,7 @@
                 walletBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>' + shortAddr + '</span>';
                 walletBtn.classList.add('bg-black', 'text-white');
                 walletBtn.classList.remove('secondary-button');
-                
+
                 // Update profile avatar
                 document.getElementById('profileAvatar').textContent = userAccount.substring(2, 4).toUpperCase();
                 document.getElementById('profileName').textContent = shortAddr;
@@ -718,12 +747,12 @@
                 const url = `${API_BASE}/api/farcaster-recipients/?page=${page}&limit=10&category=${filter}`;
                 const response = await fetch(url);
                 const data = await response.json();
-                
+
                 const container = document.getElementById('recipientsList');
                 if (!append) {
                     container.innerHTML = '';
                 }
-                
+
                 if (data.recipients.length === 0 && !append) {
                     container.innerHTML = `
                         <div class="text-center py-12">
@@ -734,17 +763,17 @@
                     `;
                     return;
                 }
-                
+
                 data.recipients.forEach(recipient => {
                     const progress = Math.min((recipient.raised_amount / recipient.goal_amount) * 100, 100);
                     const card = createRecipientCard(recipient, progress);
                     container.appendChild(card);
                 });
-                
+
                 // Update load more button
                 hasMore = data.pagination.has_next;
                 document.getElementById('loadMoreContainer').classList.toggle('hidden', !hasMore);
-                
+
             } catch (error) {
                 console.error('Load recipients error:', error);
                 if (!append) {
@@ -767,7 +796,7 @@
             const card = document.createElement('div');
             card.className = 'help-card rounded-3xl p-4 cursor-pointer';
             card.onclick = () => openDonationSheet(recipient);
-            
+
             card.innerHTML = `
                 <div class="flex items-start space-x-4">
                     <div class="flex-shrink-0">
@@ -801,7 +830,7 @@
                     </div>
                 </div>
             `;
-            
+
             return card;
         }
 
@@ -810,15 +839,15 @@
             try {
                 const response = await fetch(`${API_BASE}/api/donation-pools/`);
                 const data = await response.json();
-                
+
                 const container = document.getElementById('poolsList');
                 container.innerHTML = '';
-                
+
                 data.pools.forEach(pool => {
                     const card = createPoolCard(pool);
                     container.appendChild(card);
                 });
-                
+
             } catch (error) {
                 console.error('Load pools error:', error);
                 document.getElementById('poolsList').innerHTML = `
@@ -834,7 +863,7 @@
             const card = document.createElement('div');
             card.className = 'help-card rounded-3xl p-5 cursor-pointer';
             card.onclick = () => openDonationSheet(pool, true);
-            
+
             card.innerHTML = `
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
@@ -857,7 +886,7 @@
                     <i class="fas fa-arrow-right text-gray-400"></i>
                 </div>
             `;
-            
+
             return card;
         }
 
@@ -866,10 +895,10 @@
             try {
                 const response = await fetch(`${API_BASE}/api/social-feed/?limit=20`);
                 const data = await response.json();
-                
+
                 const container = document.getElementById('socialFeed');
                 container.innerHTML = '';
-                
+
                 if (data.feed.length === 0) {
                     container.innerHTML = `
                         <div class="text-center py-8 text-gray-500">
@@ -879,12 +908,12 @@
                     `;
                     return;
                 }
-                
+
                 data.feed.forEach(donation => {
                     const item = createFeedItem(donation);
                     container.appendChild(item);
                 });
-                
+
             } catch (error) {
                 console.error('Load feed error:', error);
             }
@@ -894,13 +923,13 @@
         function createFeedItem(donation) {
             const item = document.createElement('div');
             item.className = 'help-card rounded-2xl p-3';
-            
-            const donorName = donation.donor.display_name || 
-                            `${donation.donor.address.substring(0, 6)}...${donation.donor.address.substring(38)}`;
-            const recipientName = donation.recipient.display_name || 
-                                donation.recipient.username ||
-                                `${donation.recipient.address.substring(0, 6)}...${donation.recipient.address.substring(38)}`;
-            
+
+            const donorName = donation.donor.display_name ||
+                `${donation.donor.address.substring(0, 6)}...${donation.donor.address.substring(38)}`;
+            const recipientName = donation.recipient.display_name ||
+                donation.recipient.username ||
+                `${donation.recipient.address.substring(0, 6)}...${donation.recipient.address.substring(38)}`;
+
             item.innerHTML = `
                 <div class="flex items-center space-x-3">
                     <div class="flex-shrink-0">
@@ -920,32 +949,32 @@
                     ${donation.frame_interaction ? '<span class="text-xs bg-black text-white px-2 py-1 rounded-full">Frame</span>' : ''}
                 </div>
             `;
-            
+
             return item;
         }
 
         // Load user profile
         async function loadUserProfile() {
             if (!userAccount) return;
-            
+
             try {
                 // Load user stats
                 const statsResponse = await fetch(`${API_BASE}/api/stats/?user=${userAccount}`);
                 const statsData = await statsResponse.json();
-                
+
                 if (statsData.user_stats) {
                     document.getElementById('userDonated').textContent = `${parseFloat(statsData.user_stats.total_donated).toLocaleString()}`;
                     document.getElementById('userPoints').textContent = statsData.user_stats.total_points.toLocaleString();
                     document.getElementById('socialRank').textContent = statsData.user_stats.rank ? `#${statsData.user_stats.rank}` : '#-';
                 }
-                
+
                 // Load donation history
                 const historyResponse = await fetch(`${API_BASE}/api/user-donations/?user=${userAccount}`);
                 const historyData = await historyResponse.json();
-                
+
                 const container = document.getElementById('donationHistory');
                 container.innerHTML = '';
-                
+
                 if (historyData.donations.length === 0) {
                     container.innerHTML = `
                         <div class="text-center py-8 text-gray-500">
@@ -959,11 +988,11 @@
                         container.appendChild(item);
                     });
                 }
-                
+
                 // Update social stats
                 document.getElementById('socialDonations').textContent = statsData.user_stats?.donation_count || 0;
                 document.getElementById('socialImpact').textContent = `${parseFloat(statsData.user_stats?.total_donated || 0).toLocaleString()}`;
-                
+
             } catch (error) {
                 console.error('Load profile error:', error);
             }
@@ -973,7 +1002,7 @@
         function createHistoryItem(donation) {
             const item = document.createElement('div');
             item.className = 'help-card rounded-2xl p-3';
-            
+
             item.innerHTML = `
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
@@ -989,7 +1018,7 @@
                     </div>
                 </div>
             `;
-            
+
             return item;
         }
 
@@ -998,10 +1027,10 @@
             try {
                 const response = await fetch(`${API_BASE}/api/farcaster-stats/`);
                 const data = await response.json();
-                
+
                 document.getElementById('totalRaised').textContent = `${data.total_raised.toLocaleString()}`;
                 document.getElementById('peopleHelped').textContent = data.active_recipients.toLocaleString();
-                
+
             } catch (error) {
                 console.error('Load stats error:', error);
             }
@@ -1024,9 +1053,9 @@
                 alert('Please connect your wallet first!');
                 return;
             }
-            
+
             selectedRecipient = recipient;
-            
+
             const info = document.getElementById('sheetRecipientInfo');
             info.innerHTML = `
                 <div class="flex items-center space-x-3 mb-4">
@@ -1038,13 +1067,13 @@
                 </div>
                 <p class="text-sm text-gray-700">${recipient.description}</p>
             `;
-            
+
             // Reset form
             document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
             document.getElementById('customAmount').value = '';
             document.getElementById('donationMessage').value = '';
             document.getElementById('usdEquivalent').textContent = '0.00';
-            
+
             const sheet = document.getElementById('donationSheet');
             sheet.style.transform = '';
             sheet.classList.add('open');
@@ -1063,29 +1092,29 @@
         // Process donation
         async function processDonation() {
             if (!selectedRecipient || !farcasterProvider) return;
-            
+
             // Get amount in ETH
             const customAmount = parseFloat(document.getElementById('customAmount').value) || 0;
             const selectedBtn = document.querySelector('.amount-btn.selected');
             const presetAmount = selectedBtn ? parseFloat(selectedBtn.dataset.amount) : 0;
             const ethAmount = Math.max(customAmount, presetAmount);
-            
+
             if (ethAmount < 0.0001) {
                 alert('Minimum donation is 0.0001 ETH');
                 return;
             }
-            
+
             const usdAmount = ethAmount * ethPrice;
             const message = document.getElementById('donationMessage').value;
-            
+
             const donateBtn = document.getElementById('donateBtn');
             donateBtn.textContent = 'Processing...';
             donateBtn.disabled = true;
-            
+
             try {
                 // Send transaction
                 const weiAmount = '0x' + Math.floor(ethAmount * 1e18).toString(16);
-                
+
                 const txHash = await farcasterProvider.request({
                     method: 'eth_sendTransaction',
                     params: [{
@@ -1095,7 +1124,7 @@
                         gas: '0x5208',
                     }]
                 });
-                
+
                 // Record donation
                 await fetch(`${API_BASE}/api/record-farcaster-donation/`, {
                     method: 'POST',
@@ -1112,17 +1141,17 @@
                         platform: 'farcaster'
                     }),
                 });
-                
+
                 // Show success
                 document.getElementById('txHash').textContent = txHash;
                 closeDonationSheet();
                 document.getElementById('successModal').classList.remove('hidden');
-                
+
                 // Refresh data
                 loadStats();
                 loadRecipients(1, currentFilter);
                 loadUserProfile();
-                
+
             } catch (error) {
                 console.error('Donation error:', error);
                 alert(error.code === 4001 ? 'Transaction cancelled' : 'Transaction failed');
@@ -1139,7 +1168,7 @@
                 alert('Please enter a username or address');
                 return;
             }
-            
+
             // Open donation sheet for P2P
             openDonationSheet({
                 id: 'p2p',
@@ -1154,7 +1183,7 @@
         function setupEventListeners() {
             // Wallet button
             document.getElementById('walletButton').addEventListener('click', connectWallet);
-            
+
             // Tab navigation
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -1162,14 +1191,14 @@
                     switchTab(tab);
                 });
             });
-            
+
             // Filter pills
             document.querySelectorAll('.filter-pill').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const filter = e.target.dataset.filter;
                     currentFilter = filter;
                     currentPage = 1;
-                    
+
                     // Update UI
                     document.querySelectorAll('.filter-pill').forEach(p => {
                         p.classList.remove('bg-black', 'text-white');
@@ -1177,17 +1206,17 @@
                     });
                     e.target.classList.add('bg-black', 'text-white');
                     e.target.classList.remove('bg-gray-100', 'text-gray-700');
-                    
+
                     loadRecipients(1, filter);
                 });
             });
-            
+
             // Load more
             document.getElementById('loadMoreBtn').addEventListener('click', () => {
                 currentPage++;
                 loadRecipients(currentPage, currentFilter, true);
             });
-            
+
             // Amount buttons
             document.querySelectorAll('.amount-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -1197,25 +1226,25 @@
                     updateUSDEquivalent(parseFloat(e.target.dataset.amount));
                 });
             });
-            
+
             // Custom amount with USD conversion
             document.getElementById('customAmount').addEventListener('input', (e) => {
                 document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
                 const ethValue = parseFloat(e.target.value) || 0;
                 updateUSDEquivalent(ethValue);
             });
-            
+
             // Donate button
             document.getElementById('donateBtn').addEventListener('click', processDonation);
-            
+
             // Quick send
             document.getElementById('quickSendBtn').addEventListener('click', quickSend);
-            
+
             // Close success modal
             document.getElementById('closeSuccessBtn').addEventListener('click', () => {
                 document.getElementById('successModal').classList.add('hidden');
             });
-            
+
             // FAB
             document.getElementById('fab').addEventListener('click', () => {
                 if (currentTab === 'donate' && selectedRecipient) {
@@ -1224,7 +1253,7 @@
                     switchTab('donate');
                 }
             });
-            
+
             // Bottom sheet swipe to close
             let sheetStartY = 0;
             let sheetCurrentY = 0;
@@ -1232,32 +1261,32 @@
             const sheet = document.getElementById('donationSheet');
             const sheetContent = sheet.querySelector('.sheet-content');
             const sheetHandle = sheet.querySelector('.sheet-handle');
-            
+
             // Handle drag start
             const handleDragStart = (e) => {
                 isDragging = true;
                 sheetStartY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                 sheet.style.transition = 'none';
             };
-            
+
             // Handle drag move
             const handleDragMove = (e) => {
                 if (!isDragging) return;
-                
+
                 sheetCurrentY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                 const translateY = Math.max(0, sheetCurrentY - sheetStartY);
-                
+
                 sheet.style.transform = `translateY(${translateY}px)`;
             };
-            
+
             // Handle drag end
             const handleDragEnd = (e) => {
                 if (!isDragging) return;
                 isDragging = false;
-                
+
                 const translateY = sheetCurrentY - sheetStartY;
                 sheet.style.transition = '';
-                
+
                 // If dragged more than 100px or 25% of sheet height, close it
                 if (translateY > 100 || translateY > sheet.offsetHeight * 0.25) {
                     closeDonationSheet();
@@ -1265,46 +1294,46 @@
                     sheet.style.transform = '';
                 }
             };
-            
+
             // Touch events for sheet handle
             sheetHandle.addEventListener('touchstart', handleDragStart, { passive: true });
             document.addEventListener('touchmove', handleDragMove, { passive: true });
             document.addEventListener('touchend', handleDragEnd);
-            
+
             // Mouse events for sheet handle (desktop testing)
             sheetHandle.addEventListener('mousedown', handleDragStart);
             document.addEventListener('mousemove', handleDragMove);
             document.addEventListener('mouseup', handleDragEnd);
-            
+
             // Click outside to close
             sheet.addEventListener('click', (e) => {
                 if (e.target === sheet) {
                     closeDonationSheet();
                 }
             });
-            
+
             // Pull to refresh
             let startY = 0;
             let isPulling = false;
-            
+
             document.addEventListener('touchstart', (e) => {
                 if (window.scrollY === 0 && !sheet.classList.contains('open')) {
                     startY = e.touches[0].clientY;
                     isPulling = true;
                 }
             });
-            
+
             document.addEventListener('touchmove', (e) => {
                 if (!isPulling) return;
-                
+
                 const currentY = e.touches[0].clientY;
                 const diff = currentY - startY;
-                
+
                 if (diff > 50) {
                     document.getElementById('pullToRefresh').classList.add('active');
                 }
             });
-            
+
             document.addEventListener('touchend', () => {
                 if (document.getElementById('pullToRefresh').classList.contains('active')) {
                     refreshCurrentTab();
@@ -1323,7 +1352,7 @@
         // Switch tab
         function switchTab(tab) {
             currentTab = tab;
-            
+
             // Update tab buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 if (btn.dataset.tab === tab) {
@@ -1334,7 +1363,7 @@
                     btn.classList.add('text-gray-500');
                 }
             });
-            
+
             // Update tab indicator
             const activeBtn = document.querySelector('.tab-btn.active');
             const indicator = document.getElementById('tabIndicator');
@@ -1342,13 +1371,13 @@
                 indicator.style.left = activeBtn.offsetLeft + 'px';
                 indicator.style.width = activeBtn.offsetWidth + 'px';
             }
-            
+
             // Show/hide content
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');
             });
             document.getElementById(tab + 'Tab').classList.remove('hidden');
-            
+
             // Load tab data
             if (tab === 'pools') {
                 loadPools();
@@ -1390,4 +1419,5 @@
         window.addEventListener('load', initializeApp);
     </script>
 </body>
+
 </html>
