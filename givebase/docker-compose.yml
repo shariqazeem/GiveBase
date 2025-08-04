@@ -41,5 +41,5 @@ services:
       - /var/www/certbot:/var/www/certbot
     entrypoint: >
       sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot
-      --email you@example.com --agree-tos --no-eff-email
-      -d yourdomain.com"
+      --email shariqshaukat786@gmail.com --agree-tos --no-eff-email
+      -d umanity.xyz"
