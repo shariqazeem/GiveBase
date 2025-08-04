@@ -2,9 +2,9 @@
   "miniapp": {
     "version": "1",
     "name": "Umanity",
-    "iconUrl": "https://umanity.xyz/icon.png",
+    "iconUrl": "https://miniapp.umanity.xyz/icon.png",
     "homeUrl": "https://miniapp.umanity.xyz/",
-    "splashImageUrl": "https://umanity.xyz/splash.png", 
+    "splashImageUrl": "https://miniapp..xyz/splash.png", 
     "splashBackgroundColor": "#ffffff",
     "subtitle": "Help people in need",
     "description": "Donate to verified individuals using crypto. Make a real difference in someone's life.",
