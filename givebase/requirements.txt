@@ -1,0 +1,11 @@
+# Based on your current settings.py, you'll need these:
+Django>=4.2
+django-cors-headers
+
+# Optional: Add PostgreSQL support if you want to use the PostgreSQL version
+psycopg2-binary
+
+# Optional: For environment variable management
+python-decouple
+
+gunicorn  # For running the Django app in production
