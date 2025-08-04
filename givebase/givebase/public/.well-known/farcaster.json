@@ -1,10 +1,10 @@
 {
   "miniapp": {
     "version": "1",
-    "name": "GiveBase",
-    "iconUrl": "https://yourdomain.com/logo.png",
-    "homeUrl": "https://yourdomain.com/farcaster-mini-app",
-    "splashImageUrl": "https://yourdomain.com/splash.png", 
+    "name": "Umanity",
+    "iconUrl": "https://umanity.xyz/logo.png",
+    "homeUrl": "https://umanity.xyz/farcaster-mini-app",
+    "splashImageUrl": "https://umanity.xyz/splash.png", 
     "splashBackgroundColor": "#ffffff",
     "subtitle": "Help people in need",
     "description": "Donate to verified individuals using crypto. Make a real difference in someone's life.",
