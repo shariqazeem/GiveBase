@@ -373,17 +373,20 @@
                 <!-- Tab Navigation -->
                 <div class="sticky top-[61px] z-30 bg-white border-b border-gray-100">
                     <div class="relative">
-                        <div class="flex overflow-x-auto hide-scrollbar px-4 py-2">
-                            <button class="tab-btn active px-4 py-2 text-sm font-semibold whitespace-nowrap" data-tab="donate">
+                        <div class="flex overflow-x-auto hide-scrollbar px-2 py-2">
+                            <button class="tab-btn active px-3 py-2 text-xs font-semibold whitespace-nowrap flex-shrink-0" data-tab="donate">
                                 💙 Donate
                             </button>
-                            <button class="tab-btn px-4 py-2 text-sm font-semibold whitespace-nowrap text-gray-500" data-tab="pools">
+                            <button class="tab-btn px-3 py-2 text-xs font-semibold whitespace-nowrap text-gray-500 flex-shrink-0" data-tab="pools">
                                 🌊 Pools
                             </button>
-                            <button class="tab-btn px-4 py-2 text-sm font-semibold whitespace-nowrap text-gray-500" data-tab="social">
+                            <button class="tab-btn px-3 py-2 text-xs font-semibold whitespace-nowrap text-gray-500 flex-shrink-0" data-tab="social">
                                 👥 Social
                             </button>
-                            <button class="tab-btn px-4 py-2 text-sm font-semibold whitespace-nowrap text-gray-500" data-tab="profile">
+                            <button class="tab-btn px-3 py-2 text-xs font-semibold whitespace-nowrap text-gray-500 flex-shrink-0" data-tab="leaderboard">
+                                🏆 Top
+                            </button>
+                            <button class="tab-btn px-3 py-2 text-xs font-semibold whitespace-nowrap text-gray-500 flex-shrink-0" data-tab="profile">
                                 ⭐ Profile
                             </button>
                         </div>
@@ -392,22 +395,61 @@
                 </div>
 
                 <!-- Main Content Area -->
+
+                <!-- Epoch Banner -->
+                <div class="px-4 py-3 bg-gradient-to-r from-purple-50 via-blue-50 to-green-50 border-b border-gray-100">
+                    <div class="text-center">
+                        <div class="flex items-center justify-center space-x-4 text-xs">
+                            <div class="flex items-center space-x-1">
+                                <span class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+                                <span class="font-bold text-purple-600">EPOCH 0</span>
+                            </div>
+                            <div class="text-gray-600">|</div>
+                            <div class="text-blue-600 font-medium">
+                                🎁 <span id="pointsMultiplier">10x</span> Points
+                            </div>
+                            <div class="text-gray-600">|</div>
+                            <div class="text-green-600 font-medium">
+                                🚀 <span id="tokensMultiplier">5000x</span> Tokens
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-600 mt-1">
+                            Genesis rewards! Earn massive bonuses for early adoption
+                        </div>
+                    </div>
+                </div>
                 <main class="pb-20 safe-area-bottom">
                     <!-- Donate Tab -->
                     <div id="donateTab" class="tab-content">
                         <!-- Stats Cards -->
-                        <div class="px-4 py-4">
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="help-card rounded-2xl p-4 stats-gradient">
-                                    <div class="text-2xl font-black" id="totalRaised">$0</div>
-                                    <div class="text-xs text-gray-600 mt-1">Total Raised</div>
-                                </div>
-                                <div class="help-card rounded-2xl p-4 stats-gradient">
-                                    <div class="text-2xl font-black" id="peopleHelped">0</div>
-                                    <div class="text-xs text-gray-600 mt-1">People Helped</div>
+                    <div class="px-4 py-4">
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="help-card rounded-2xl p-4 stats-gradient">
+                                <div class="text-2xl font-black" id="totalRaised">$0</div>
+                                <div class="text-xs text-gray-600 mt-1">Total Raised</div>
+                            </div>
+                            <div class="help-card rounded-2xl p-4 stats-gradient">
+                                <div class="text-2xl font-black" id="peopleHelped">0</div>
+                                <div class="text-xs text-gray-600 mt-1">People Helped</div>
+                            </div>
+                        </div>
+                        
+                        <!-- User Rewards Display (if connected) -->
+                        <div id="userRewardsCard" class="hidden">
+                            <div class="help-card rounded-2xl p-4 bg-gradient-to-r from-purple-50 to-blue-50">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="text-center">
+                                        <div class="text-lg font-black text-purple-600" id="userPointsDisplay">0</div>
+                                        <div class="text-xs text-purple-500">Points Earned</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-lg font-black text-blue-600" id="userTokensDisplay">0 $GIVE</div>
+                                        <div class="text-xs text-blue-500">Tokens Earned</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
                         <!-- Filter Pills -->
                         <div class="px-4 pb-4">
@@ -507,6 +549,33 @@
                         </div>
                     </div>
 
+                    <!-- Leaderboard Tab -->
+                    <div id="leaderboardTab" class="tab-content hidden">
+                        <div class="px-4 py-4">
+                            <div class="mb-6">
+                                <h2 class="text-xl font-bold mb-2">🏆 Top Donors</h2>
+                                <p class="text-sm text-gray-600">Champions of generosity</p>
+                            </div>
+                            
+                            <!-- User Position (if not in top 10) -->
+                            <div id="userPositionCard" class="hidden mb-4">
+                                <div class="help-card rounded-2xl p-4 bg-gradient-to-r from-purple-50 to-blue-50">
+                                    <div class="text-xs text-gray-600 mb-2 text-center">Your Position</div>
+                                    <div id="userPositionInfo" class="flex items-center justify-between">
+                                        <!-- Populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="leaderboardList" class="space-y-3">
+                                <!-- Loading skeleton -->
+                                <div class="help-card rounded-2xl p-4">
+                                    <div class="skeleton h-12 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Profile Tab -->
                     <div id="profileTab" class="tab-content hidden">
                         <div class="px-4 py-4">
@@ -576,8 +645,15 @@
                             <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-600">ETH</span>
                         </div>
                         <div class="mt-2 text-center">
-                            <span class="text-sm text-gray-600">≈ $<span id="usdEquivalent">0.00</span> USD</span>
+                        <span class="text-sm text-gray-600">≈ $<span id="usdEquivalent">0.00</span> USD</span>
+                    </div>
+                    <div class="mt-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3">
+                        <div class="text-xs font-medium text-gray-700 mb-2 text-center">🎁 Epoch 0 Rewards:</div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-purple-600">Points: <span id="estimatedPoints" class="font-bold">0</span></span>
+                            <span class="text-blue-600">Tokens: <span id="estimatedTokens" class="font-bold">0 $GIVE</span></span>
                         </div>
+                    </div>
                     </div>
 
                     <!-- Message -->
@@ -600,9 +676,21 @@
                         <div class="text-6xl mb-4">🎉</div>
                         <h3 class="text-2xl font-bold mb-2">Thank You!</h3>
                         <p class="text-gray-600 mb-6">Your donation has been sent successfully.</p>
-                        <div class="bg-gray-100 rounded-2xl p-4 mb-6">
+                        <div class="bg-gray-100 rounded-2xl p-4 mb-4">
                             <div class="text-sm text-gray-600 mb-1">Transaction Hash</div>
                             <div id="txHash" class="font-mono text-xs break-all">-</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 text-center">
+                                <div class="text-lg font-black text-purple-600">+<span id="pointsEarned">0</span></div>
+                                <div class="text-xs text-purple-500">Points</div>
+                                <div class="text-xs text-purple-400 mt-1">Epoch 0!</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-blue-50 to-green-100 rounded-2xl p-4 text-center">
+                                <div class="text-lg font-black text-blue-600">+<span id="tokensEarned">0</span></div>
+                                <div class="text-xs text-blue-500">$GIVE</div>
+                                <div class="text-xs text-blue-400 mt-1">Genesis!</div>
+                            </div>
                         </div>
                         <button id="closeSuccessBtn" class="primary-button w-full py-3 rounded-xl text-white font-medium">
                             Done
@@ -622,6 +710,23 @@
         let hasMore = true;
         let ethPrice = 2500;
         let currentTab = 'donate';
+        // Epoch and Rewards System
+        let currentEpoch = 0;
+        let epochStartTime = Date.now();
+        let epochDuration = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+        const epochMultipliers = {
+            0: { points: 10.0, tokens: 5000 },
+            1: { points: 8.0, tokens: 4000 },
+            2: { points: 6.0, tokens: 3000 },
+            3: { points: 4.0, tokens: 2000 },
+            4: { points: 3.0, tokens: 1500 },
+            5: { points: 2.5, tokens: 1200 },
+            default: { points: 1.0, tokens: 400 }
+        };
+
+        const basePointsPerETH = 10000;
+        const baseTokensPerETH = 1;
 
         // API Configuration
         const API_BASE = import.meta.env.DEV ? 'http://localhost:8000' : 'https://umanity.xyz';
@@ -967,6 +1072,12 @@
                     document.getElementById('userPoints').textContent = statsData.user_stats.total_points.toLocaleString();
                     document.getElementById('socialRank').textContent = statsData.user_stats.rank ? `#${statsData.user_stats.rank}` : '#-';
                 }
+                // Update rewards display in donate tab
+                if (isConnected && statsData.user_stats) {
+                    document.getElementById('userRewardsCard').classList.remove('hidden');
+                    document.getElementById('userPointsDisplay').textContent = formatLargeNumber(statsData.user_stats.total_points);
+                    document.getElementById('userTokensDisplay').textContent = formatLargeNumber(statsData.user_stats.tokens_earned || 0) + ' $GIVE';
+                }
 
                 // Load donation history
                 const historyResponse = await fetch(`${API_BASE}/api/user-donations/?user=${userAccount}`);
@@ -998,6 +1109,88 @@
             }
         }
 
+        // Load leaderboard
+        async function loadLeaderboard() {
+            try {
+                const url = userAccount ? `${API_BASE}/api/leaderboard/?user=${userAccount}` : `${API_BASE}/api/leaderboard/`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                const container = document.getElementById('leaderboardList');
+                container.innerHTML = '';
+
+                if (data.leaderboard.length === 0) {
+                    container.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-trophy text-3xl mb-2"></i>
+                    <p class="text-sm">No donors yet</p>
+                </div>
+            `;
+                    return;
+                }
+
+                data.leaderboard.forEach((donor, index) => {
+                    const item = createLeaderboardItem(donor, index);
+                    container.appendChild(item);
+                });
+
+                // Show user position if not in top 10
+                if (userAccount && data.user_position && !data.user_position.is_current_user) {
+                    const userPos = data.user_position;
+                    document.getElementById('userPositionCard').classList.remove('hidden');
+                    document.getElementById('userPositionInfo').innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <span class="text-lg font-black text-gray-600">#${userPos.rank}</span>
+                    <div class="w-8 h-8 bg-gradient-to-r from-black to-gray-700 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        ${userPos.display_name ? userPos.display_name.charAt(0).toUpperCase() : 'Y'}
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-sm">${userPos.display_name || 'You'}</p>
+                        <p class="text-xs text-gray-600">${userPos.donation_count} donations</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-sm">${formatLargeNumber(userPos.total_points)} pts</p>
+                    <p class="text-xs text-gray-600">${parseFloat(userPos.total_donated).toFixed(4)} ETH</p>
+                </div>
+            `;
+                }
+
+            } catch (error) {
+                console.error('Load leaderboard error:', error);
+            }
+        }
+
+        // Create leaderboard item
+        function createLeaderboardItem(donor, index) {
+            const item = document.createElement('div');
+            const rankColors = ['text-yellow-500', 'text-gray-500', 'text-orange-500', 'text-black'];
+            const rankColor = rankColors[Math.min(index, 3)];
+
+            item.className = `help-card rounded-2xl p-4 ${donor.is_current_user ? 'bg-gradient-to-r from-purple-50 to-blue-50' : ''}`;
+
+            item.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-xl font-black ${rankColor}">#${donor.rank}</span>
+                <div class="w-10 h-10 bg-gradient-to-r from-black to-gray-700 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                    ${donor.display_name ? donor.display_name.charAt(0).toUpperCase() : 'A'}
+                </div>
+                <div>
+                    <p class="font-semibold text-sm ${donor.is_current_user ? 'text-purple-700' : 'text-black'}">${donor.display_name || donor.ens_name || (donor.address.substring(0, 6) + '...')}</p>
+                    <p class="text-xs text-gray-600">${donor.donation_count} donations</p>
+                </div>
+                ${donor.is_current_user ? '<span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-medium">You</span>' : ''}
+            </div>
+            <div class="text-right">
+                <p class="font-bold text-sm ${donor.is_current_user ? 'text-purple-600' : rankColor}">${formatLargeNumber(donor.total_points)} pts</p>
+                <p class="text-xs text-gray-600">${parseFloat(donor.total_donated).toFixed(4)} ETH</p>
+            </div>
+        </div>
+    `;
+
+            return item;
+        }
         // Create history item
         function createHistoryItem(donation) {
             const item = document.createElement('div');
@@ -1045,6 +1238,45 @@
             } catch (error) {
                 console.error('ETH price error:', error);
             }
+        }
+
+        // Epoch calculation functions
+        function getCurrentEpoch() {
+            const timeElapsed = Date.now() - epochStartTime;
+            return Math.floor(timeElapsed / epochDuration);
+        }
+
+        function getEpochMultipliers(epoch = null) {
+            const targetEpoch = epoch !== null ? epoch : getCurrentEpoch();
+            return epochMultipliers[targetEpoch] || epochMultipliers.default;
+        }
+
+        function calculateRewards(ethAmount, isPublic = false) {
+            const epoch = getCurrentEpoch();
+            const multipliers = getEpochMultipliers(epoch);
+
+            const basePoints = Math.floor(ethAmount * basePointsPerETH);
+            const baseTokens = ethAmount * baseTokensPerETH;
+
+            const epochPoints = Math.floor(basePoints * multipliers.points);
+            const epochTokens = baseTokens * multipliers.tokens;
+
+            const finalPoints = isPublic ? Math.floor(epochPoints * 1.2) : epochPoints;
+            const finalTokens = isPublic ? epochTokens * 1.2 : epochTokens;
+
+            return {
+                points: finalPoints,
+                tokens: finalTokens,
+                epoch: epoch,
+                multipliers: multipliers
+            };
+        }
+
+        function formatLargeNumber(num) {
+            if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return Math.floor(num).toString();
         }
 
         // Open donation sheet
@@ -1142,8 +1374,12 @@
                     }),
                 });
 
-                // Show success
+                // Calculate and show rewards
+                const rewards = calculateRewards(ethAmount, false);
                 document.getElementById('txHash').textContent = txHash;
+                document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
+                document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
+
                 closeDonationSheet();
                 document.getElementById('successModal').classList.remove('hidden');
 
@@ -1223,7 +1459,9 @@
                     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
                     e.target.classList.add('selected');
                     document.getElementById('customAmount').value = '';
-                    updateUSDEquivalent(parseFloat(e.target.dataset.amount));
+                    const amount = parseFloat(e.target.dataset.amount);
+                    updateUSDEquivalent(amount);
+                    updateRewardsPreview(amount);
                 });
             });
 
@@ -1232,6 +1470,7 @@
                 document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
                 const ethValue = parseFloat(e.target.value) || 0;
                 updateUSDEquivalent(ethValue);
+                updateRewardsPreview(ethValue);
             });
 
             // Donate button
@@ -1349,6 +1588,13 @@
             document.getElementById('usdEquivalent').textContent = usdAmount.toFixed(2);
         }
 
+        // Update rewards preview
+        function updateRewardsPreview(ethAmount) {
+            const rewards = calculateRewards(ethAmount, false);
+            document.getElementById('estimatedPoints').textContent = formatLargeNumber(rewards.points);
+            document.getElementById('estimatedTokens').textContent = formatLargeNumber(rewards.tokens);
+        }
+
         // Switch tab
         function switchTab(tab) {
             currentTab = tab;
@@ -1383,12 +1629,13 @@
                 loadPools();
             } else if (tab === 'social') {
                 loadSocialFeed();
+            } else if (tab === 'leaderboard') {
+                loadLeaderboard();
             } else if (tab === 'profile') {
                 loadUserProfile();
             }
         }
 
-        // Refresh current tab
         function refreshCurrentTab() {
             if (currentTab === 'donate') {
                 loadRecipients(1, currentFilter);
@@ -1397,6 +1644,8 @@
                 loadPools();
             } else if (currentTab === 'social') {
                 loadSocialFeed();
+            } else if (currentTab === 'leaderboard') {
+                loadLeaderboard();
             } else if (currentTab === 'profile') {
                 loadUserProfile();
             }
