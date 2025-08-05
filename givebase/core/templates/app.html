@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +30,7 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-        
+
         * {
             font-family: 'Inter', sans-serif;
             scroll-behavior: smooth;
@@ -45,15 +46,20 @@
         }
 
         @keyframes floating {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0px) rotate(0deg);
             }
+
             25% {
                 transform: translateY(-10px) rotate(1deg);
             }
+
             50% {
                 transform: translateY(-20px) rotate(0deg);
             }
+
             75% {
                 transform: translateY(-10px) rotate(-1deg);
             }
@@ -393,8 +399,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Geometric Patterns */
@@ -472,10 +483,12 @@
                 transform: scale(0.95);
                 box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
             }
+
             70% {
                 transform: scale(1);
                 box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
             }
+
             100% {
                 transform: scale(0.95);
                 box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
@@ -483,6 +496,7 @@
         }
     </style>
 </head>
+
 <body class="bg-white text-gray-900 overflow-x-hidden geometric-bg">
     <!-- Header -->
     <header class="nav-blur sticky top-0 z-50">
@@ -491,30 +505,39 @@
                 <div class="flex items-center space-x-8">
                     <div class="logo">Umanity</div>
                     <nav class="hidden md:flex space-x-2">
-                        <button onclick="switchTab('donate')" class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium" data-tab="donate">
+                        <button onclick="switchTab('donate')"
+                            class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium" data-tab="donate">
                             <i class="fas fa-heart mr-2"></i>Donate
                         </button>
-                        <button onclick="switchTab('social')" class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium" data-tab="social">
+                        <button onclick="switchTab('social')"
+                            class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium" data-tab="social">
                             <i class="fas fa-users mr-2"></i>Social Feed
                         </button>
-                        <button onclick="switchTab('leaderboard')" class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium" data-tab="leaderboard">
+                        <button onclick="switchTab('leaderboard')"
+                            class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium"
+                            data-tab="leaderboard">
                             <i class="fas fa-trophy mr-2"></i>Leaderboard
                         </button>
-                        <button onclick="switchTab('my-donations')" class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium" data-tab="my-donations">
+                        <button onclick="switchTab('my-donations')"
+                            class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium"
+                            data-tab="my-donations">
                             <i class="fas fa-history mr-2"></i>My History
                         </button>
-                        <button onclick="switchTab('profile')" class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium" data-tab="profile">
+                        <button onclick="switchTab('profile')"
+                            class="tab-btn px-4 py-2 rounded-xl transition-all text-sm font-medium" data-tab="profile">
                             <i class="fas fa-user mr-2"></i>Profile
                         </button>
                     </nav>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <div id="networkInfo" class="hidden md:flex items-center space-x-2 px-3 py-2 bg-black/5 rounded-xl border border-black/10">
+                    <div id="networkInfo"
+                        class="hidden md:flex items-center space-x-2 px-3 py-2 bg-black/5 rounded-xl border border-black/10">
                         <div class="w-2 h-2 bg-black rounded-full pulse-dot"></div>
-                        <span class="text-sm font-medium">Base Sepolia</span>
+                        <span class="text-sm font-medium">Base Mainnet</span>
                     </div>
                     <div class="relative">
-                        <button id="connectWallet" onclick="handleWalletButton()" class="primary-button px-6 py-3 rounded-xl text-white font-semibold text-sm">
+                        <button id="connectWallet" onclick="handleWalletButton()"
+                            class="primary-button px-6 py-3 rounded-xl font-semibold text-sm text-black">
                             Connect Wallet
                         </button>
                         <!-- Wallet Dropdown Menu -->
@@ -525,13 +548,16 @@
                                 <div class="text-sm text-gray-500 mb-1">Balance</div>
                                 <div id="walletBalance" class="text-2xl font-bold text-black mb-6">0.0000 ETH</div>
                                 <div class="space-y-2">
-                                    <button onclick="copyAddress()" class="w-full bg-black/5 hover:bg-black/10 text-black py-3 rounded-xl font-medium transition-all">
+                                    <button onclick="copyAddress()"
+                                        class="w-full bg-black/5 hover:bg-black/10 text-black py-3 rounded-xl font-medium transition-all">
                                         <i class="fas fa-copy mr-2"></i>Copy Address
                                     </button>
-                                    <button onclick="viewOnExplorer()" class="w-full bg-black/5 hover:bg-black/10 text-black py-3 rounded-xl font-medium transition-all">
+                                    <button onclick="viewOnExplorer()"
+                                        class="w-full bg-black/5 hover:bg-black/10 text-black py-3 rounded-xl font-medium transition-all">
                                         <i class="fas fa-external-link-alt mr-2"></i>View on Explorer
                                     </button>
-                                    <button onclick="disconnectWallet()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-600 py-3 rounded-xl font-medium transition-all">
+                                    <button onclick="disconnectWallet()"
+                                        class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-600 py-3 rounded-xl font-medium transition-all">
                                         <i class="fas fa-sign-out-alt mr-2"></i>Disconnect
                                     </button>
                                 </div>
@@ -576,13 +602,16 @@
             <!-- Donation Type Selector -->
             <div class="flex justify-center mb-12">
                 <div class="glass-card rounded-2xl p-2">
-                    <button onclick="switchDonationType('pools')" id="poolsTypeBtn" class="donation-type-btn px-8 py-4 rounded-xl transition-all font-medium">
+                    <button onclick="switchDonationType('pools')" id="poolsTypeBtn"
+                        class="donation-type-btn px-8 py-4 rounded-xl transition-all font-medium">
                         <i class="fas fa-swimming-pool mr-2"></i>Global Pools
                     </button>
-                    <button onclick="switchDonationType('social')" id="socialTypeBtn" class="donation-type-btn px-8 py-4 rounded-xl transition-all font-medium">
+                    <button onclick="switchDonationType('social')" id="socialTypeBtn"
+                        class="donation-type-btn px-8 py-4 rounded-xl transition-all font-medium">
                         <i class="fas fa-user-friends mr-2"></i>Direct P2P
                     </button>
-                    <button onclick="switchDonationType('legacy')" id="legacyTypeBtn" class="donation-type-btn px-8 py-4 rounded-xl transition-all font-medium">
+                    <button onclick="switchDonationType('legacy')" id="legacyTypeBtn"
+                        class="donation-type-btn px-8 py-4 rounded-xl transition-all font-medium">
                         <i class="fas fa-heart mr-2"></i>Verified Recipients
                     </button>
                 </div>
@@ -593,7 +622,8 @@
                 <div class="text-center mb-12">
                     <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Global Donation Pools</h2>
                     <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
-                        Contribute to global causes and earn $GIVE tokens. No verification needed - just donate and make an impact worldwide.
+                        Contribute to global causes and earn $GIVE tokens. No verification needed - just donate and make
+                        an impact worldwide.
                     </p>
                 </div>
                 <div id="poolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -612,32 +642,35 @@
                         Send donations directly to other users. Perfect for Farcaster communities and creator support.
                     </p>
                 </div>
-                
+
                 <!-- P2P Donation Form -->
                 <div class="max-w-lg mx-auto mb-12">
                     <div class="glass-card rounded-3xl p-8">
                         <h3 class="text-2xl font-bold mb-6 text-center">Send Direct Donation</h3>
                         <div class="space-y-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Recipient Address or @username</label>
-                                <input type="text" id="p2pRecipient" placeholder="0x... or @username" 
-                                       class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Recipient Address or
+                                    @username</label>
+                                <input type="text" id="p2pRecipient" placeholder="0x... or @username"
+                                    class="form-input w-full rounded-xl px-4 py-4 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Amount (ETH)</label>
                                 <input type="number" id="p2pAmount" step="0.001" min="0.001" placeholder="0.01"
-                                       class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                    class="form-input w-full rounded-xl px-4 py-4 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Message (optional)</label>
-                                <input type="text" id="p2pMessage" placeholder="Thanks for being awesome!" maxlength="280"
-                                       class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                <input type="text" id="p2pMessage" placeholder="Thanks for being awesome!"
+                                    maxlength="280" class="form-input w-full rounded-xl px-4 py-4 text-sm">
                             </div>
                             <div class="flex items-center space-x-3">
                                 <input type="checkbox" id="p2pPublic" checked class="rounded">
-                                <label for="p2pPublic" class="text-sm text-gray-600">Make donation public (earn social bonus)</label>
+                                <label for="p2pPublic" class="text-sm text-gray-600">Make donation public (earn social
+                                    bonus)</label>
                             </div>
-                            <button onclick="processP2PDonation()" class="primary-button w-full py-4 rounded-xl text-white font-bold">
+                            <button onclick="processP2PDonation()"
+                                class="primary-button w-full py-4 rounded-xl text-white font-bold">
                                 <span id="p2pDonateButtonText">Send Donation</span>
                             </button>
                         </div>
@@ -675,7 +708,7 @@
                     See the latest public donations and join the community of givers.
                 </p>
             </div>
-            
+
             <div class="max-w-3xl mx-auto">
                 <div id="socialFeed" class="space-y-6">
                     <!-- Loading state -->
@@ -683,10 +716,11 @@
                         <div class="loading-spinner"></div>
                     </div>
                 </div>
-                
+
                 <!-- Load More Button -->
                 <div id="loadMoreSocialContainer" class="text-center mt-8 hidden">
-                    <button onclick="loadMoreSocialFeed()" class="secondary-button px-8 py-3 rounded-xl font-medium transition-all hover-lift">
+                    <button onclick="loadMoreSocialFeed()"
+                        class="secondary-button px-8 py-3 rounded-xl font-medium transition-all hover-lift">
                         Load More
                     </button>
                 </div>
@@ -701,7 +735,7 @@
                     Celebrate the most generous members of our community.
                 </p>
             </div>
-            
+
             <!-- User Position Card (if not in top 10) -->
             <div id="userPositionCard" class="hidden mb-8">
                 <div class="glass-card max-w-3xl mx-auto rounded-3xl">
@@ -734,7 +768,7 @@
                     Track your giving journey and impact on the world.
                 </p>
             </div>
-            
+
             <!-- User Stats -->
             <div id="userStatsCards" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
                 <div class="stats-card rounded-2xl p-6 hover-lift">
@@ -764,7 +798,8 @@
 
             <!-- Load More Button -->
             <div id="loadMoreContainer" class="text-center mt-8 hidden">
-                <button onclick="loadMoreDonations()" class="secondary-button px-8 py-3 rounded-xl font-medium transition-all hover-lift">
+                <button onclick="loadMoreDonations()"
+                    class="secondary-button px-8 py-3 rounded-xl font-medium transition-all hover-lift">
                     Load More
                 </button>
             </div>
@@ -779,7 +814,7 @@
                         Customize your giving profile and manage your preferences.
                     </p>
                 </div>
-                
+
                 <!-- Profile Form -->
                 <div class="glass-card rounded-3xl">
                     <div class="p-8">
@@ -788,27 +823,30 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
-                                    <input type="text" id="profileDisplayName" placeholder="Your name" 
-                                           class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                    <input type="text" id="profileDisplayName" placeholder="Your name"
+                                        class="form-input w-full rounded-xl px-4 py-4 text-sm">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Farcaster Username</label>
-                                    <input type="text" id="profileFarcaster" placeholder="@username" 
-                                           class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Farcaster
+                                        Username</label>
+                                    <input type="text" id="profileFarcaster" placeholder="@username"
+                                        class="form-input w-full rounded-xl px-4 py-4 text-sm">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                                <textarea id="profileBio" rows="4" placeholder="Tell us about yourself..." maxlength="280"
-                                          class="form-input w-full rounded-xl px-4 py-4 text-sm resize-none"></textarea>
+                                <textarea id="profileBio" rows="4" placeholder="Tell us about yourself..."
+                                    maxlength="280"
+                                    class="form-input w-full rounded-xl px-4 py-4 text-sm resize-none"></textarea>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Donation Message</label>
-                                <input type="text" id="profileDonationMessage" placeholder="Thanks for your support! 💙" maxlength="100"
-                                       class="form-input w-full rounded-xl px-4 py-4 text-sm">
-                                <div class="text-xs text-gray-500 mt-2">This message shows when people donate to you</div>
+                                <input type="text" id="profileDonationMessage" placeholder="Thanks for your support! 💙"
+                                    maxlength="100" class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                <div class="text-xs text-gray-500 mt-2">This message shows when people donate to you
+                                </div>
                             </div>
 
                             <!-- Privacy Settings -->
@@ -837,20 +875,24 @@
                                 <h3 class="text-xl font-bold mb-6">🪙 Token Rewards</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div class="stats-card rounded-xl p-6">
-                                        <div class="text-3xl font-black text-black" id="profileTokensEarned">0 $GIVE</div>
+                                        <div class="text-3xl font-black text-black" id="profileTokensEarned">0 $GIVE
+                                        </div>
                                         <div class="text-sm text-gray-500">Total Earned</div>
                                     </div>
                                     <div class="token-highlight rounded-xl p-6">
-                                        <div class="text-3xl font-black text-white" id="profileTokensPending">0 $GIVE</div>
+                                        <div class="text-3xl font-black text-white" id="profileTokensPending">0 $GIVE
+                                        </div>
                                         <div class="text-sm text-gray-300">Pending Claim</div>
                                     </div>
                                 </div>
-                                <button onclick="checkAirdropEligibility()" class="primary-button w-full py-4 rounded-xl text-white font-bold">
+                                <button onclick="checkAirdropEligibility()"
+                                    class="primary-button w-full py-4 rounded-xl text-white font-bold">
                                     Check Airdrop Eligibility
                                 </button>
                             </div>
 
-                            <button onclick="updateProfile()" class="primary-button w-full py-4 rounded-xl text-white font-bold">
+                            <button onclick="updateProfile()"
+                                class="primary-button w-full py-4 rounded-xl text-white font-bold">
                                 <span id="updateProfileButtonText">Update Profile</span>
                             </button>
                         </div>
@@ -869,20 +911,21 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            
+
             <div id="selectedPool" class="mb-8">
                 <!-- Selected pool info will be shown here -->
             </div>
-            
+
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Donation Amount (ETH)</label>
-                <input type="number" id="poolDonationAmount" step="0.001" min="0.001" placeholder="0.01" 
-                       class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                <input type="number" id="poolDonationAmount" step="0.001" min="0.001" placeholder="0.01"
+                    class="form-input w-full rounded-xl px-4 py-4 text-sm">
                 <div class="mt-3 text-sm text-gray-600">
-                    Minimum: 0.001 ETH • Points: <span id="poolEstimatedPoints" class="font-bold text-black">0</span> • Tokens: <span id="poolEstimatedTokens" class="font-bold text-black">0 $GIVE</span>
+                    Minimum: 0.001 ETH • Points: <span id="poolEstimatedPoints" class="font-bold text-black">0</span> •
+                    Tokens: <span id="poolEstimatedTokens" class="font-bold text-black">0 $GIVE</span>
                 </div>
             </div>
-            
+
             <button onclick="processPoolDonation()" class="primary-button w-full py-4 rounded-xl text-white font-bold">
                 <span id="poolDonateButtonText">Donate Now</span>
             </button>
@@ -898,20 +941,20 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            
+
             <div id="selectedRecipient" class="mb-8">
                 <!-- Selected recipient info will be shown here -->
             </div>
-            
+
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Donation Amount (ETH)</label>
-                <input type="number" id="donationAmount" step="0.001" min="0.001" placeholder="0.01" 
-                       class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                <input type="number" id="donationAmount" step="0.001" min="0.001" placeholder="0.01"
+                    class="form-input w-full rounded-xl px-4 py-4 text-sm">
                 <div class="mt-3 text-sm text-gray-600">
                     Minimum: 0.001 ETH • Points: <span id="estimatedPoints" class="font-bold text-black">0</span>
                 </div>
             </div>
-            
+
             <button onclick="processDonation()" class="primary-button w-full py-4 rounded-xl text-white font-bold">
                 <span id="donateButtonText">Donate Now</span>
             </button>
@@ -925,7 +968,8 @@
                 <i class="fas fa-check text-3xl text-black"></i>
             </div>
             <h3 class="text-3xl font-bold mb-4">Donation Successful!</h3>
-            <p class="text-gray-600 mb-8 text-lg">Thank you for your generosity. Your donation has been recorded on the blockchain.</p>
+            <p class="text-gray-600 mb-8 text-lg">Thank you for your generosity. Your donation has been recorded on the
+                blockchain.</p>
             <div class="bg-black/5 rounded-2xl p-6 mb-8">
                 <div class="text-sm text-gray-500 mb-2">Transaction Hash</div>
                 <div id="txHash" class="font-mono text-xs break-all text-black font-medium"></div>
@@ -957,8 +1001,8 @@
         let hasMoreDonations = false;
         let hasMoreSocialFeed = false;
         let currentDonationType = 'pools';
-        
-        const BASE_SEPOLIA_CHAIN_ID = '0x14A34'; // 84532 in decimal
+
+        const BASE_MAINNET_CHAIN_ID = '0x2105'; // 8453 in decimal
         const CONTRACT_ADDRESS = '{{ contract_address }}';
 
         // Initialize
@@ -971,11 +1015,11 @@
                 console.log('MetaMask is not installed');
                 updateConnectButton('Install MetaMask', false);
             }
-            
+
             await loadStats();
             await loadPools();
             switchTab('donate');
-            
+
             // Update donation amount input listeners
             document.getElementById('donationAmount').addEventListener('input', updateEstimatedPoints);
             document.getElementById('poolDonationAmount').addEventListener('input', updatePoolEstimatedRewards);
@@ -1020,7 +1064,7 @@
                 // Toggle dropdown
                 const dropdown = document.getElementById('walletDropdown');
                 dropdown.classList.toggle('hidden');
-                
+
                 // Update balance when showing dropdown
                 if (!dropdown.classList.contains('hidden')) {
                     await updateWalletBalance();
@@ -1035,7 +1079,7 @@
         document.addEventListener('click', (e) => {
             const walletBtn = document.getElementById('connectWallet');
             const dropdown = document.getElementById('walletDropdown');
-            
+
             if (!walletBtn.contains(e.target) && !dropdown.contains(e.target)) {
                 dropdown.classList.add('hidden');
             }
@@ -1044,7 +1088,7 @@
         // Update wallet balance
         async function updateWalletBalance() {
             if (!userAccount || !web3) return;
-            
+
             try {
                 const balanceWei = await web3.eth.getBalance(userAccount);
                 const balanceEth = web3.utils.fromWei(balanceWei, 'ether');
@@ -1068,7 +1112,7 @@
         // View on block explorer
         function viewOnExplorer() {
             if (userAccount) {
-                window.open(`https://sepolia.basescan.org/address/${userAccount}`, '_blank');
+                window.open(`https://basescan.org/address/${userAccount}`, '_blank');
             }
         }
 
@@ -1082,10 +1126,10 @@
             document.getElementById('userPoints').textContent = '0';
             document.getElementById('userTokens').textContent = '0 $GIVE';
             document.getElementById('userRank').textContent = '';
-            
+
             // Clear user-specific data
             resetUserData();
-            
+
             console.log('Wallet disconnected');
         }
 
@@ -1093,13 +1137,13 @@
             // Reset donation history
             const donationHistory = document.getElementById('donationHistory');
             donationHistory.innerHTML = '<div class="text-center py-12 text-gray-500">Connect wallet to view your donation history</div>';
-            
+
             // Reset user stats
             document.getElementById('userTotalDonated').textContent = '0 ETH';
             document.getElementById('userDonationCount').textContent = '0';
             document.getElementById('userTotalPoints').textContent = '0';
             document.getElementById('userCurrentRank').textContent = '#--';
-            
+
             // Hide user position card
             document.getElementById('userPositionCard').classList.add('hidden');
 
@@ -1111,7 +1155,7 @@
         function updateConnectButton(text, isConnected) {
             const connectBtn = document.getElementById('connectWallet');
             connectBtn.textContent = text;
-            
+
             if (isConnected) {
                 connectBtn.classList.remove('primary-button');
                 connectBtn.classList.add('secondary-button');
@@ -1125,7 +1169,7 @@
         async function checkWalletConnection() {
             if (typeof window.ethereum !== 'undefined') {
                 web3 = new Web3(window.ethereum);
-                
+
                 try {
                     const accounts = await web3.eth.getAccounts();
                     if (accounts.length > 0) {
@@ -1153,27 +1197,27 @@
                 const accounts = await window.ethereum.request({
                     method: 'eth_requestAccounts'
                 });
-                
+
                 if (accounts.length === 0) {
                     alert('No accounts found. Please check your MetaMask.');
                     return;
                 }
-                
+
                 userAccount = accounts[0];
                 web3 = new Web3(window.ethereum);
-                
+
                 // Check and switch to Base Sepolia
                 await checkAndSwitchNetwork();
-                
+
                 // Update UI
                 updateWalletUI();
-                
+
                 // Load user-specific data
                 await loadUserStats();
                 await loadUserProfile();
-                
+
                 console.log('Connected to wallet:', userAccount);
-                
+
             } catch (error) {
                 console.error('Error connecting wallet:', error);
                 if (error.code === 4001) {
@@ -1189,56 +1233,56 @@
             try {
                 const chainId = await web3.eth.getChainId();
                 const currentChainId = '0x' + chainId.toString(16);
-                
+
                 console.log('Current chain ID:', currentChainId);
-                console.log('Expected chain ID:', BASE_SEPOLIA_CHAIN_ID);
-                
-                if (currentChainId !== BASE_SEPOLIA_CHAIN_ID) {
-                    console.log('Wrong network, switching to Base Sepolia...');
-                    await switchToBaseSepolia();
+                console.log('Expected chain ID:', BASE_MAINNET_CHAIN_ID);
+
+                if (currentChainId !== BASE_MAINNET_CHAIN_ID) {
+                    console.log('Wrong network, switching to Base Mainnet...');
+                    await switchToBaseMainnet();
                 } else {
-                    console.log('Already on Base Sepolia');
+                    console.log('Already on Base Mainnet');
                 }
             } catch (error) {
                 console.error('Error checking network:', error);
             }
         }
 
-        async function switchToBaseSepolia() {
+        async function switchToBaseMainnet() {
             try {
-                // Try to switch to Base Sepolia
+                // Try to switch to Base Mainnet
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: BASE_SEPOLIA_CHAIN_ID }],
+                    params: [{ chainId: BASE_MAINNET_CHAIN_ID }],
                 });
-                console.log('Switched to Base Sepolia');
+                console.log('Switched to Base Mainnet');
             } catch (switchError) {
                 // This error code indicates that the chain has not been added to MetaMask
                 if (switchError.code === 4902) {
-                    console.log('Base Sepolia not found, adding network...');
+                    console.log('Base Mainnet not found, adding network...');
                     try {
                         await window.ethereum.request({
                             method: 'wallet_addEthereumChain',
                             params: [{
-                                chainId: BASE_SEPOLIA_CHAIN_ID,
-                                chainName: 'Base Sepolia',
+                                chainId: BASE_MAINNET_CHAIN_ID,
+                                chainName: 'Base',
                                 nativeCurrency: {
                                     name: 'Ethereum',
                                     symbol: 'ETH',
                                     decimals: 18
                                 },
-                                rpcUrls: ['https://sepolia.base.org'],
-                                blockExplorerUrls: ['https://sepolia.basescan.org']
+                                rpcUrls: ['https://mainnet.base.org'],
+                                blockExplorerUrls: ['https://basescan.org']
                             }]
                         });
-                        console.log('Base Sepolia network added successfully');
+                        console.log('Base Mainnet network added successfully');
                     } catch (addError) {
-                        console.error('Error adding Base Sepolia network:', addError);
-                        alert('Failed to add Base Sepolia network. Please add it manually in MetaMask.');
+                        console.error('Error adding Base Mainnet network:', addError);
+                        alert('Failed to add Base Mainnet network. Please add it manually in MetaMask.');
                     }
                 } else {
                     console.error('Error switching network:', switchError);
-                    alert('Failed to switch network. Please switch to Base Sepolia manually in MetaMask.');
+                    alert('Failed to switch network. Please switch to Base Mainnet manually in MetaMask.');
                 }
             }
         }
@@ -1248,7 +1292,7 @@
                 const shortAddress = `${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
                 updateConnectButton(shortAddress, true);
                 document.getElementById('networkInfo').classList.remove('hidden');
-                
+
                 // Update dropdown info
                 document.getElementById('fullAddress').textContent = userAccount;
             }
@@ -1257,26 +1301,26 @@
         // Tab switching
         function switchTab(tabName) {
             console.log('Switching to tab:', tabName, 'User account:', userAccount);
-            
+
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.add('hidden');
             });
-            
+
             // Remove active class from all buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('tab-active');
             });
-            
+
             // Show selected tab
             document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-            
+
             // Add active class to button
             const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
             if (activeBtn) {
                 activeBtn.classList.add('tab-active');
             }
-            
+
             // Load tab-specific data
             if (tabName === 'leaderboard') {
                 console.log('Loading leaderboard...');
@@ -1302,17 +1346,17 @@
         // Donation type switching
         function switchDonationType(type) {
             currentDonationType = type;
-            
+
             // Hide all sections
             document.querySelectorAll('.donation-section').forEach(section => {
                 section.classList.add('hidden');
             });
-            
+
             // Remove active class from all buttons
             document.querySelectorAll('.donation-type-btn').forEach(btn => {
                 btn.classList.remove('donation-type-active');
             });
-            
+
             // Show selected section
             if (type === 'pools') {
                 document.getElementById('poolsSection').classList.remove('hidden');
@@ -1334,15 +1378,15 @@
             try {
                 const response = await fetch('/api/pools/');
                 const data = await response.json();
-                
+
                 const grid = document.getElementById('poolsGrid');
                 grid.innerHTML = '';
-                
+
                 if (data.pools.length === 0) {
                     grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No active pools yet. Check back soon!</div>';
                     return;
                 }
-                
+
                 data.pools.forEach(pool => {
                     const card = document.createElement('div');
                     card.className = 'pool-card rounded-3xl p-8 text-center hover-lift';
@@ -1367,7 +1411,7 @@
                     `;
                     grid.appendChild(card);
                 });
-                
+
             } catch (error) {
                 console.error('Error loading pools:', error);
                 const grid = document.getElementById('poolsGrid');
@@ -1380,17 +1424,17 @@
             try {
                 const response = await fetch('/api/user-profile/?popular=true');
                 const data = await response.json();
-                
+
                 const grid = document.getElementById('popularRecipients');
                 grid.innerHTML = '';
-                
+
                 // Mock popular recipients for now
                 const mockRecipients = [
                     { address: '0x1234...5678', display_name: '@alice', total_received: '0.5', avatar_url: '' },
                     { address: '0x2345...6789', display_name: '@bob', total_received: '0.3', avatar_url: '' },
                     { address: '0x3456...7890', display_name: '@charlie', total_received: '0.2', avatar_url: '' }
                 ];
-                
+
                 mockRecipients.forEach(recipient => {
                     const card = document.createElement('div');
                     card.className = 'social-card rounded-2xl p-6 cursor-pointer hover-lift';
@@ -1411,7 +1455,7 @@
                     `;
                     grid.appendChild(card);
                 });
-                
+
             } catch (error) {
                 console.error('Error loading popular recipients:', error);
             }
@@ -1426,26 +1470,26 @@
             try {
                 const response = await fetch('/api/recipients/');
                 const data = await response.json();
-                
+
                 const grid = document.getElementById('recipientsGrid');
                 grid.innerHTML = '';
-                
+
                 if (data.recipients.length === 0) {
                     grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No verified recipients yet. Check back soon!</div>';
                     return;
                 }
-                
+
                 // Only show legacy recipients (not pools)
                 const legacyRecipients = data.recipients.filter(r => !r.is_pool);
-                
+
                 if (legacyRecipients.length === 0) {
                     grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No verified recipients yet. Check back soon!</div>';
                     return;
                 }
-                
+
                 legacyRecipients.forEach(recipient => {
                     const progress = Math.min((parseFloat(recipient.raised_amount) / parseFloat(recipient.goal_amount)) * 100, 100);
-                    
+
                     const card = document.createElement('div');
                     card.className = 'glass-card rounded-3xl hover-lift';
                     card.innerHTML = `
@@ -1483,7 +1527,7 @@
                     `;
                     grid.appendChild(card);
                 });
-                
+
             } catch (error) {
                 console.error('Error loading recipients:', error);
             }
@@ -1495,12 +1539,12 @@
                 const url = userAccount ? `/api/stats/?user=${userAccount}` : '/api/stats/';
                 const response = await fetch(url);
                 const data = await response.json();
-                
+
                 document.getElementById('totalDonated').textContent = `${parseFloat(data.total_donated).toFixed(4)} ETH`;
                 document.getElementById('activePools').textContent = data.active_pools || '0';
                 document.getElementById('totalDonors').textContent = data.total_donors;
                 document.getElementById('userPoints').textContent = data.user_points || '0';
-                
+
                 // Show user rank if available
                 if (data.user_stats && data.user_stats.rank) {
                     document.getElementById('userRank').textContent = `Rank #${data.user_stats.rank}`;
@@ -1510,7 +1554,7 @@
                 if (data.user_stats && data.user_stats.tokens_earned) {
                     document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $GIVE`;
                 }
-                
+
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
@@ -1519,13 +1563,13 @@
         // Load user stats
         async function loadUserStats() {
             if (!userAccount) return;
-            
+
             try {
                 const response = await fetch(`/api/stats/?user=${userAccount}`);
                 const data = await response.json();
-                
+
                 document.getElementById('userPoints').textContent = data.user_points || '0';
-                
+
                 if (data.user_stats && data.user_stats.rank) {
                     document.getElementById('userRank').textContent = `Rank #${data.user_stats.rank}`;
                 }
@@ -1533,7 +1577,7 @@
                 if (data.user_stats && data.user_stats.tokens_earned) {
                     document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $GIVE`;
                 }
-                
+
             } catch (error) {
                 console.error('Error loading user stats:', error);
             }
@@ -1542,11 +1586,11 @@
         // Load user profile
         async function loadUserProfile() {
             if (!userAccount) return;
-            
+
             try {
                 const response = await fetch(`/api/user-profile/?address=${userAccount}`);
                 const data = await response.json();
-                
+
                 if (data.exists !== false) {
                     // Fill profile form
                     document.getElementById('profileDisplayName').value = data.display_name || '';
@@ -1555,10 +1599,10 @@
                     document.getElementById('profileDonationMessage').value = data.donation_message || '';
                     document.getElementById('profilePublic').checked = data.is_public !== false;
                     document.getElementById('profileAcceptDonations').checked = data.accepts_donations !== false;
-                    
+
                     // Update token info
                     document.getElementById('profileTokensEarned').textContent = `${parseFloat(data.tokens_earned || 0).toFixed(2)} $GIVE`;
-                    
+
                     // Calculate pending tokens
                     const tokensEarned = parseFloat(data.tokens_earned || 0);
                     const tokensClaimed = parseFloat(data.tokens_claimed || 0);
@@ -1570,7 +1614,7 @@
                     document.getElementById('profileAcceptDonations').checked = true;
                     document.getElementById('profileDonationMessage').value = 'Thanks for your support! 💙';
                 }
-                
+
             } catch (error) {
                 console.error('Error loading user profile:', error);
             }
@@ -1665,18 +1709,18 @@
             try {
                 const response = await fetch(`/api/social-feed/?page=${page}&limit=20`);
                 const data = await response.json();
-                
+
                 const feed = document.getElementById('socialFeed');
-                
+
                 if (page === 1) {
                     feed.innerHTML = '';
                 }
-                
+
                 if (data.feed.length === 0 && page === 1) {
                     feed.innerHTML = '<div class="text-center py-12 text-gray-500">No public donations yet. Be the first to share your generosity!</div>';
                     return;
                 }
-                
+
                 data.feed.forEach(donation => {
                     const feedItem = document.createElement('div');
                     feedItem.className = 'social-card rounded-2xl p-6';
@@ -1699,7 +1743,7 @@
                                     <span>${donation.time_ago}</span>
                                     <div class="flex items-center space-x-4">
                                         <span class="text-black font-medium">+${donation.points_earned} pts</span>
-                                        <a href="https://sepolia.basescan.org/tx/${donation.tx_hash}" target="_blank" class="text-black hover:text-gray-700">
+                                        <a href="https://basescan.org/tx/${donation.tx_hash}" target="_blank" class="text-black hover:text-gray-700">
                                             <i class="fas fa-external-link-alt"></i>
                                         </a>
                                     </div>
@@ -1709,7 +1753,7 @@
                     `;
                     feed.appendChild(feedItem);
                 });
-                
+
                 // Handle pagination
                 const loadMoreContainer = document.getElementById('loadMoreSocialContainer');
                 if (data.pagination && data.pagination.has_next) {
@@ -1720,7 +1764,7 @@
                     loadMoreContainer.classList.add('hidden');
                     hasMoreSocialFeed = false;
                 }
-                
+
             } catch (error) {
                 console.error('Error loading social feed:', error);
                 const feed = document.getElementById('socialFeed');
@@ -1740,19 +1784,19 @@
                 const url = userAccount ? `/api/leaderboard/?user=${userAccount}` : '/api/leaderboard/';
                 const response = await fetch(url);
                 const data = await response.json();
-                
+
                 const list = document.getElementById('leaderboardList');
                 list.innerHTML = '';
-                
+
                 if (data.leaderboard.length === 0) {
                     list.innerHTML = '<div class="text-center py-12 text-gray-500">Be the first to donate and claim the top spot!</div>';
                     return;
                 }
-                
+
                 data.leaderboard.forEach((donor, index) => {
                     const rankColors = ['text-yellow-600', 'text-gray-600', 'text-orange-600', 'text-black'];
                     const rankColor = rankColors[Math.min(index, 3)];
-                    
+
                     const row = document.createElement('div');
                     row.className = `leaderboard-item rounded-2xl p-6 ${donor.is_current_user ? 'user-highlight' : ''}`;
                     row.innerHTML = `
@@ -1776,13 +1820,13 @@
                     `;
                     list.appendChild(row);
                 });
-                
+
                 // Show user position card if user is not in top 100
                 if (userAccount && data.user_position && !data.user_position.is_current_user) {
                     const userPos = data.user_position;
                     const userPositionCard = document.getElementById('userPositionCard');
                     const userPositionInfo = document.getElementById('userPositionInfo');
-                    
+
                     userPositionInfo.innerHTML = `
                         <div class="flex items-center space-x-6">
                             <span class="text-3xl font-black text-black">#${userPos.rank}</span>
@@ -1800,10 +1844,10 @@
                             <div class="text-sm text-gray-500">${parseFloat(userPos.total_donated).toFixed(4)} ETH</div>
                         </div>
                     `;
-                    
+
                     userPositionCard.classList.remove('hidden');
                 }
-                
+
             } catch (error) {
                 console.error('Error loading leaderboard:', error);
             }
@@ -1819,61 +1863,61 @@
             try {
                 console.log('Loading user donations for:', userAccount, 'page:', page);
                 const response = await fetch(`/api/user-donations/?user=${userAccount}&page=${page}`);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
                 console.log('User donations data:', data);
-                
+
                 // Check if we have the expected data structure
                 if (!data.user_stats) {
                     console.error('Missing user_stats in response');
                     throw new Error('Invalid response format');
                 }
-                
+
                 // Update user stats cards
                 const stats = data.user_stats;
                 document.getElementById('userTotalDonated').textContent = `${parseFloat(stats.total_donated || 0).toFixed(4)} ETH`;
                 document.getElementById('userDonationCount').textContent = stats.donation_count || 0;
                 document.getElementById('userTotalPoints').textContent = stats.total_points || 0;
-                
+
                 // Get user rank
                 if (stats.rank) {
                     document.getElementById('userCurrentRank').textContent = `#${stats.rank}`;
                 } else {
                     document.getElementById('userCurrentRank').textContent = '#--';
                 }
-                
+
                 const historyDiv = document.getElementById('donationHistory');
-                
+
                 if (page === 1) {
                     // Clear existing donations for first page
                     historyDiv.innerHTML = '';
                 }
-                
+
                 // Check if we have donations array
                 if (!data.donations || !Array.isArray(data.donations)) {
                     console.error('Missing or invalid donations array');
                     historyDiv.innerHTML = '<div class="text-center py-12 text-gray-500">Error loading donation history. Please try again.</div>';
                     return;
                 }
-                
+
                 if (data.donations.length === 0 && page === 1) {
                     historyDiv.innerHTML = '<div class="text-center py-12 text-gray-500">No donations yet. Make your first donation to appear here!</div>';
                     return;
                 }
-                
+
                 // Add donations
                 data.donations.forEach(donation => {
                     const donationCard = document.createElement('div');
                     donationCard.className = 'glass-card rounded-2xl p-6';
-                    
+
                     let typeIcon = '📍';
                     let typeBadge = '';
                     let recipientInfo = donation.recipient_name || 'Unknown Recipient';
-                    
+
                     if (donation.type === 'pool') {
                         typeIcon = donation.emoji || '🌍';
                         typeBadge = '<span class="bg-black/10 text-black px-3 py-1 rounded-full text-xs font-medium ml-2">Pool</span>';
@@ -1887,7 +1931,7 @@
                         typeIcon = '❤️';
                         typeBadge = '<span class="bg-black/10 text-black px-3 py-1 rounded-full text-xs font-medium ml-2">Legacy</span>';
                     }
-                    
+
                     donationCard.innerHTML = `
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex items-center">
@@ -1910,14 +1954,14 @@
                         ${donation.message ? `<div class="text-sm text-gray-700 mb-4 italic bg-black/5 p-3 rounded-xl">"${donation.message}"</div>` : ''}
                         <div class="flex justify-between items-center text-sm text-gray-500">
                             <span>${donation.time_ago || 'Unknown time'}</span>
-                            ${donation.tx_hash ? `<a href="https://sepolia.basescan.org/tx/${donation.tx_hash}" target="_blank" class="text-black hover:text-gray-700 font-medium">
+                            ${donation.tx_hash ? `<a href="https://basescan.org/tx/${donation.tx_hash}" target="_blank" class="text-black hover:text-gray-700 font-medium">
                                 View Transaction <i class="fas fa-external-link-alt ml-1"></i>
                             </a>` : '<span class="text-gray-500">No transaction hash</span>'}
                         </div>
                     `;
                     historyDiv.appendChild(donationCard);
                 });
-                
+
                 // Handle pagination
                 const loadMoreContainer = document.getElementById('loadMoreContainer');
                 if (data.pagination && data.pagination.has_next) {
@@ -1928,11 +1972,11 @@
                     loadMoreContainer.classList.add('hidden');
                     hasMoreDonations = false;
                 }
-                
+
             } catch (error) {
                 console.error('Error loading user donations:', error);
                 const historyDiv = document.getElementById('donationHistory');
-                
+
                 if (error.message.includes('404') || error.message.includes('HTTP error! status: 404')) {
                     historyDiv.innerHTML = '<div class="text-center py-12 text-gray-500">API endpoint not found. Please check your backend configuration.</div>';
                 } else if (error.message.includes('Failed to fetch')) {
@@ -1940,7 +1984,7 @@
                 } else {
                     historyDiv.innerHTML = `<div class="text-center py-12 text-gray-500">Error loading donations: ${error.message}</div>`;
                 }
-                
+
                 // Reset stats to default values on error
                 document.getElementById('userTotalDonated').textContent = '0 ETH';
                 document.getElementById('userDonationCount').textContent = '0';
@@ -1961,10 +2005,10 @@
                 alert('Please connect your wallet first!');
                 return;
             }
-            
+
             selectedPoolId = poolId;
             document.getElementById('poolDonationModal').classList.remove('hidden');
-            
+
             // Load pool details
             fetch('/api/pools/')
                 .then(res => res.json())
@@ -2009,59 +2053,59 @@
         // Process pool donation
         async function processPoolDonation() {
             const amount = document.getElementById('poolDonationAmount').value;
-            
+
             if (!amount || parseFloat(amount) < 0.001) {
                 alert('Minimum donation is 0.001 ETH');
                 return;
             }
-            
+
             if (!selectedPoolId) return;
-            
+
             const donateBtn = document.getElementById('poolDonateButtonText');
             donateBtn.textContent = 'Processing...';
-            
+
             try {
                 // Check user balance first
                 const balanceWei = await web3.eth.getBalance(userAccount);
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
-                
+
                 // Account for gas fees (roughly 0.0001 ETH for simple transfer)
                 if (balanceEth < donationAmount + 0.0001) {
                     alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
-                
+
                 // Get pool wallet
                 const response = await fetch('/api/pools/');
                 const data = await response.json();
                 const pool = data.pools.find(p => p.id === selectedPoolId);
-                
+
                 if (!pool) {
                     alert('Pool not found');
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
-                
+
                 // Send transaction directly to pool wallet
                 const amountWei = web3.utils.toWei(amount, 'ether');
-                
+
                 console.log('Sending pool donation:', {
                     from: userAccount,
                     to: pool.wallet_address,
                     value: amountWei
                 });
-                
+
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
                     to: pool.wallet_address,
                     value: amountWei,
                     gas: 21000, // Standard gas limit for ETH transfer
                 });
-                
+
                 console.log('Pool donation successful:', tx);
-                
+
                 // Record donation in backend
                 await fetch('/api/donate-to-pool/', {
                     method: 'POST',
@@ -2076,29 +2120,29 @@
                         block_number: tx.blockNumber,
                     }),
                 });
-                
+
                 // Show success
                 document.getElementById('txHash').textContent = tx.transactionHash;
                 document.getElementById('pointsEarned').textContent = Math.floor(parseFloat(amount) * 1000);
                 document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100).toFixed(1);
-                
+
                 closePoolDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
-                
+
                 // Refresh data
                 await loadStats();
                 await loadPools();
                 await loadUserStats();
-                
+
             } catch (error) {
                 console.error('Pool donation error:', error);
-                
+
                 if (error.code === 4001) {
                     alert('Transaction cancelled by user.');
                 } else if (error.code === -32000) {
-                    alert('Insufficient funds for gas. You need Base Sepolia ETH to pay for transaction fees.');
+                    alert('Insufficient funds for gas. You need Base Mainnet ETH to pay for transaction fees.');
                 } else if (error.message && error.message.includes('insufficient funds')) {
-                    alert('Insufficient ETH balance. Please add more Base Sepolia ETH to your wallet.');
+                    alert('Insufficient ETH balance. Please add more Base Mainnet ETH to your wallet.');
                 } else {
                     alert('Transaction failed. Please try again. Error: ' + (error.message || 'Unknown error'));
                 }
@@ -2121,36 +2165,36 @@
             const amount = document.getElementById('p2pAmount').value;
             const message = document.getElementById('p2pMessage').value.trim();
             const isPublic = document.getElementById('p2pPublic').checked;
-            
+
             if (!recipient) {
                 alert('Please enter a recipient address or username');
                 return;
             }
-            
+
             if (!amount || parseFloat(amount) < 0.001) {
                 alert('Minimum donation is 0.001 ETH');
                 return;
             }
-            
+
             const donateBtn = document.getElementById('p2pDonateButtonText');
             donateBtn.textContent = 'Processing...';
-            
+
             try {
                 // Check user balance first
                 const balanceWei = await web3.eth.getBalance(userAccount);
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
-                
+
                 if (balanceEth < donationAmount + 0.0001) {
                     alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
                     donateBtn.textContent = 'Send Donation';
                     return;
                 }
-                
+
                 // Parse recipient (could be address or username)
                 let recipientAddress = recipient;
                 let recipientUsername = '';
-                
+
                 if (recipient.startsWith('@')) {
                     recipientUsername = recipient;
                     // For now, you'd need to resolve username to address
@@ -2163,19 +2207,19 @@
                     donateBtn.textContent = 'Send Donation';
                     return;
                 }
-                
+
                 // Send transaction
                 const amountWei = web3.utils.toWei(amount, 'ether');
-                
+
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
                     to: recipientAddress,
                     value: amountWei,
                     gas: 21000,
                 });
-                
+
                 console.log('P2P donation successful:', tx);
-                
+
                 // Record donation in backend
                 await fetch('/api/donate-to-user/', {
                     method: 'POST',
@@ -2194,28 +2238,28 @@
                         frame_interaction: false,
                     }),
                 });
-                
+
                 // Show success
                 document.getElementById('txHash').textContent = tx.transactionHash;
                 const basePoints = Math.floor(parseFloat(amount) * 1000);
                 const finalPoints = isPublic ? Math.floor(basePoints * 1.2) : basePoints;
                 document.getElementById('pointsEarned').textContent = finalPoints;
                 document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100 * (isPublic ? 1.2 : 1)).toFixed(1);
-                
+
                 // Clear form
                 document.getElementById('p2pRecipient').value = '';
                 document.getElementById('p2pAmount').value = '';
                 document.getElementById('p2pMessage').value = '';
-                
+
                 document.getElementById('successModal').classList.remove('hidden');
-                
+
                 // Refresh data
                 await loadStats();
                 await loadUserStats();
-                
+
             } catch (error) {
                 console.error('P2P donation error:', error);
-                
+
                 if (error.code === 4001) {
                     alert('Transaction cancelled by user.');
                 } else if (error.code === -32000) {
@@ -2236,10 +2280,10 @@
                 alert('Please connect your wallet first!');
                 return;
             }
-            
+
             selectedRecipientId = recipientId;
             document.getElementById('donationModal').classList.remove('hidden');
-            
+
             // Load recipient details
             fetch('/api/recipients/')
                 .then(res => res.json())
@@ -2281,59 +2325,59 @@
         // Process legacy donation
         async function processDonation() {
             const amount = document.getElementById('donationAmount').value;
-            
+
             if (!amount || parseFloat(amount) < 0.001) {
                 alert('Minimum donation is 0.001 ETH');
                 return;
             }
-            
+
             if (!selectedRecipientId) return;
-            
+
             const donateBtn = document.getElementById('donateButtonText');
             donateBtn.textContent = 'Processing...';
-            
+
             try {
                 // Check user balance first
                 const balanceWei = await web3.eth.getBalance(userAccount);
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
-                
+
                 // Account for gas fees (roughly 0.0001 ETH for simple transfer)
                 if (balanceEth < donationAmount + 0.0001) {
                     alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
-                
+
                 // Get recipient wallet
                 const response = await fetch('/api/recipients/');
                 const data = await response.json();
                 const recipient = data.recipients.find(r => r.id === selectedRecipientId && !r.is_pool);
-                
+
                 if (!recipient) {
                     alert('Recipient not found');
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
-                
+
                 // Send transaction directly to recipient wallet
                 const amountWei = web3.utils.toWei(amount, 'ether');
-                
+
                 console.log('Sending transaction:', {
                     from: userAccount,
                     to: recipient.wallet_address,
                     value: amountWei
                 });
-                
+
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
                     to: recipient.wallet_address,
                     value: amountWei,
                     gas: 21000, // Standard gas limit for ETH transfer
                 });
-                
+
                 console.log('Transaction successful:', tx);
-                
+
                 // Record donation in backend
                 await fetch('/api/record-donation/', {
                     method: 'POST',
@@ -2348,23 +2392,23 @@
                         block_number: tx.blockNumber,
                     }),
                 });
-                
+
                 // Show success
                 document.getElementById('txHash').textContent = tx.transactionHash;
                 document.getElementById('pointsEarned').textContent = Math.floor(parseFloat(amount) * 1000);
                 document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100).toFixed(1);
-                
+
                 closeDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
-                
+
                 // Refresh data
                 await loadStats();
                 await loadRecipients();
                 await loadUserStats();
-                
+
             } catch (error) {
                 console.error('Donation error:', error);
-                
+
                 if (error.code === 4001) {
                     alert('Transaction cancelled by user.');
                 } else if (error.code === -32000) {
@@ -2381,7 +2425,7 @@
 
         function closeSuccessModal() {
             document.getElementById('successModal').classList.add('hidden');
-            
+
             // Refresh current tab data
             const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
             if (activeTab === 'my-donations') {
@@ -2391,7 +2435,7 @@
             } else if (activeTab === 'social') {
                 loadSocialFeed();
             }
-            
+
             // Refresh donate tab content based on current type
             if (activeTab === 'donate') {
                 if (currentDonationType === 'pools') {
@@ -2449,7 +2493,7 @@
                     updateWalletUI();
                     loadUserStats();
                     loadUserProfile();
-                    
+
                     // Refresh current tab if it's user-specific
                     const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
                     if (activeTab === 'my-donations') {
@@ -2477,7 +2521,7 @@
         document.addEventListener('keydown', (e) => {
             // Alt + 1-5 for quick tab switching
             if (e.altKey && !e.ctrlKey && !e.shiftKey) {
-                switch(e.key) {
+                switch (e.key) {
                     case '1':
                         e.preventDefault();
                         switchTab('donate');
@@ -2500,7 +2544,7 @@
                         break;
                 }
             }
-            
+
             // Escape to close modals
             if (e.key === 'Escape') {
                 document.getElementById('donationModal').classList.add('hidden');
@@ -2512,12 +2556,12 @@
 
         // Auto-refresh data every 30 seconds when tab is active
         let refreshInterval;
-        
+
         function startAutoRefresh() {
             refreshInterval = setInterval(() => {
                 if (!document.hidden) {
                     loadStats();
-                    
+
                     const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
                     if (activeTab === 'social') {
                         // Refresh social feed silently
@@ -2528,13 +2572,13 @@
                 }
             }, 30000); // 30 seconds
         }
-        
+
         function stopAutoRefresh() {
             if (refreshInterval) {
                 clearInterval(refreshInterval);
             }
         }
-        
+
         // Start auto-refresh when page is visible
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
@@ -2543,7 +2587,7 @@
                 startAutoRefresh();
             }
         });
-        
+
         // Start auto-refresh on load
         startAutoRefresh();
 
@@ -2562,4 +2606,5 @@
         console.log('🔧 Press F12 to open developer tools for debugging');
     </script>
 </body>
+
 </html>
