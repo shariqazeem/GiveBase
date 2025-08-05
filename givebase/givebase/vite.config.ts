@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    allowedHosts: ['umanity.xyz'], // 👈 Add this line
+    allowedHosts: ['acoustic-brazilian-cyber-fly.trycloudflare.com'], // 👈 Add this line
     proxy: {
       '/api': {
         target: 'http://localhost:8000',

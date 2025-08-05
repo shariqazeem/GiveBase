@@ -571,35 +571,7 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-8">
-        <!-- Epoch Banner -->
-        <div class="mb-8">
-            <div class="glass-card rounded-2xl p-6 text-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-green-500/10"></div>
-                <div class="relative">
-                    <div class="flex items-center justify-center space-x-8 flex-wrap">
-                        <div>
-                            <div class="text-sm text-gray-500 mb-1">Current Epoch</div>
-                            <div class="text-3xl font-black text-purple-600" id="currentEpochDisplay">0</div>
-                        </div>
-                        <div>
-                            <div class="text-sm text-gray-500 mb-1">Points Multiplier</div>
-                            <div class="text-3xl font-black text-blue-600" id="pointsMultiplierDisplay">10.0x</div>
-                        </div>
-                        <div>
-                            <div class="text-sm text-gray-500 mb-1">Token Multiplier</div>
-                            <div class="text-3xl font-black text-green-600" id="tokensMultiplierDisplay">5000x</div>
-                        </div>
-                        <div>
-                            <div class="text-sm text-gray-500 mb-1">Next Epoch In</div>
-                            <div class="text-lg font-bold text-orange-600" id="epochCountdown">--d --h</div>
-                        </div>
-                    </div>
-                    <div class="mt-4 text-sm text-gray-600">
-                        🎉 <strong>Early Adopter Bonus!</strong> Earn massive rewards during the genesis epochs
-                    </div>
-                </div>
-            </div>
-        </div>
+
         <!-- Stats Bar -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
             <div class="stats-card rounded-2xl p-6 hover-lift">
@@ -651,7 +623,8 @@
                 <div class="text-center mb-12">
                     <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Global Donation Pools</h2>
                     <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
-                        Contribute to global causes and earn $UMANITY tokens. No verification needed - just donate and make
+                        Contribute to global causes and earn $UMANITY tokens. No verification needed - just donate and
+                        make
                         an impact worldwide.
                     </p>
                 </div>
@@ -992,13 +965,14 @@
                     Minimum: 0.001 ETH (<span id="poolMinUSD" class="text-green-600 font-medium">$3.00</span>) •
                     <span id="poolEstimatedUSD" class="text-green-600 font-bold">$0.00</span>
                 </div>
-                <div class="mt-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3">
-                    <div class="text-sm font-medium text-gray-700 mb-2">🎁 Epoch 0 Rewards:</div>
+                <div class="mt-2 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-3">
+                    <div class="text-sm font-medium text-gray-700 mb-2">💰 Estimated Rewards:</div>
                     <div class="flex justify-between text-sm">
-                        <span>Points: <span id="poolEstimatedPoints" class="font-bold text-purple-600">0</span></span>
-                        <span>Tokens: <span id="poolEstimatedTokens" class="font-bold text-blue-600">0
-                                $UMANITY</span></span>
+                        <span>Points: <span id="poolEstimatedPoints" class="font-bold text-blue-600">0</span></span>
+                        <span>Tokens: <span id="poolEstimatedTokens" class="font-bold text-green-600">0
+                                $UMAN</span></span>
                     </div>
+                    <div class="text-xs text-gray-600 mt-1">Emergency pools get +150% bonus</div>
                 </div>
                 <div class="text-xs text-gray-500 mt-2">
                     Gas fees: ~$0.01-0.05 additional • ETH Price: $<span id="poolEthPrice">0</span>
@@ -1081,12 +1055,12 @@
                 <div class="stats-card rounded-2xl p-4 bg-gradient-to-br from-purple-50 to-purple-100">
                     <div class="text-2xl font-black text-purple-600">+<span id="pointsEarned">0</span></div>
                     <div class="text-sm text-purple-500">Points Earned</div>
-                    <div class="text-xs text-purple-400 mt-1">Epoch <span id="successEpoch">0</span> Bonus!</div>
+                    <div class="text-xs text-purple-400 mt-1">Impact Points Earned!</div>
                 </div>
                 <div class="token-highlight rounded-2xl p-4 bg-gradient-to-br from-blue-600 to-green-600">
                     <div class="text-2xl font-black text-white">+<span id="tokensEarned">0</span></div>
                     <div class="text-sm text-blue-100">$UMANITY Tokens</div>
-                    <div class="text-xs text-blue-200 mt-1">Genesis Rewards!</div>
+                    <div class="text-xs text-blue-200 mt-1">$UMANITY Tokens!</div>
                 </div>
             </div>
             <button onclick="closeSuccessModal()" class="primary-button py-4 px-8 rounded-xl text-white font-bold">
@@ -1109,31 +1083,30 @@
 
         const BASE_MAINNET_CHAIN_ID = '0x2105'; // 8453 in decimal
         const CONTRACT_ADDRESS = '{{ contract_address }}';
-        // ETH Price tracking
-        let ethPriceUSD = 0;
-        // Epoch and Rewards System
-        let currentEpoch = 0;
-        let epochStartTime = Date.now();
-        let epochDuration = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
-        // Epoch-based multipliers (higher multipliers for early epochs)
-        const epochMultipliers = {
-            0: { points: 10.0, tokens: 5000 },    // Epoch 0: 10x points, 5000x tokens
-            1: { points: 8.0, tokens: 4000 },     // Epoch 1: 8x points, 4000x tokens  
-            2: { points: 6.0, tokens: 3000 },     // Epoch 2: 6x points, 3000x tokens
-            3: { points: 4.0, tokens: 2000 },     // Epoch 3: 4x points, 2000x tokens
-            4: { points: 3.0, tokens: 1500 },     // Epoch 4: 3x points, 1500x tokens
-            5: { points: 2.5, tokens: 1200 },     // Epoch 5: 2.5x points, 1200x tokens
-            6: { points: 2.0, tokens: 1000 },     // Epoch 6: 2x points, 1000x tokens
-            7: { points: 1.8, tokens: 800 },      // Epoch 7: 1.8x points, 800x tokens
-            8: { points: 1.5, tokens: 600 },      // Epoch 8: 1.5x points, 600x tokens
-            9: { points: 1.3, tokens: 500 },      // Epoch 9: 1.3x points, 500x tokens
-            default: { points: 1.0, tokens: 400 } // Epoch 10+: 1x points, 400x tokens
+        // New $UMAN Tokenomics System
+        let ethPriceUSD = 0; // Will be fetched from API
+
+        // Base reward rates - 100 $UMAN per $1 USD donated
+        const BASE_TOKENS_PER_USD = 100; // 1 USD = 100 $UMAN
+        const BASE_POINTS_PER_USD = 1000; // 1 USD = 1000 Impact Points
+
+        // Multiplier system for verified/underfunded causes
+        const CAUSE_MULTIPLIERS = {
+            verified: 1.5,        // 50% bonus (150 $UMAN per $1)
+            underfunded: 2.0,     // 100% bonus (200 $UMAN per $1)
+            emergency: 2.5,       // 150% bonus (250 $UMAN per $1)
+            community_verified: 1.3,  // 30% bonus (130 $UMAN per $1)
+            standard: 1.0         // Base rate (100 $UMAN per $1)
         };
 
-        // Base rewards per ETH donated
-        const basePointsPerETH = 10000;  // 10,000 base points per ETH (was 1000)
-        const baseTokensPerETH = 1;      // 1 base token per ETH (was 100)
+        // P2P bonus system
+        const P2P_BONUS_MULTIPLIER = 1.2; // 20% bonus for P2P donations
+        const PUBLIC_DONATION_BONUS = 1.1; // 10% bonus for public donations (total 32% when combined)
+
+        // Token distribution info
+        const TOTAL_SUPPLY = 10000000000; // 10 billion $UMAN
+        const DONOR_ALLOCATION = 0.40; // 40% for donor rewards
 
         // Fetch ETH price from CoinGecko
         async function fetchETHPrice() {
@@ -1161,42 +1134,58 @@
             const usdAmount = ethAmount * ethPriceUSD;
             return usdAmount >= 1 ? `$${usdAmount.toFixed(2)}` : `$${usdAmount.toFixed(4)}`;
         }
-        // Calculate current epoch based on time
-        function getCurrentEpoch() {
-            const timeElapsed = Date.now() - epochStartTime;
-            const epochsPassed = Math.floor(timeElapsed / epochDuration);
-            return epochsPassed;
-        }
 
-        // Get epoch multipliers
-        function getEpochMultipliers(epoch = null) {
-            const targetEpoch = epoch !== null ? epoch : getCurrentEpoch();
-            return epochMultipliers[targetEpoch] || epochMultipliers.default;
-        }
 
-        // Calculate rewards with epoch multipliers
-        function calculateRewards(ethAmount, isPublic = false, epochOverride = null) {
-            const epoch = epochOverride !== null ? epochOverride : getCurrentEpoch();
-            const multipliers = getEpochMultipliers(epoch);
+        function calculateRewards(usdAmount, donationType = 'pool', isPublic = false, causeType = 'standard') {
+            // Base calculations using USD amount
+            const baseTokens = usdAmount * BASE_TOKENS_PER_USD;
+            const basePoints = usdAmount * BASE_POINTS_PER_USD;
 
-            // Base calculations
-            const basePoints = Math.floor(ethAmount * basePointsPerETH);
-            const baseTokens = ethAmount * baseTokensPerETH;
+            // Apply cause multiplier
+            let causeMultiplier = CAUSE_MULTIPLIERS[causeType] || CAUSE_MULTIPLIERS.standard;
 
-            // Apply epoch multipliers
-            const epochPoints = Math.floor(basePoints * multipliers.points);
-            const epochTokens = baseTokens * multipliers.tokens;
+            // Apply donation type bonus
+            let typeMultiplier = 1.0;
+            if (donationType === 'p2p') {
+                typeMultiplier = P2P_BONUS_MULTIPLIER;
+            }
 
-            // Apply public bonus (20% extra for public donations)
-            const finalPoints = isPublic ? Math.floor(epochPoints * 1.2) : epochPoints;
-            const finalTokens = isPublic ? epochTokens * 1.2 : epochTokens;
+            // Apply public donation bonus (only for P2P)
+            let publicMultiplier = 1.0;
+            if (donationType === 'p2p' && isPublic) {
+                publicMultiplier = PUBLIC_DONATION_BONUS;
+            }
+
+            // Calculate final rewards
+            const finalTokens = Math.floor(baseTokens * causeMultiplier * typeMultiplier * publicMultiplier);
+            const finalPoints = Math.floor(basePoints * causeMultiplier * typeMultiplier * publicMultiplier);
 
             return {
-                points: finalPoints,
                 tokens: finalTokens,
-                epoch: epoch,
-                multipliers: multipliers
+                points: finalPoints,
+                usdAmount: usdAmount,
+                baseRate: BASE_TOKENS_PER_USD,
+                multipliers: {
+                    cause: causeMultiplier,
+                    type: typeMultiplier,
+                    public: publicMultiplier,
+                    total: causeMultiplier * typeMultiplier * publicMultiplier
+                }
             };
+        }
+
+        // Convert ETH amount to USD for calculations
+        function calculateUSDAmount(ethAmount) {
+            return ethAmount * ethPriceUSD;
+        }
+
+        // Helper function to get cause type from recipient data
+        function getCauseType(recipient) {
+            if (recipient.is_emergency) return 'emergency';
+            if (recipient.is_verified) return 'verified';
+            if (recipient.is_underfunded) return 'underfunded';
+            if (recipient.community_verified) return 'community_verified';
+            return 'standard';
         }
 
         // Format large numbers for display
@@ -1213,17 +1202,7 @@
             return Math.floor(num).toString();
         }
 
-        // Get epoch time remaining
-        function getEpochTimeRemaining() {
-            const timeElapsed = Date.now() - epochStartTime;
-            const timeInCurrentEpoch = timeElapsed % epochDuration;
-            const timeRemaining = epochDuration - timeInCurrentEpoch;
 
-            const days = Math.floor(timeRemaining / (24 * 60 * 60 * 1000));
-            const hours = Math.floor((timeRemaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-
-            return { days, hours, totalMs: timeRemaining };
-        }
         // Initialize
         window.addEventListener('load', async () => {
             // Check if MetaMask is installed
@@ -1238,7 +1217,8 @@
             await loadStats();
             await loadPools();
             await fetchETHPrice();
-            updateEpochDisplay();
+            // Initialize reward calculations
+            updateAllRewardDisplays();
             switchTab('donate');
 
             // Update donation amount input listeners
@@ -2273,10 +2253,12 @@
         }
 
         function updatePoolEstimatedRewards() {
-            const amount = parseFloat(document.getElementById('poolDonationAmount').value) || 0;
-            const rewards = calculateRewards(amount, false);
+            const ethAmount = parseFloat(document.getElementById('poolDonationAmount').value) || 0;
+            const usdAmount = calculateUSDAmount(ethAmount);
+            const rewards = calculateRewards(usdAmount, 'pool', false, 'emergency'); // Assuming emergency pool
+
             document.getElementById('poolEstimatedPoints').textContent = formatLargeNumber(rewards.points);
-            document.getElementById('poolEstimatedTokens').textContent = formatLargeNumber(rewards.tokens) + ' $UMANITY';
+            document.getElementById('poolEstimatedTokens').textContent = formatLargeNumber(rewards.tokens) + ' $UMAN';
         }
 
         // Enhanced error handling for mainnet transactions
@@ -2402,11 +2384,13 @@
                 });
 
                 // Calculate and show success rewards
-                const rewards = calculateRewards(parseFloat(amount), false);
+                const usdAmount = calculateUSDAmount(parseFloat(amount));
+                const causeType = getCauseType(selectedRecipient); // or determine based on pool type
+                const rewards = calculateRewards(usdAmount, 'pool', false, causeType);
+
                 document.getElementById('txHash').textContent = tx.transactionHash;
                 document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
                 document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
-                document.getElementById('successEpoch').textContent = rewards.epoch;
 
                 closePoolDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
@@ -2426,16 +2410,17 @@
 
         // P2P donation functions
         function updateP2PEstimatedRewards() {
-            const amount = parseFloat(document.getElementById('p2pAmount').value) || 0;
+            const ethAmount = parseFloat(document.getElementById('p2pAmount').value) || 0;
             const isPublic = document.getElementById('p2pPublic').checked;
-            const rewards = calculateRewards(amount, isPublic);
+            const usdAmount = calculateUSDAmount(ethAmount);
+            const rewards = calculateRewards(usdAmount, 'p2p', isPublic, 'standard');
 
-            // Update UI elements (you'll need to add these elements to the P2P form)
+            // Update UI elements
             const pointsElement = document.getElementById('p2pEstimatedPoints');
             const tokensElement = document.getElementById('p2pEstimatedTokens');
 
             if (pointsElement) pointsElement.textContent = formatLargeNumber(rewards.points);
-            if (tokensElement) tokensElement.textContent = formatLargeNumber(rewards.tokens) + ' $UMANITY';
+            if (tokensElement) tokensElement.textContent = formatLargeNumber(rewards.tokens) + ' $UMAN';
         }
 
         async function processP2PDonation() {
@@ -2525,11 +2510,13 @@
                 });
 
                 // Calculate and show success rewards
-                const rewards = calculateRewards(parseFloat(amount), isPublic);
+                const usdAmount = calculateUSDAmount(parseFloat(amount));
+                const causeType = getCauseType(selectedRecipient); // or determine based on pool type
+                const rewards = calculateRewards(usdAmount, 'pool', false, causeType);
+
                 document.getElementById('txHash').textContent = tx.transactionHash;
                 document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
                 document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
-                document.getElementById('successEpoch').textContent = rewards.epoch;
 
                 // Clear form
                 document.getElementById('p2pRecipient').value = '';
@@ -2602,29 +2589,14 @@
         }
 
         function updateEstimatedPoints() {
-            const amount = parseFloat(document.getElementById('donationAmount').value) || 0;
-            const rewards = calculateRewards(amount, false);
+            const ethAmount = parseFloat(document.getElementById('donationAmount').value) || 0;
+            const usdAmount = calculateUSDAmount(ethAmount);
+            const rewards = calculateRewards(usdAmount, 'legacy', false, 'verified'); // Assuming verified recipient
+
             document.getElementById('estimatedPoints').textContent = formatLargeNumber(rewards.points);
         }
 
-        // Update epoch display elements
-        function updateEpochDisplay() {
-            const currentEpoch = getCurrentEpoch();
-            const multipliers = getEpochMultipliers(currentEpoch);
-            const timeRemaining = getEpochTimeRemaining();
 
-            // Update epoch banner
-            document.getElementById('currentEpochDisplay').textContent = currentEpoch;
-            document.getElementById('pointsMultiplierDisplay').textContent = multipliers.points + 'x';
-            document.getElementById('tokensMultiplierDisplay').textContent = formatLargeNumber(multipliers.tokens) + 'x';
-            document.getElementById('epochCountdown').textContent = `${timeRemaining.days}d ${timeRemaining.hours}h`;
-
-            // Update P2P form
-            const p2pEpochElement = document.getElementById('p2pCurrentEpoch');
-            if (p2pEpochElement) {
-                p2pEpochElement.textContent = currentEpoch;
-            }
-        }
 
         // Process legacy donation
         async function processDonation() {
@@ -2716,11 +2688,13 @@
                 });
 
                 // Calculate and show success rewards
-                const rewards = calculateRewards(parseFloat(amount), false);
+                const usdAmount = calculateUSDAmount(parseFloat(amount));
+                const causeType = getCauseType(selectedRecipient); // or determine based on pool type
+                const rewards = calculateRewards(usdAmount, 'pool', false, causeType);
+
                 document.getElementById('txHash').textContent = tx.transactionHash;
                 document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
                 document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
-                document.getElementById('successEpoch').textContent = rewards.epoch;
 
                 closeDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
@@ -2886,7 +2860,8 @@
                 if (!document.hidden) {
                     loadStats();
                     fetchETHPrice(); // Update ETH price every 30 seconds
-                    updateEpochDisplay(); // Update epoch info
+                    // Initialize reward calculations
+                    updateAllRewardDisplays(); // Update epoch info
 
                     const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
                     if (activeTab === 'social') {
@@ -2915,7 +2890,15 @@
 
         // Start auto-refresh on load
         startAutoRefresh();
-
+        // Update all reward displays when ETH price changes
+        function updateAllRewardDisplays() {
+            updateEstimatedUSD();
+            updatePoolEstimatedUSD();
+            updateP2PEstimatedUSD();
+            updateEstimatedPoints();
+            updatePoolEstimatedRewards();
+            updateP2PEstimatedRewards();
+        }
         // Error handling for failed API calls
         window.addEventListener('unhandledrejection', (event) => {
             console.error('Unhandled promise rejection:', event.reason);
