@@ -1,0 +1,6 @@
+[submodule "givebase/contracts/lib/forge-std"]
+	path = givebase/contracts/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "givebase/contracts/lib/openzeppelin-contracts"]
+	path = givebase/contracts/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
