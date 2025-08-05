@@ -571,6 +571,35 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Epoch Banner -->
+        <div class="mb-8">
+            <div class="glass-card rounded-2xl p-6 text-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-green-500/10"></div>
+                <div class="relative">
+                    <div class="flex items-center justify-center space-x-8 flex-wrap">
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">Current Epoch</div>
+                            <div class="text-3xl font-black text-purple-600" id="currentEpochDisplay">0</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">Points Multiplier</div>
+                            <div class="text-3xl font-black text-blue-600" id="pointsMultiplierDisplay">10.0x</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">Token Multiplier</div>
+                            <div class="text-3xl font-black text-green-600" id="tokensMultiplierDisplay">5000x</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">Next Epoch In</div>
+                            <div class="text-lg font-bold text-orange-600" id="epochCountdown">--d --h</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        🎉 <strong>Early Adopter Bonus!</strong> Earn massive rewards during the genesis epochs
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Stats Bar -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
             <div class="stats-card rounded-2xl p-6 hover-lift">
@@ -592,7 +621,7 @@
             </div>
             <div class="token-highlight rounded-2xl p-6 hover-lift">
                 <div class="text-sm text-gray-300 mb-2">Tokens Earned</div>
-                <div class="text-3xl font-black text-white" id="userTokens">0 $GIVE</div>
+                <div class="text-3xl font-black text-white" id="userTokens">0 $UMANITY</div>
                 <div class="text-sm text-gray-300">Unclaimed</div>
             </div>
         </div>
@@ -622,7 +651,7 @@
                 <div class="text-center mb-12">
                     <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Global Donation Pools</h2>
                     <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
-                        Contribute to global causes and earn $GIVE tokens. No verification needed - just donate and make
+                        Contribute to global causes and earn $UMANITY tokens. No verification needed - just donate and make
                         an impact worldwide.
                     </p>
                 </div>
@@ -646,6 +675,21 @@
                 <!-- P2P Donation Form -->
                 <div class="max-w-lg mx-auto mb-12">
                     <div class="glass-card rounded-3xl p-8">
+                        <!-- Mainnet Warning -->
+                        <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-exclamation-triangle text-red-500 mt-1"></i>
+                                <div class="text-sm">
+                                    <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
+                                    <div class="text-red-700">
+                                        This will use <strong>real ETH</strong> from Base Mainnet.
+                                        Verify recipient address carefully - transactions are
+                                        <strong>irreversible</strong>.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <h3 class="text-2xl font-bold mb-6 text-center">Send Direct Donation</h3>
                         <div class="space-y-6">
                             <div>
@@ -658,6 +702,16 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Amount (ETH)</label>
                                 <input type="number" id="p2pAmount" step="0.001" min="0.001" placeholder="0.01"
                                     class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                <div class="mt-2 text-sm text-gray-600">
+                                    <span id="p2pEstimatedUSD" class="text-green-600 font-bold">$0.00</span> •
+                                    Gas fees: ~$0.01-0.05 additional
+                                </div>
+                                <div class="mt-2 text-xs text-gray-500">
+                                    Rewards: <span id="p2pEstimatedPoints" class="text-purple-600 font-medium">0</span>
+                                    pts •
+                                    <span id="p2pEstimatedTokens" class="text-blue-600 font-medium">0 $UMANITY</span> •
+                                    Epoch <span id="p2pCurrentEpoch" class="font-medium">0</span>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Message (optional)</label>
@@ -875,12 +929,12 @@
                                 <h3 class="text-xl font-bold mb-6">🪙 Token Rewards</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div class="stats-card rounded-xl p-6">
-                                        <div class="text-3xl font-black text-black" id="profileTokensEarned">0 $GIVE
+                                        <div class="text-3xl font-black text-black" id="profileTokensEarned">0 $UMANITY
                                         </div>
                                         <div class="text-sm text-gray-500">Total Earned</div>
                                     </div>
                                     <div class="token-highlight rounded-xl p-6">
-                                        <div class="text-3xl font-black text-white" id="profileTokensPending">0 $GIVE
+                                        <div class="text-3xl font-black text-white" id="profileTokensPending">0 $UMANITY
                                         </div>
                                         <div class="text-sm text-gray-300">Pending Claim</div>
                                     </div>
@@ -916,13 +970,38 @@
                 <!-- Selected pool info will be shown here -->
             </div>
 
+            <!-- Mainnet Warning -->
+            <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-exclamation-triangle text-red-500 mt-1"></i>
+                    <div class="text-sm">
+                        <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
+                        <div class="text-red-700">
+                            This will use <strong>real ETH</strong> from Base Mainnet.
+                            Transaction fees apply (~$0.01-0.05) and donations are <strong>irreversible</strong>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Donation Amount (ETH)</label>
                 <input type="number" id="poolDonationAmount" step="0.001" min="0.001" placeholder="0.01"
                     class="form-input w-full rounded-xl px-4 py-4 text-sm">
                 <div class="mt-3 text-sm text-gray-600">
-                    Minimum: 0.001 ETH • Points: <span id="poolEstimatedPoints" class="font-bold text-black">0</span> •
-                    Tokens: <span id="poolEstimatedTokens" class="font-bold text-black">0 $GIVE</span>
+                    Minimum: 0.001 ETH (<span id="poolMinUSD" class="text-green-600 font-medium">$3.00</span>) •
+                    <span id="poolEstimatedUSD" class="text-green-600 font-bold">$0.00</span>
+                </div>
+                <div class="mt-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3">
+                    <div class="text-sm font-medium text-gray-700 mb-2">🎁 Epoch 0 Rewards:</div>
+                    <div class="flex justify-between text-sm">
+                        <span>Points: <span id="poolEstimatedPoints" class="font-bold text-purple-600">0</span></span>
+                        <span>Tokens: <span id="poolEstimatedTokens" class="font-bold text-blue-600">0
+                                $UMANITY</span></span>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 mt-2">
+                    Gas fees: ~$0.01-0.05 additional • ETH Price: $<span id="poolEthPrice">0</span>
                 </div>
             </div>
 
@@ -946,12 +1025,36 @@
                 <!-- Selected recipient info will be shown here -->
             </div>
 
+            <!-- Mainnet Warning -->
+            <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-exclamation-triangle text-red-500 mt-1"></i>
+                    <div class="text-sm">
+                        <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
+                        <div class="text-red-700">
+                            This will use <strong>real ETH</strong> from Base Mainnet.
+                            Transaction fees apply (~$0.01-0.05) and donations are <strong>irreversible</strong>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Donation Amount (ETH)</label>
                 <input type="number" id="donationAmount" step="0.001" min="0.001" placeholder="0.01"
                     class="form-input w-full rounded-xl px-4 py-4 text-sm">
                 <div class="mt-3 text-sm text-gray-600">
-                    Minimum: 0.001 ETH • Points: <span id="estimatedPoints" class="font-bold text-black">0</span>
+                    Minimum: 0.001 ETH (<span id="legacyMinUSD" class="text-green-600 font-medium">$3.00</span>) •
+                    <span id="legacyEstimatedUSD" class="text-green-600 font-bold">$0.00</span>
+                </div>
+                <div class="mt-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3">
+                    <div class="text-sm font-medium text-gray-700 mb-1">🎁 Epoch 0 Rewards:</div>
+                    <div class="text-sm">
+                        Points: <span id="estimatedPoints" class="font-bold text-purple-600">0</span>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 mt-2">
+                    Gas fees: ~$0.01-0.05 additional • ETH Price: $<span id="legacyEthPrice">0</span>
                 </div>
             </div>
 
@@ -975,13 +1078,15 @@
                 <div id="txHash" class="font-mono text-xs break-all text-black font-medium"></div>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="stats-card rounded-2xl p-4">
-                    <div class="text-2xl font-black text-black">+<span id="pointsEarned">0</span></div>
-                    <div class="text-sm text-gray-500">Points Earned</div>
+                <div class="stats-card rounded-2xl p-4 bg-gradient-to-br from-purple-50 to-purple-100">
+                    <div class="text-2xl font-black text-purple-600">+<span id="pointsEarned">0</span></div>
+                    <div class="text-sm text-purple-500">Points Earned</div>
+                    <div class="text-xs text-purple-400 mt-1">Epoch <span id="successEpoch">0</span> Bonus!</div>
                 </div>
-                <div class="token-highlight rounded-2xl p-4">
+                <div class="token-highlight rounded-2xl p-4 bg-gradient-to-br from-blue-600 to-green-600">
                     <div class="text-2xl font-black text-white">+<span id="tokensEarned">0</span></div>
-                    <div class="text-sm text-gray-300">$GIVE Tokens</div>
+                    <div class="text-sm text-blue-100">$UMANITY Tokens</div>
+                    <div class="text-xs text-blue-200 mt-1">Genesis Rewards!</div>
                 </div>
             </div>
             <button onclick="closeSuccessModal()" class="primary-button py-4 px-8 rounded-xl text-white font-bold">
@@ -1004,7 +1109,121 @@
 
         const BASE_MAINNET_CHAIN_ID = '0x2105'; // 8453 in decimal
         const CONTRACT_ADDRESS = '{{ contract_address }}';
+        // ETH Price tracking
+        let ethPriceUSD = 0;
+        // Epoch and Rewards System
+        let currentEpoch = 0;
+        let epochStartTime = Date.now();
+        let epochDuration = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
+        // Epoch-based multipliers (higher multipliers for early epochs)
+        const epochMultipliers = {
+            0: { points: 10.0, tokens: 5000 },    // Epoch 0: 10x points, 5000x tokens
+            1: { points: 8.0, tokens: 4000 },     // Epoch 1: 8x points, 4000x tokens  
+            2: { points: 6.0, tokens: 3000 },     // Epoch 2: 6x points, 3000x tokens
+            3: { points: 4.0, tokens: 2000 },     // Epoch 3: 4x points, 2000x tokens
+            4: { points: 3.0, tokens: 1500 },     // Epoch 4: 3x points, 1500x tokens
+            5: { points: 2.5, tokens: 1200 },     // Epoch 5: 2.5x points, 1200x tokens
+            6: { points: 2.0, tokens: 1000 },     // Epoch 6: 2x points, 1000x tokens
+            7: { points: 1.8, tokens: 800 },      // Epoch 7: 1.8x points, 800x tokens
+            8: { points: 1.5, tokens: 600 },      // Epoch 8: 1.5x points, 600x tokens
+            9: { points: 1.3, tokens: 500 },      // Epoch 9: 1.3x points, 500x tokens
+            default: { points: 1.0, tokens: 400 } // Epoch 10+: 1x points, 400x tokens
+        };
+
+        // Base rewards per ETH donated
+        const basePointsPerETH = 10000;  // 10,000 base points per ETH (was 1000)
+        const baseTokensPerETH = 1;      // 1 base token per ETH (was 100)
+
+        // Fetch ETH price from CoinGecko
+        async function fetchETHPrice() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+                const data = await response.json();
+                ethPriceUSD = data.ethereum.usd;
+                console.log('ETH Price updated:', ethPriceUSD);
+                updatePriceDisplays();
+            } catch (error) {
+                console.error('Error fetching ETH price:', error);
+                ethPriceUSD = 3000; // Fallback price
+            }
+        }
+
+        // Update all USD price displays
+        function updatePriceDisplays() {
+            // Update donation amount displays
+            updateEstimatedUSD();
+            updatePoolEstimatedUSD();
+            updateP2PEstimatedUSD();
+        }
+
+        function formatUSD(ethAmount) {
+            const usdAmount = ethAmount * ethPriceUSD;
+            return usdAmount >= 1 ? `$${usdAmount.toFixed(2)}` : `$${usdAmount.toFixed(4)}`;
+        }
+        // Calculate current epoch based on time
+        function getCurrentEpoch() {
+            const timeElapsed = Date.now() - epochStartTime;
+            const epochsPassed = Math.floor(timeElapsed / epochDuration);
+            return epochsPassed;
+        }
+
+        // Get epoch multipliers
+        function getEpochMultipliers(epoch = null) {
+            const targetEpoch = epoch !== null ? epoch : getCurrentEpoch();
+            return epochMultipliers[targetEpoch] || epochMultipliers.default;
+        }
+
+        // Calculate rewards with epoch multipliers
+        function calculateRewards(ethAmount, isPublic = false, epochOverride = null) {
+            const epoch = epochOverride !== null ? epochOverride : getCurrentEpoch();
+            const multipliers = getEpochMultipliers(epoch);
+
+            // Base calculations
+            const basePoints = Math.floor(ethAmount * basePointsPerETH);
+            const baseTokens = ethAmount * baseTokensPerETH;
+
+            // Apply epoch multipliers
+            const epochPoints = Math.floor(basePoints * multipliers.points);
+            const epochTokens = baseTokens * multipliers.tokens;
+
+            // Apply public bonus (20% extra for public donations)
+            const finalPoints = isPublic ? Math.floor(epochPoints * 1.2) : epochPoints;
+            const finalTokens = isPublic ? epochTokens * 1.2 : epochTokens;
+
+            return {
+                points: finalPoints,
+                tokens: finalTokens,
+                epoch: epoch,
+                multipliers: multipliers
+            };
+        }
+
+        // Format large numbers for display
+        function formatLargeNumber(num) {
+            if (num >= 1000000000) {
+                return (num / 1000000000).toFixed(1) + 'B';
+            }
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return Math.floor(num).toString();
+        }
+
+        // Get epoch time remaining
+        function getEpochTimeRemaining() {
+            const timeElapsed = Date.now() - epochStartTime;
+            const timeInCurrentEpoch = timeElapsed % epochDuration;
+            const timeRemaining = epochDuration - timeInCurrentEpoch;
+
+            const days = Math.floor(timeRemaining / (24 * 60 * 60 * 1000));
+            const hours = Math.floor((timeRemaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+
+            return { days, hours, totalMs: timeRemaining };
+        }
         // Initialize
         window.addEventListener('load', async () => {
             // Check if MetaMask is installed
@@ -1018,12 +1237,23 @@
 
             await loadStats();
             await loadPools();
+            await fetchETHPrice();
+            updateEpochDisplay();
             switchTab('donate');
 
             // Update donation amount input listeners
-            document.getElementById('donationAmount').addEventListener('input', updateEstimatedPoints);
-            document.getElementById('poolDonationAmount').addEventListener('input', updatePoolEstimatedRewards);
-            document.getElementById('p2pAmount').addEventListener('input', updateP2PEstimatedRewards);
+            document.getElementById('donationAmount').addEventListener('input', () => {
+                updateEstimatedPoints();
+                updateEstimatedUSD();
+            });
+            document.getElementById('poolDonationAmount').addEventListener('input', () => {
+                updatePoolEstimatedRewards();
+                updatePoolEstimatedUSD();
+            });
+            document.getElementById('p2pAmount').addEventListener('input', () => {
+                updateP2PEstimatedRewards();
+                updateP2PEstimatedUSD();
+            });
 
             // Initialize animations
             initializeAnimations();
@@ -1124,7 +1354,7 @@
             document.getElementById('networkInfo').classList.add('hidden');
             document.getElementById('walletDropdown').classList.add('hidden');
             document.getElementById('userPoints').textContent = '0';
-            document.getElementById('userTokens').textContent = '0 $GIVE';
+            document.getElementById('userTokens').textContent = '0 $UMANITY';
             document.getElementById('userRank').textContent = '';
 
             // Clear user-specific data
@@ -1552,7 +1782,7 @@
 
                 // Show user tokens if available
                 if (data.user_stats && data.user_stats.tokens_earned) {
-                    document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $GIVE`;
+                    document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $UMANITY`;
                 }
 
             } catch (error) {
@@ -1575,7 +1805,7 @@
                 }
 
                 if (data.user_stats && data.user_stats.tokens_earned) {
-                    document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $GIVE`;
+                    document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $UMANITY`;
                 }
 
             } catch (error) {
@@ -1601,13 +1831,13 @@
                     document.getElementById('profileAcceptDonations').checked = data.accepts_donations !== false;
 
                     // Update token info
-                    document.getElementById('profileTokensEarned').textContent = `${parseFloat(data.tokens_earned || 0).toFixed(2)} $GIVE`;
+                    document.getElementById('profileTokensEarned').textContent = `${parseFloat(data.tokens_earned || 0).toFixed(2)} $UMANITY`;
 
                     // Calculate pending tokens
                     const tokensEarned = parseFloat(data.tokens_earned || 0);
                     const tokensClaimed = parseFloat(data.tokens_claimed || 0);
                     const pending = tokensEarned - tokensClaimed;
-                    document.getElementById('profileTokensPending').textContent = `${pending.toFixed(2)} $GIVE`;
+                    document.getElementById('profileTokensPending').textContent = `${pending.toFixed(2)} $UMANITY`;
                 } else {
                     // Set defaults for new user
                     document.getElementById('profilePublic').checked = true;
@@ -1627,8 +1857,8 @@
             document.getElementById('profileDonationMessage').value = 'Thanks for your support! 💙';
             document.getElementById('profilePublic').checked = true;
             document.getElementById('profileAcceptDonations').checked = true;
-            document.getElementById('profileTokensEarned').textContent = '0 $GIVE';
-            document.getElementById('profileTokensPending').textContent = '0 $GIVE';
+            document.getElementById('profileTokensEarned').textContent = '0 $UMANITY';
+            document.getElementById('profileTokensPending').textContent = '0 $UMANITY';
         }
 
         // Update user profile
@@ -1690,9 +1920,9 @@
                 let message = `🪙 Airdrop Eligibility Check\n\n`;
                 message += `Eligible: ${data.eligible ? '✅ YES' : '❌ NO'}\n`;
                 message += `Total Points: ${data.total_points}\n`;
-                message += `Base Tokens: ${data.base_tokens} $GIVE\n`;
+                message += `Base Tokens: ${data.base_tokens} $UMANITY\n`;
                 message += `Multiplier: ${data.multiplier}x\n`;
-                message += `Final Tokens: ${data.final_tokens} $GIVE\n`;
+                message += `Final Tokens: ${data.final_tokens} $UMANITY\n`;
                 message += `Current Rank: #${data.rank || 'N/A'}\n\n`;
                 message += `Bonus Reason: ${data.reason}`;
 
@@ -2044,12 +2274,55 @@
 
         function updatePoolEstimatedRewards() {
             const amount = parseFloat(document.getElementById('poolDonationAmount').value) || 0;
-            const points = Math.max(Math.floor(amount * 1000), 0);
-            const tokens = Math.max((amount * 100), 0); // 100 tokens per ETH base rate
-            document.getElementById('poolEstimatedPoints').textContent = points;
-            document.getElementById('poolEstimatedTokens').textContent = tokens.toFixed(1);
+            const rewards = calculateRewards(amount, false);
+            document.getElementById('poolEstimatedPoints').textContent = formatLargeNumber(rewards.points);
+            document.getElementById('poolEstimatedTokens').textContent = formatLargeNumber(rewards.tokens) + ' $UMANITY';
         }
 
+        // Enhanced error handling for mainnet transactions
+        function handleMainnetError(error) {
+            console.error('Mainnet transaction error:', error);
+
+            if (error.code === 4001) {
+                return 'Transaction cancelled by user.';
+            } else if (error.code === -32000) {
+                return 'Insufficient funds for gas. You need Base ETH to pay for transaction fees (~$0.01-0.05).';
+            } else if (error.code === -32603) {
+                return 'Network error. Please check your connection and try again.';
+            } else if (error.code === -32002) {
+                return 'Transaction request already pending. Please check MetaMask.';
+            } else if (error.message && error.message.includes('insufficient funds')) {
+                return 'Insufficient ETH balance. Please add more Base ETH to your wallet.';
+            } else if (error.message && error.message.includes('gas required exceeds allowance')) {
+                return 'Gas limit too low. Transaction may fail. Please try again.';
+            } else if (error.message && error.message.includes('replacement transaction underpriced')) {
+                return 'Transaction fee too low. Please increase gas price and try again.';
+            } else {
+                return `Transaction failed: ${error.message || 'Unknown error'}. Please try again or contact support.`;
+            }
+        }
+        // Update estimated USD values
+        function updateEstimatedUSD() {
+            const amount = parseFloat(document.getElementById('donationAmount').value) || 0;
+            const usdValue = formatUSD(amount);
+            document.getElementById('legacyEstimatedUSD').textContent = usdValue;
+            document.getElementById('legacyMinUSD').textContent = formatUSD(0.001);
+            document.getElementById('legacyEthPrice').textContent = ethPriceUSD.toFixed(0);
+        }
+
+        function updatePoolEstimatedUSD() {
+            const amount = parseFloat(document.getElementById('poolDonationAmount').value) || 0;
+            const usdValue = formatUSD(amount);
+            document.getElementById('poolEstimatedUSD').textContent = usdValue;
+            document.getElementById('poolMinUSD').textContent = formatUSD(0.001);
+            document.getElementById('poolEthPrice').textContent = ethPriceUSD.toFixed(0);
+        }
+
+        function updateP2PEstimatedUSD() {
+            const amount = parseFloat(document.getElementById('p2pAmount').value) || 0;
+            const usdValue = formatUSD(amount);
+            document.getElementById('p2pEstimatedUSD').textContent = usdValue;
+        }
         // Process pool donation
         async function processPoolDonation() {
             const amount = document.getElementById('poolDonationAmount').value;
@@ -2097,11 +2370,18 @@
                     value: amountWei
                 });
 
+                // Estimate gas dynamically
+                const gasEstimate = await web3.eth.estimateGas({
+                    from: userAccount,
+                    to: recipientAddress,
+                    value: amountWei,
+                });
+
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
-                    to: pool.wallet_address,
+                    to: recipientAddress,
                     value: amountWei,
-                    gas: 21000, // Standard gas limit for ETH transfer
+                    gas: Math.floor(gasEstimate * 1.2), // Add 20% buffer
                 });
 
                 console.log('Pool donation successful:', tx);
@@ -2121,10 +2401,12 @@
                     }),
                 });
 
-                // Show success
+                // Calculate and show success rewards
+                const rewards = calculateRewards(parseFloat(amount), false);
                 document.getElementById('txHash').textContent = tx.transactionHash;
-                document.getElementById('pointsEarned').textContent = Math.floor(parseFloat(amount) * 1000);
-                document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100).toFixed(1);
+                document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
+                document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
+                document.getElementById('successEpoch').textContent = rewards.epoch;
 
                 closePoolDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
@@ -2136,16 +2418,7 @@
 
             } catch (error) {
                 console.error('Pool donation error:', error);
-
-                if (error.code === 4001) {
-                    alert('Transaction cancelled by user.');
-                } else if (error.code === -32000) {
-                    alert('Insufficient funds for gas. You need Base Mainnet ETH to pay for transaction fees.');
-                } else if (error.message && error.message.includes('insufficient funds')) {
-                    alert('Insufficient ETH balance. Please add more Base Mainnet ETH to your wallet.');
-                } else {
-                    alert('Transaction failed. Please try again. Error: ' + (error.message || 'Unknown error'));
-                }
+                alert(handleMainnetError(error));
             } finally {
                 donateBtn.textContent = 'Donate Now';
             }
@@ -2155,9 +2428,14 @@
         function updateP2PEstimatedRewards() {
             const amount = parseFloat(document.getElementById('p2pAmount').value) || 0;
             const isPublic = document.getElementById('p2pPublic').checked;
-            const basePoints = Math.max(Math.floor(amount * 1000), 0);
-            const points = isPublic ? Math.floor(basePoints * 1.2) : basePoints; // 20% bonus for public
-            // Update UI to show estimated points
+            const rewards = calculateRewards(amount, isPublic);
+
+            // Update UI elements (you'll need to add these elements to the P2P form)
+            const pointsElement = document.getElementById('p2pEstimatedPoints');
+            const tokensElement = document.getElementById('p2pEstimatedTokens');
+
+            if (pointsElement) pointsElement.textContent = formatLargeNumber(rewards.points);
+            if (tokensElement) tokensElement.textContent = formatLargeNumber(rewards.tokens) + ' $UMANITY';
         }
 
         async function processP2PDonation() {
@@ -2211,11 +2489,18 @@
                 // Send transaction
                 const amountWei = web3.utils.toWei(amount, 'ether');
 
+                // Estimate gas dynamically
+                const gasEstimate = await web3.eth.estimateGas({
+                    from: userAccount,
+                    to: recipientAddress,
+                    value: amountWei,
+                });
+
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
                     to: recipientAddress,
                     value: amountWei,
-                    gas: 21000,
+                    gas: Math.floor(gasEstimate * 1.2), // Add 20% buffer
                 });
 
                 console.log('P2P donation successful:', tx);
@@ -2239,12 +2524,12 @@
                     }),
                 });
 
-                // Show success
+                // Calculate and show success rewards
+                const rewards = calculateRewards(parseFloat(amount), isPublic);
                 document.getElementById('txHash').textContent = tx.transactionHash;
-                const basePoints = Math.floor(parseFloat(amount) * 1000);
-                const finalPoints = isPublic ? Math.floor(basePoints * 1.2) : basePoints;
-                document.getElementById('pointsEarned').textContent = finalPoints;
-                document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100 * (isPublic ? 1.2 : 1)).toFixed(1);
+                document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
+                document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
+                document.getElementById('successEpoch').textContent = rewards.epoch;
 
                 // Clear form
                 document.getElementById('p2pRecipient').value = '';
@@ -2263,9 +2548,9 @@
                 if (error.code === 4001) {
                     alert('Transaction cancelled by user.');
                 } else if (error.code === -32000) {
-                    alert('Insufficient funds for gas. You need Base Sepolia ETH to pay for transaction fees.');
+                    alert(handleMainnetError(error));
                 } else if (error.message && error.message.includes('insufficient funds')) {
-                    alert('Insufficient ETH balance. Please add more Base Sepolia ETH to your wallet.');
+                    alert(handleMainnetError(error));
                 } else {
                     alert('Transaction failed. Please try again. Error: ' + (error.message || 'Unknown error'));
                 }
@@ -2318,8 +2603,27 @@
 
         function updateEstimatedPoints() {
             const amount = parseFloat(document.getElementById('donationAmount').value) || 0;
-            const points = Math.max(Math.floor(amount * 1000), 0);
-            document.getElementById('estimatedPoints').textContent = points;
+            const rewards = calculateRewards(amount, false);
+            document.getElementById('estimatedPoints').textContent = formatLargeNumber(rewards.points);
+        }
+
+        // Update epoch display elements
+        function updateEpochDisplay() {
+            const currentEpoch = getCurrentEpoch();
+            const multipliers = getEpochMultipliers(currentEpoch);
+            const timeRemaining = getEpochTimeRemaining();
+
+            // Update epoch banner
+            document.getElementById('currentEpochDisplay').textContent = currentEpoch;
+            document.getElementById('pointsMultiplierDisplay').textContent = multipliers.points + 'x';
+            document.getElementById('tokensMultiplierDisplay').textContent = formatLargeNumber(multipliers.tokens) + 'x';
+            document.getElementById('epochCountdown').textContent = `${timeRemaining.days}d ${timeRemaining.hours}h`;
+
+            // Update P2P form
+            const p2pEpochElement = document.getElementById('p2pCurrentEpoch');
+            if (p2pEpochElement) {
+                p2pEpochElement.textContent = currentEpoch;
+            }
         }
 
         // Process legacy donation
@@ -2369,14 +2673,32 @@
                     value: amountWei
                 });
 
+                // Estimate gas dynamically
+                const gasEstimate = await web3.eth.estimateGas({
+                    from: userAccount,
+                    to: recipientAddress,
+                    value: amountWei,
+                });
+
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
-                    to: recipient.wallet_address,
+                    to: recipientAddress,
                     value: amountWei,
-                    gas: 21000, // Standard gas limit for ETH transfer
+                    gas: Math.floor(gasEstimate * 1.2), // Add 20% buffer
                 });
 
                 console.log('Transaction successful:', tx);
+                // Wait for transaction confirmation
+                const donateBtn = document.getElementById('poolDonateButtonText'); // or appropriate button
+                donateBtn.textContent = 'Confirming...';
+
+                try {
+                    const receipt = await web3.eth.waitForTransactionReceipt(tx.transactionHash);
+                    console.log('Transaction confirmed:', receipt);
+                } catch (confirmError) {
+                    console.warn('Could not confirm transaction:', confirmError);
+                    // Continue anyway, transaction was sent
+                }
 
                 // Record donation in backend
                 await fetch('/api/record-donation/', {
@@ -2393,10 +2715,12 @@
                     }),
                 });
 
-                // Show success
+                // Calculate and show success rewards
+                const rewards = calculateRewards(parseFloat(amount), false);
                 document.getElementById('txHash').textContent = tx.transactionHash;
-                document.getElementById('pointsEarned').textContent = Math.floor(parseFloat(amount) * 1000);
-                document.getElementById('tokensEarned').textContent = (parseFloat(amount) * 100).toFixed(1);
+                document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
+                document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
+                document.getElementById('successEpoch').textContent = rewards.epoch;
 
                 closeDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
@@ -2412,9 +2736,9 @@
                 if (error.code === 4001) {
                     alert('Transaction cancelled by user.');
                 } else if (error.code === -32000) {
-                    alert('Insufficient funds for gas. You need Base Sepolia ETH to pay for transaction fees.');
+                    alert(handleMainnetError(error));
                 } else if (error.message && error.message.includes('insufficient funds')) {
-                    alert('Insufficient ETH balance. Please add more Base Sepolia ETH to your wallet.');
+                    alert(handleMainnetError(error));
                 } else {
                     alert('Transaction failed. Please try again. Error: ' + (error.message || 'Unknown error'));
                 }
@@ -2561,10 +2885,11 @@
             refreshInterval = setInterval(() => {
                 if (!document.hidden) {
                     loadStats();
+                    fetchETHPrice(); // Update ETH price every 30 seconds
+                    updateEpochDisplay(); // Update epoch info
 
                     const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
                     if (activeTab === 'social') {
-                        // Refresh social feed silently
                         loadSocialFeed(1);
                     } else if (activeTab === 'leaderboard') {
                         loadLeaderboard();
