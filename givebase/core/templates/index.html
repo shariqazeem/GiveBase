@@ -375,10 +375,10 @@
     <section class="min-h-screen flex flex-col justify-center items-center px-6 relative geometric-bg">
         <div class="absolute inset-0 grid-pattern opacity-30"></div>
         <div class="text-center z-10 max-w-6xl mx-auto relative">
-            <!-- Protocol Badge -->
+            <!-- Protocol Badge with Epoch -->
             <div class="inline-flex items-center space-x-3 glass-card rounded-full px-6 py-3 mb-8 fade-in-up">
-                <div class="w-2 h-2 bg-black rounded-full animate-pulse"></div>
-                <span class="text-sm font-mono text-gray-700 font-medium">GLOBAL DONATION PROTOCOL • BASE
+                <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                <span class="text-sm font-mono text-gray-700 font-medium">EPOCH 0 LIVE • 10X REWARDS • BASE
                     BLOCKCHAIN</span>
             </div>
 
@@ -413,38 +413,71 @@
                 </a>
             </div>
 
+            <!-- Epoch Rewards Banner -->
+            <div class="max-w-4xl mx-auto mb-16 fade-in-up" style="animation-delay: 0.7s;">
+                <div
+                    class="glass-card rounded-3xl p-8 bg-gradient-to-r from-purple-50 via-blue-50 to-green-50 border-2 border-purple-100">
+                    <div class="text-center">
+                        <div class="flex items-center justify-center space-x-2 mb-4">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                            <span class="text-2xl font-black text-purple-600">EPOCH 0 GENESIS REWARDS</span>
+                            <div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="text-center">
+                                <div class="text-4xl font-black text-purple-600 mb-2">10x</div>
+                                <div class="text-sm text-purple-500 font-medium">Points Multiplier</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl font-black text-blue-600 mb-2">5000x</div>
+                                <div class="text-sm text-blue-500 font-medium">Token Multiplier</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl font-black text-green-600 mb-2">30</div>
+                                <div class="text-sm text-green-500 font-medium">Days Remaining</div>
+                            </div>
+                        </div>
+                        <p class="text-lg text-gray-700 font-medium">
+                            🚀 <strong>Limited Time:</strong> Earn massive rewards for early adoption!
+                            Genesis users get 10,000 points + 5M tokens per 1 ETH donated.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Stats Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto fade-in-up"
                 style="animation-delay: 0.8s;">
                 <div class="stats-card rounded-2xl p-6 text-center hover-lift">
-                    <div class="text-3xl font-black text-black mb-2">$0</div>
+                    <div id="total-donated" class="text-3xl font-black text-black mb-2">$0</div>
                     <div class="text-sm text-gray-500 font-medium">Total Donated</div>
                 </div>
                 <div class="stats-card rounded-2xl p-6 text-center hover-lift">
-                    <div class="text-3xl font-black text-black mb-2">4</div>
+                    <div id="active-pools" class="text-3xl font-black text-black mb-2">0</div>
                     <div class="text-sm text-gray-500 font-medium">Global Pools</div>
                 </div>
                 <div class="stats-card rounded-2xl p-6 text-center hover-lift">
-                    <div class="text-3xl font-black text-black mb-2">0</div>
+                    <div id="active-donors" class="text-3xl font-black text-black mb-2">0</div>
                     <div class="text-sm text-gray-500 font-medium">Active Donors</div>
                 </div>
-                <div class="token-highlight rounded-2xl p-6 text-center hover-lift">
-                    <div class="text-3xl font-black text-white mb-2">∞</div>
-                    <div class="text-sm text-gray-300 font-medium">$UMANITY Rewards</div>
+                <div
+                    class="token-highlight rounded-2xl p-6 text-center hover-lift bg-gradient-to-br from-purple-600 to-blue-600">
+                    <div id="tokens-per-eth" class="text-3xl font-black text-white mb-2">5M+</div>
+                    <div class="text-sm text-purple-100 font-medium">Tokens Per 1 ETH</div>
+                    <div class="text-xs text-purple-200 mt-1">Epoch 0 Only!</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Floating Elements -->
-        <div class="absolute top-20 left-10 floating opacity-20">
-            <div class="w-20 h-20 border-2 border-black rounded-full"></div>
-        </div>
-        <div class="absolute bottom-20 right-10 floating opacity-20" style="animation-delay: -2s;">
-            <div class="w-16 h-16 bg-black rounded-xl rotate-45"></div>
-        </div>
-        <div class="absolute top-1/2 left-20 floating opacity-20" style="animation-delay: -4s;">
-            <div class="w-12 h-12 border-2 border-black rounded-xl"></div>
-        </div>
+            <!-- Floating Elements -->
+            <div class="absolute top-20 left-10 floating opacity-20">
+                <div class="w-20 h-20 border-2 border-black rounded-full"></div>
+            </div>
+            <div class="absolute bottom-20 right-10 floating opacity-20" style="animation-delay: -2s;">
+                <div class="w-16 h-16 bg-black rounded-xl rotate-45"></div>
+            </div>
+            <div class="absolute top-1/2 left-20 floating opacity-20" style="animation-delay: -4s;">
+                <div class="w-12 h-12 border-2 border-black rounded-xl"></div>
+            </div>
     </section>
 
     <!-- Ecosystem Section -->
@@ -469,7 +502,8 @@
                     <h3 class="text-2xl font-bold mb-4 text-black">🌍 Global Pools</h3>
                     <p class="text-gray-600 mb-6 leading-relaxed">
                         Donate to verified global causes. No KYC required.
-                        Instant impact with automatic token rewards.
+                        <strong class="text-purple-600">Genesis Epoch:</strong> 10,000 points + 5M tokens per 1 ETH
+                        donated!
                     </p>
                     <div class="space-y-3 text-sm">
                         <div class="flex items-center space-x-3">
@@ -568,104 +602,47 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Emergency Fund -->
-                <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: 0.1s;">
-                    <div class="text-6xl mb-6 floating">🚨</div>
-                    <h3 class="text-xl font-bold mb-3 text-black">Emergency Fund</h3>
-                    <p class="text-gray-600 text-sm mb-6 leading-relaxed">Help those in urgent need worldwide</p>
-                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
-                        <div class="text-3xl font-black text-black">0.0000 ETH</div>
-                        <div class="text-xs text-gray-500 font-medium mt-1">10% allocation</div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                        <div class="progress-bar h-3 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <div class="text-xs text-gray-500 font-medium">0 donors</div>
-                </div>
-
-
-                <!-- Community Projects -->
-                <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: 0.2s;">
-                    <div class="text-6xl mb-6 floating" style="animation-delay: -1s;">🏘️</div>
-                    <h3 class="text-xl font-bold mb-3 text-black">Community Projects</h3>
-                    <p class="text-gray-600 text-sm mb-6 leading-relaxed">Fund community initiatives</p>
-                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
-                        <div class="text-3xl font-black text-black">0.0000 ETH</div>
-                        <div class="text-xs text-gray-500 font-medium mt-1">30% allocation</div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                        <div class="progress-bar h-3 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <div class="text-xs text-gray-500 font-medium">0 donors</div>
-                </div>
-
-                <!-- Creator Support -->
-                <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: 0.3s;">
-                    <div class="text-6xl mb-6 floating" style="animation-delay: -2s;">🎨</div>
-                    <h3 class="text-xl font-bold mb-3 text-black">Creator Support</h3>
-                    <p class="text-gray-600 text-sm mb-6 leading-relaxed">Support content creators</p>
-                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
-                        <div class="text-3xl font-black text-black">0.0000 ETH</div>
-                        <div class="text-xs text-gray-500 font-medium mt-1">20% allocation</div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                        <div class="progress-bar h-3 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <div class="text-xs text-gray-500 font-medium">0 donors</div>
-                </div>
-
-                <!-- Platform Development -->
-                <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: 0.4s;">
-                    <div class="text-6xl mb-6 floating" style="animation-delay: -3s;">⚡</div>
-                    <h3 class="text-xl font-bold mb-3 text-black">Platform Development</h3>
-                    <p class="text-gray-600 text-sm mb-6 leading-relaxed">Improve Umanity platform</p>
-                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
-                        <div class="text-3xl font-black text-black">0.0000 ETH</div>
-                        <div class="text-xs text-gray-500 font-medium mt-1">40% allocation</div>
-
-                        <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                            <div class="progress-bar h-3 rounded-full" style="width: 0%"></div>
-                        </div>
-                        <div class="text-xs text-gray-500 font-medium">0 donors</div>
-                    </div>
-
+            <!-- Dynamic Pools Container -->
+            <div id="pools-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Loading state -->
+                <div class="col-span-full text-center py-12">
+                    <div class="text-gray-500">Loading pools...</div>
                 </div>
             </div>
 
-                <!-- Pool Benefits -->
-                <div class="mt-20 text-center fade-in-up" style="animation-delay: 0.5s;">
-                    <h3 class="text-4xl font-black mb-12 gradient-text hero-text">
-                        Why Global Pools?
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                        <div class="glass-card rounded-3xl p-8 hover-lift">
-                            <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                                <i class="fas fa-zap text-2xl text-white"></i>
-                            </div>
-                            <h4 class="font-bold text-xl mb-4 text-black">Instant Impact</h4>
-                            <p class="text-gray-600 leading-relaxed">No verification delays. Donate and make immediate
-                                global impact.</p>
+            <!-- Pool Benefits -->
+            <div class="mt-20 text-center fade-in-up" style="animation-delay: 0.5s;">
+                <h3 class="text-4xl font-black mb-12 gradient-text hero-text">
+                    Why Global Pools?
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div class="glass-card rounded-3xl p-8 hover-lift">
+                        <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                            <i class="fas fa-zap text-2xl text-white"></i>
                         </div>
-                        <div class="glass-card rounded-3xl p-8 hover-lift">
-                            <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                                <i class="fas fa-coins text-2xl text-white"></i>
-                            </div>
-                            <h4 class="font-bold text-xl mb-4 text-black">Auto Token Rewards</h4>
-                            <p class="text-gray-600 leading-relaxed">Earn $UMANITY tokens automatically with every
-                                donation.</p>
+                        <h4 class="font-bold text-xl mb-4 text-black">Instant Impact</h4>
+                        <p class="text-gray-600 leading-relaxed">No verification delays. Donate and make immediate
+                            global impact.</p>
+                    </div>
+                    <div class="glass-card rounded-3xl p-8 hover-lift">
+                        <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                            <i class="fas fa-coins text-2xl text-white"></i>
                         </div>
-                        <div class="glass-card rounded-3xl p-8 hover-lift">
-                            <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                                <i class="fas fa-globe text-2xl text-white"></i>
-                            </div>
-                            <h4 class="font-bold text-xl mb-4 text-black">Global Reach</h4>
-                            <p class="text-gray-600 leading-relaxed">Support worldwide causes from anywhere, anytime.
-                            </p>
+                        <h4 class="font-bold text-xl mb-4 text-black">Auto Token Rewards</h4>
+                        <p class="text-gray-600 leading-relaxed">Earn $UMANITY tokens automatically with every
+                            donation.</p>
+                    </div>
+                    <div class="glass-card rounded-3xl p-8 hover-lift">
+                        <div class="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                            <i class="fas fa-globe text-2xl text-white"></i>
                         </div>
+                        <h4 class="font-bold text-xl mb-4 text-black">Global Reach</h4>
+                        <p class="text-gray-600 leading-relaxed">Support worldwide causes from anywhere, anytime.
+                        </p>
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
     <!-- Tokenomics Section -->
@@ -677,9 +654,30 @@
                         $UMANITY Token Economy
                     </span>
                 </h2>
-                <p class="text-xl text-gray-300 max-w-4xl mx-auto subtitle-text">
+                <p class="text-xl text-gray-300 max-w-4xl mx-auto subtitle-text mb-8">
                     Get rewarded for your generosity. The more you give, the more you earn.
                 </p>
+                <!-- Epoch Highlight -->
+                <div class="max-w-3xl mx-auto mb-12">
+                    <div
+                        class="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-3xl p-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-black text-purple-300 mb-2">🎉 EPOCH 0 GENESIS REWARDS</div>
+                            <div class="text-lg text-gray-300 mb-4">Early adopters earn <strong>massive
+                                    multipliers</strong> that decrease over time</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-purple-500/20 rounded-2xl p-4">
+                                    <div class="text-3xl font-black text-purple-300">10,000</div>
+                                    <div class="text-sm text-purple-200">Base Points per 1 ETH</div>
+                                </div>
+                                <div class="bg-blue-500/20 rounded-2xl p-4">
+                                    <div class="text-3xl font-black text-blue-300">5,000,000</div>
+                                    <div class="text-sm text-blue-200">Base Tokens per 1 ETH</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -732,35 +730,53 @@
 
                 <!-- Earning Mechanism -->
                 <div class="dark-glass-card rounded-3xl p-10 slide-in-right" style="animation-delay: 0.4s;">
-                    <h3 class="text-3xl font-bold mb-10 text-center text-white">How to Earn $UMANITY</h3>
+                    <h3 class="text-3xl font-bold mb-10 text-center text-white">Epoch-Based Rewards System</h3>
                     <div class="space-y-6">
-                        <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover-lift">
+                        <!-- Epoch 0 -->
+                        <div
+                            class="bg-gradient-to-r from-purple-800/50 to-blue-800/50 rounded-2xl p-8 border border-purple-500/30 hover-lift">
                             <div class="flex items-center justify-between mb-4">
-                                <h4 class="font-bold text-xl text-white">Base Rate</h4>
-                                <span class="text-white font-mono font-bold text-lg">1 ETH = 100 $UMANITY</span>
+                                <h4 class="font-bold text-xl text-white flex items-center space-x-2">
+                                    <span class="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></span>
+                                    <span>Epoch 0 (Current)</span>
+                                </h4>
+                                <span class="text-purple-300 font-mono font-bold text-lg">1 ETH = 5M $UMANITY</span>
                             </div>
-                            <p class="text-gray-300 leading-relaxed">Automatic token rewards for every donation</p>
+                            <p class="text-purple-200 leading-relaxed">🚀 Genesis multipliers: 10x points, 5000x tokens
+                            </p>
+                            <div class="text-xs text-purple-300 mt-2">⏰ 30 days remaining</div>
                         </div>
 
+                        <!-- Future Epochs -->
                         <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover-lift">
                             <div class="flex items-center justify-between mb-4">
-                                <h4 class="font-bold text-xl text-white">Social Bonus</h4>
-                                <span class="text-gray-400 font-mono font-bold text-lg">+20% $UMANITY</span>
+                                <h4 class="font-bold text-xl text-white">Epoch 1-2</h4>
+                                <span class="text-gray-400 font-mono font-bold text-lg">1 ETH = 3-4M $UMANITY</span>
                             </div>
-                            <p class="text-gray-300 leading-relaxed">Extra rewards for public P2P donations</p>
+                            <p class="text-gray-300 leading-relaxed">Reduced but still generous early adopter rewards
+                            </p>
                         </div>
 
+                        <!-- Social & Frame Bonuses -->
                         <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover-lift">
                             <div class="flex items-center justify-between mb-4">
-                                <h4 class="font-bold text-xl text-white">Frame Interaction</h4>
-                                <span class="text-gray-300 font-mono font-bold text-lg">+20% $UMANITY</span>
+                                <h4 class="font-bold text-xl text-white">Bonus Multipliers</h4>
+                                <span class="text-green-400 font-mono font-bold text-lg">+20% Each</span>
                             </div>
-                            <p class="text-gray-300 leading-relaxed">Bonus for Farcaster frame donations</p>
+                            <p class="text-gray-300 leading-relaxed">Public donations & Farcaster frames get additional
+                                bonuses</p>
+                        </div>
+
+                        <!-- Total Supply Info -->
+                        <div class="bg-gray-900 rounded-2xl p-6 border border-gray-600">
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-white mb-2">Total Supply: 100 Billion $UMANITY</div>
+                                <div class="text-sm text-gray-400">40% allocated to community rewards</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
     <!-- Roadmap Section -->
@@ -783,30 +799,35 @@
                     <!-- Phase 1 -->
                     <div class="flex items-center justify-center">
                         <div class="w-1/2 pr-8 text-right fade-in-up" style="animation-delay: 0.1s;">
-                            <div class="glass-card rounded-3xl p-8">
-                                <h3 class="text-2xl font-bold mb-4 text-black">Phase 1: Foundation</h3>
-                                <p class="text-gray-600 mb-4 leading-relaxed">Launch core donation platform with global
-                                    pools and P2P functionality</p>
-                                <div class="inline-block bg-black text-white px-4 py-2 rounded-full text-sm font-bold">
-                                    Q2 2025</div>
+                            <div
+                                class="glass-card rounded-3xl p-8 bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-200">
+                                <h3 class="text-2xl font-bold mb-4 text-black">✅ Phase 1: Foundation</h3>
+                                <p class="text-gray-600 mb-4 leading-relaxed">Core donation platform with epoch-based
+                                    rewards system launched on Base Mainnet</p>
+                                <div
+                                    class="inline-block bg-green-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                                    COMPLETED</div>
+                                <div class="text-xs text-green-600 mt-2 font-medium">🎉 Epoch 0 rewards now live!</div>
                             </div>
                         </div>
-                        <div class="w-8 h-8 bg-black rounded-full border-4 border-white shadow-lg z-10"></div>
+                        <div class="w-8 h-8 bg-green-600 rounded-full border-4 border-white shadow-lg z-10"></div>
                         <div class="w-1/2 pl-8"></div>
                     </div>
 
                     <!-- Phase 2 -->
                     <div class="flex items-center justify-center">
                         <div class="w-1/2 pr-8"></div>
-                        <div class="w-8 h-8 bg-gray-300 rounded-full border-4 border-white shadow-lg z-10"></div>
+                        <div class="w-8 h-8 bg-blue-500 rounded-full border-4 border-white shadow-lg z-10"></div>
                         <div class="w-1/2 pl-8 fade-in-up" style="animation-delay: 0.2s;">
-                            <div class="glass-card rounded-3xl p-8">
-                                <h3 class="text-2xl font-bold mb-4 text-black">Phase 2: Token Launch</h3>
-                                <p class="text-gray-600 mb-4 leading-relaxed">Deploy $UMANITY token with reward mechanisms
-                                    and community governance</p>
+                            <div
+                                class="glass-card rounded-3xl p-8 bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-200">
+                                <h3 class="text-2xl font-bold mb-4 text-black">🚀 Phase 2: Token Launch</h3>
+                                <p class="text-gray-600 mb-4 leading-relaxed">Deploy $UMANITY token on Base with DEX
+                                    liquidity, staking rewards, and governance voting</p>
                                 <div
-                                    class="inline-block bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm font-bold">
-                                    Q3 2025</div>
+                                    class="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                                    IN PROGRESS</div>
+                                <div class="text-xs text-blue-600 mt-2 font-medium">Expected: March 2025</div>
                             </div>
                         </div>
                     </div>
@@ -815,12 +836,12 @@
                     <div class="flex items-center justify-center">
                         <div class="w-1/2 pr-8 text-right fade-in-up" style="animation-delay: 0.3s;">
                             <div class="glass-card rounded-3xl p-8">
-                                <h3 class="text-2xl font-bold mb-4 text-black">Phase 3: Farcaster Integration</h3>
-                                <p class="text-gray-600 mb-4 leading-relaxed">Full Farcaster frames integration and
-                                    social features</p>
+                                <h3 class="text-2xl font-bold mb-4 text-black">📱 Phase 3: Mobile & Social</h3>
+                                <p class="text-gray-600 mb-4 leading-relaxed">Native mobile apps, advanced Farcaster
+                                    frames, and social gaming features</p>
                                 <div
                                     class="inline-block bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm font-bold">
-                                    Q4 2025</div>
+                                    Q2 2025</div>
                             </div>
                         </div>
                         <div class="w-8 h-8 bg-gray-300 rounded-full border-4 border-white shadow-lg z-10"></div>
@@ -833,12 +854,12 @@
                         <div class="w-8 h-8 bg-gray-300 rounded-full border-4 border-white shadow-lg z-10"></div>
                         <div class="w-1/2 pl-8 fade-in-up" style="animation-delay: 0.4s;">
                             <div class="glass-card rounded-3xl p-8">
-                                <h3 class="text-2xl font-bold mb-4 text-black">Phase 4: Global Expansion</h3>
-                                <p class="text-gray-600 mb-4 leading-relaxed">Multi-chain support and global
-                                    verification network</p>
+                                <h3 class="text-2xl font-bold mb-4 text-black">🌍 Phase 4: Global Scale</h3>
+                                <p class="text-gray-600 mb-4 leading-relaxed">Multi-chain expansion, institutional
+                                    partnerships, and global verification network</p>
                                 <div
                                     class="inline-block bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm font-bold">
-                                    Q1 2026</div>
+                                    Q4 2025</div>
                             </div>
                         </div>
                     </div>
@@ -852,13 +873,24 @@
         <div class="max-w-7xl mx-auto text-center relative z-10">
             <h2 class="text-5xl md:text-7xl font-black mb-8 hero-text fade-in-up">
                 <span class="gradient-text-white">
-                    Ready to Make Impact?
+                    Ready to Earn Genesis Rewards?
                 </span>
             </h2>
-            <p class="text-xl text-gray-300 mb-12 max-w-3xl mx-auto subtitle-text fade-in-up"
+            <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto subtitle-text fade-in-up"
                 style="animation-delay: 0.2s;">
-                Join the future of giving. Start donating, earn rewards, and make a real difference in the world.
+                Don't miss Epoch 0! Early adopters earn <strong>10x points</strong> and <strong>5000x tokens</strong>.
+                Limited time offer that decreases with each epoch.
             </p>
+            <!-- Urgency Banner -->
+            <div class="max-w-2xl mx-auto mb-12 fade-in-up" style="animation-delay: 0.3s;">
+                <div class="bg-gradient-to-r from-red-900/30 to-orange-900/30 border border-red-500/30 rounded-3xl p-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-black text-red-300 mb-2">⏰ EPOCH 0 ENDS SOON</div>
+                        <div class="text-lg text-gray-300">Only <strong class="text-red-300">30 days</strong> left to
+                            earn maximum rewards!</div>
+                    </div>
+                </div>
+            </div>
 
             <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 fade-in-up"
                 style="animation-delay: 0.4s;">
@@ -944,5 +976,165 @@
                 nav.style.background = 'rgba(255, 255, 255, 0.9)';
                 nav.style.borderBottomColor = 'rgba(0, 0, 0, 0.08)';
             }
+        });
+
+        // Fetch and update landing page stats
+        async function updateLandingStats() {
+            try {
+                const response = await fetch('/api/landing-stats/');
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Format total donated as ETH with 4 decimal places
+                    const totalDonatedETH = parseFloat(data.total_donated);
+                    const formattedETH = totalDonatedETH.toFixed(4);
+                    document.getElementById('total-donated').textContent = `${formattedETH} ETH`;
+
+                    // Update other stats
+                    document.getElementById('active-pools').textContent = data.active_pools;
+                    document.getElementById('active-donors').textContent = data.active_donors;
+                    document.getElementById('tokens-per-eth').textContent = data.tokens_per_eth;
+                }
+            } catch (error) {
+                console.error('Error fetching landing stats:', error);
+                // Keep default values on error
+            }
+        }
+
+        // Update stats on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            updateLandingStats();
+
+            // Optionally update stats every 30 seconds
+            setInterval(updateLandingStats, 30000);
+        });
+
+        // Pool emoji mapping
+        const poolEmojis = {
+            'emergency': '🚨',
+            'community': '🏘️',
+            'creator': '🎨',
+            'platform': '⚡'
+        };
+
+        // Default pool data for fallback
+        const defaultPools = [
+            { name: 'Emergency Fund', pool_type: 'emergency', description: 'Help those in urgent need worldwide', allocation_percentage: '10' },
+            { name: 'Community Projects', pool_type: 'community', description: 'Fund community initiatives', allocation_percentage: '30' },
+            { name: 'Creator Support', pool_type: 'creator', description: 'Support content creators', allocation_percentage: '20' },
+            { name: 'Platform Development', pool_type: 'platform', description: 'Improve Umanity platform', allocation_percentage: '40' }
+        ];
+
+        // Fetch and update pools data
+        async function updatePoolsData() {
+            try {
+                const response = await fetch('/api/pools-landing/');
+                const data = await response.json();
+
+                if (response.ok && data.pools) {
+                    renderPools(data.pools);
+                } else {
+                    // Fallback to default pools if API fails
+                    renderPools(defaultPools.map(pool => ({
+                        ...pool,
+                        total_raised: '0',
+                        donor_count: 0,
+                        progress_percentage: 0,
+                        emoji: poolEmojis[pool.pool_type] || '📍'
+                    })));
+                }
+            } catch (error) {
+                console.error('Error fetching pools data:', error);
+                // Fallback to default pools
+                renderPools(defaultPools.map(pool => ({
+                    ...pool,
+                    total_raised: '0',
+                    donor_count: 0,
+                    progress_percentage: 0,
+                    emoji: poolEmojis[pool.pool_type] || '📍'
+                })));
+            }
+        }
+
+        // Render pools in the DOM
+        function renderPools(pools) {
+            const container = document.getElementById('pools-container');
+
+            if (pools.length === 0) {
+                container.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <div class="text-gray-500">No active pools found</div>
+            </div>
+        `;
+                return;
+            }
+
+            // Dynamic grid classes based on pool count
+            let gridClass = '';
+            let justifyClass = '';
+
+            if (pools.length === 1) {
+                gridClass = 'grid grid-cols-1 gap-8 max-w-sm mx-auto';
+                justifyClass = 'justify-center';
+            } else if (pools.length === 2) {
+                gridClass = 'grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto';
+                justifyClass = 'justify-center';
+            } else if (pools.length === 3) {
+                gridClass = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto';
+                justifyClass = 'justify-center';
+            } else {
+                // 4 or more pools - use original full-width grid
+                gridClass = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8';
+                justifyClass = '';
+            }
+
+            // Update container classes
+            container.className = `${gridClass} ${justifyClass}`;
+
+            const poolsHTML = pools.map((pool, index) => {
+                const animationDelay = (index + 1) * 0.1;
+                const totalRaised = parseFloat(pool.total_raised) || 0;
+                const formattedAmount = totalRaised.toFixed(4);
+                const progressWidth = Math.min(pool.progress_percentage || 0, 100);
+
+                return `
+            <div class="pool-card rounded-3xl p-8 text-center fade-in-up" style="animation-delay: ${animationDelay}s;">
+                <div class="text-6xl mb-6 floating" style="animation-delay: -${index}s;">${pool.emoji || '📍'}</div>
+                <h3 class="text-xl font-bold mb-3 text-black">${pool.name}</h3>
+                <p class="text-gray-600 text-sm mb-6 leading-relaxed">${pool.description}</p>
+                <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                    <div class="text-3xl font-black text-black">${formattedAmount} ETH</div>
+                    <div class="text-xs text-gray-500 font-medium mt-1">${pool.allocation_percentage}% allocation</div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div class="progress-bar h-3 rounded-full transition-all duration-1000" style="width: ${progressWidth}%"></div>
+                </div>
+                <div class="text-xs text-gray-500 font-medium">${pool.donor_count || 0} donors</div>
+            </div>
+        `;
+            }).join('');
+
+            container.innerHTML = poolsHTML;
+
+            // Re-trigger animations for newly loaded content
+            const fadeElements = container.querySelectorAll('.fade-in-up');
+            fadeElements.forEach(el => {
+                el.style.animationPlayState = 'running';
+                if (typeof observer !== 'undefined') {
+                    observer.observe(el);
+                }
+            });
+        }
+
+        // Update the existing DOMContentLoaded event listener
+        document.addEventListener('DOMContentLoaded', function () {
+            updateLandingStats();
+            updatePoolsData(); // Add this line
+
+            // Optionally update both stats and pools every 30 seconds
+            setInterval(() => {
+                updateLandingStats();
+                updatePoolsData();
+            }, 30000);
         });
     </script>

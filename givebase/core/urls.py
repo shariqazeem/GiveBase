@@ -6,7 +6,8 @@ urlpatterns = [
     # Main pages
     path('', views.index, name='index'),
     path('app/', views.app, name='app'),
-    
+    path('api/landing-stats/', views.landing_stats, name='landing_stats'),
+    path('api/pools-landing/', views.pools_landing_data, name='pools_landing_data'),
     # NEW GLOBAL SYSTEM ENDPOINTS
     
     # Donation Pools

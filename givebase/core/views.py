@@ -1090,3 +1090,52 @@ def record_farcaster_donation(request):
             return JsonResponse({'error': str(e)}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+def landing_stats(request):
+    """Get real-time stats for landing page"""
+    # Calculate total donated from all sources
+    total_donated_pools = PoolDonation.objects.aggregate(Sum('amount'))['amount__sum'] or Decimal('0')
+    total_donated_social = SocialDonation.objects.aggregate(Sum('amount'))['amount__sum'] or Decimal('0')
+    total_donated_legacy = Donation.objects.aggregate(Sum('amount'))['amount__sum'] or Decimal('0')
+    total_donated = total_donated_pools + total_donated_social + total_donated_legacy
+    
+    # Get active donors count
+    active_donors = UserProfile.objects.filter(total_donated__gt=0).count()
+    
+    # Get active pools count
+    active_pools = DonationPool.objects.filter(is_active=True).count()
+    
+    # Calculate tokens distributed per 1 ETH (current epoch multiplier)
+    tokens_per_eth = 5000000  # 5M tokens for Epoch 0
+    
+    return JsonResponse({
+        'total_donated': str(total_donated),
+        'active_donors': active_donors,
+        'active_pools': active_pools,
+        'tokens_per_eth': f"{tokens_per_eth:,}+"
+    })
+
+def pools_landing_data(request):
+    """Get pools data for landing page display"""
+    pools = DonationPool.objects.filter(is_active=True).order_by('pool_type')
+    
+    pools_data = []
+    for pool in pools:
+        # Calculate progress percentage (assuming pools have ongoing goals)
+        goal_amount = 10.0  # 10 ETH goal per pool, adjust as needed
+        progress = min((float(pool.total_raised) / goal_amount) * 100, 100) if goal_amount > 0 else 0
+        
+        pools_data.append({
+            'id': pool.id,
+            'name': pool.name,
+            'pool_type': pool.pool_type,
+            'description': pool.description,
+            'emoji': pool.emoji,
+            'total_raised': str(pool.total_raised),
+            'donor_count': pool.donor_count,
+            'allocation_percentage': str(pool.allocation_percentage),
+            'progress_percentage': round(progress, 1),
+        })
+    
+    return JsonResponse({'pools': pools_data})
