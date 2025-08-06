@@ -2418,10 +2418,28 @@
                     from: userAccount
                 });
 
+                // First estimate gas for the transaction
+                let gasEstimate;
+                try {
+                    gasEstimate = await poolsContract.methods.donateToPool(selectedPoolId).estimateGas({
+                        from: userAccount,
+                        value: amountWei
+                    });
+                    console.log('Gas estimate:', gasEstimate);
+                } catch (error) {
+                    console.error('Gas estimation failed:', error);
+                    gasEstimate = 100000; // Fallback gas limit
+                }
+
+                // Add 20% buffer to estimated gas
+                const gasLimit = Math.floor(gasEstimate * 1.2);
+
                 const tx = await poolsContract.methods.donateToPool(selectedPoolId).send({
                     from: userAccount,
-                    value: amountWei
-                    // Let Base automatically estimate gas - it's very efficient
+                    value: amountWei,
+                    gas: gasLimit,
+                    maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'), // Base uses very low priority fees
+                    maxFeePerGas: web3.utils.toWei('0.01', 'gwei') // Base has very low base fees
                 });
 
                 console.log('Smart contract donation successful:', tx);
