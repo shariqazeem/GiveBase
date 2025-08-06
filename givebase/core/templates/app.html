@@ -656,7 +656,7 @@
                                     <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
                                     <div class="text-red-700">
                                         This will use <strong>real ETH</strong> from Base Mainnet.
-                                        Minimum: $0.50 • Gas fees: ~$0.01-0.05 • <strong>Irreversible</strong>.
+                                        Minimum: $0.50 • Gas fees: ~$0.001-0.003 • <strong>Irreversible</strong>.
                                     </div>
                                 </div>
                             </div>
@@ -676,7 +676,7 @@
                                     class="form-input w-full rounded-xl px-4 py-4 text-sm">
                                 <div class="mt-2 text-sm text-gray-600">
                                     <span id="p2pEstimatedUSD" class="text-green-600 font-bold">$0.00</span> •
-                                    Gas fees: ~$0.01-0.05 additional
+                                    Gas fees: ~$0.001-0.003 additional
                                 </div>
                                 <div class="mt-2 text-xs text-gray-500">
                                     Rewards: <span id="p2pEstimatedPoints" class="text-purple-600 font-medium">0</span>
@@ -950,7 +950,7 @@
                         <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
                         <div class="text-red-700">
                             This will use <strong>real ETH</strong> from Base Mainnet.
-                            Minimum: $0.50 • Gas fees: ~$0.01-0.05 • <strong>Irreversible</strong>.
+                            Minimum: $0.50 • Gas fees: ~$0.001-0.003 • <strong>Irreversible</strong>.
                         </div>
                     </div>
                 </div>
@@ -974,7 +974,7 @@
                     <div class="text-xs text-gray-600 mt-1">Emergency pools get +150% bonus</div>
                 </div>
                 <div class="text-xs text-gray-500 mt-2">
-                    Gas fees: ~$0.01-0.05 additional • ETH Price: $<span id="poolEthPrice">0</span>
+                    Gas fees: ~$0.001-0.003 additional • ETH Price: $<span id="poolEthPrice">0</span>
                 </div>
             </div>
 
@@ -1006,7 +1006,7 @@
                         <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
                         <div class="text-red-700">
                             This will use <strong>real ETH</strong> from Base Mainnet.
-                            Minimum: $0.50 • Gas fees: ~$0.01-0.05 • <strong>Irreversible</strong>.
+                            Minimum: $0.50 • Gas fees: ~$0.001-0.003 • <strong>Irreversible</strong>.
                         </div>
                     </div>
                 </div>
@@ -2326,7 +2326,7 @@
             if (error.code === 4001) {
                 return 'Transaction cancelled by user.';
             } else if (error.code === -32000) {
-                return 'Insufficient funds for gas. You need Base ETH to pay for transaction fees (~$0.01-0.05).';
+                return 'Insufficient funds for gas. You need Base ETH to pay for transaction fees (~$0.001-0.003).';
             } else if (error.code === -32603) {
                 return 'Network error. Please check your connection and try again.';
             } else if (error.code === -32002) {
@@ -2379,7 +2379,12 @@
 
             try {
                 // Initialize contract if not done
-                if (!poolsContract) {
+                if (!poolsContract || !web3) {
+                    if (!web3) {
+                        alert('Web3 not initialized. Please reconnect your wallet.');
+                        donateBtn.textContent = 'Donate Now';
+                        return;
+                    }
                     poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
                 }
 
@@ -2388,8 +2393,8 @@
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
 
-                if (balanceEth < donationAmount + 0.005) { // Smaller buffer for gas
-                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.01).toFixed(4)} ETH (including gas fees).`);
+                if (balanceEth < donationAmount + 0.001) { // Minimal buffer for Base's low gas
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.001).toFixed(4)} ETH (including gas fees).`);
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
@@ -2405,8 +2410,8 @@
 
                 const tx = await poolsContract.methods.donateToPool(selectedPoolId).send({
                     from: userAccount,
-                    value: amountWei,
-                    gas: 300000 // Adequate gas for pool donation
+                    value: amountWei
+                    // Let Base automatically estimate gas - it's very efficient
                 });
 
                 console.log('Smart contract donation successful:', tx);
@@ -2483,8 +2488,8 @@
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
 
-                if (balanceEth < donationAmount + 0.0001) {
-                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
+                if (balanceEth < donationAmount + 0.0005) { // Slightly higher for safety on Base
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0005).toFixed(4)} ETH (including gas fees).`);
                     donateBtn.textContent = 'Send Donation';
                     return;
                 }
@@ -2522,12 +2527,12 @@
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
                     to: recipientAddress,
-                    value: amountWei,
-                    gas: 21000 // Standard ETH transfer
+                    value: amountWei
+                    // Let Base estimate gas automatically
                 });
 
                 // Record in backend for tracking
-                await fetch('/api/donate-to-user/', {
+                const backendResponse = await fetch('/api/donate-to-user/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2540,14 +2545,22 @@
                     })
                 });
 
+                const backendData = await backendResponse.json();
+                if (!backendData.success) {
+                    throw new Error(backendData.error || 'Failed to record donation');
+                }
+
+                // Use the actual points/tokens from backend
+                const actualPoints = backendData.points_earned || rewards.points;
+                const actualTokens = Math.floor(actualPoints * 0.1 * 1.2); // Approximate token calculation
+
                 // Calculate and show success rewards
                 const usdAmount = calculateUSDAmount(parseFloat(amount));
-                const causeType = getCauseType(selectedRecipient); // or determine based on pool type
-                const rewards = calculateRewards(usdAmount, 'pool', false, causeType);
+                const rewards = calculateRewards(usdAmount, 'p2p', isPublic, 'standard');
 
                 document.getElementById('txHash').textContent = tx.transactionHash;
-                document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
-                document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
+                document.getElementById('pointsEarned').textContent = formatLargeNumber(actualPoints);
+                document.getElementById('tokensEarned').textContent = formatLargeNumber(actualTokens);
 
                 // Clear form
                 document.getElementById('p2pRecipient').value = '';
@@ -2559,6 +2572,14 @@
                 // Refresh data
                 await loadStats();
                 await loadUserStats();
+                if (isPublic) {
+                    await loadSocialFeed(1); // Refresh social feed if donation was public
+                }
+                // Refresh donation history if on that tab
+                const activeTab = document.querySelector('.tab-btn.tab-active')?.getAttribute('data-tab');
+                if (activeTab === 'my-donations') {
+                    await loadUserDonations();
+                }
 
             } catch (error) {
                 console.error('P2P donation error:', error);
@@ -2649,9 +2670,9 @@
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
 
-                // Account for gas fees (roughly 0.0001 ETH for simple transfer)
-                if (balanceEth < donationAmount + 0.0001) {
-                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
+                // Account for gas fees (Base has very low fees)
+                if (balanceEth < donationAmount + 0.0005) {
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0005).toFixed(4)} ETH (including gas fees).`);
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
@@ -2676,18 +2697,12 @@
                     value: amountWei
                 });
 
-                // Estimate gas dynamically
-                const gasEstimate = await web3.eth.estimateGas({
-                    from: userAccount,
-                    to: recipientAddress,
-                    value: amountWei,
-                });
-
+                // Send transaction (Base will auto-estimate gas efficiently)
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
-                    to: recipientAddress,
-                    value: amountWei,
-                    gas: Math.floor(gasEstimate * 1.2), // Add 20% buffer
+                    to: recipient.wallet_address,
+                    value: amountWei
+                    // Base L2 has efficient gas estimation
                 });
 
                 console.log('Transaction successful:', tx);

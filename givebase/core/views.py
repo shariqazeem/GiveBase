@@ -126,10 +126,10 @@ def donate_to_user(request):
             # Check for duplicate transaction
             if SocialDonation.objects.filter(tx_hash=data['tx_hash']).exists():
                 return JsonResponse({'error': 'Donation already recorded'}, status=400)
-            
+                        
             # Create social donation record  
             donation_amount = Decimal(data['amount'])
-            points_earned = calculate_points_and_tokens(donation_amount)
+            points_earned = calculate_points_and_tokens(donation_amount, donation_type='p2p')
             
             # Social bonus for frame interactions
             if data.get('frame_interaction', False):
@@ -153,9 +153,14 @@ def donate_to_user(request):
             update_user_profile(data['donor_address'], donation_amount, points_earned, is_donor=True)
             update_user_profile(data['recipient_address'], Decimal('0'), 0, received_amount=donation_amount)
             
-            # Create token rewards
+            # Calculate token amount separately for token rewards
+            token_amount = int(float(donation_amount) * 2500 * 100 * 1.2)  # USD * 100 tokens/USD * P2P bonus
+            if data.get('frame_interaction', False):
+                token_amount = int(token_amount * 1.1)  # Additional 10% for frame
+
+            # Create token rewards with proper token amount
             reward_type = 'social_donation_frame' if data.get('frame_interaction') else 'social_donation'
-            create_token_reward(data['donor_address'], points_earned, reward_type, data['tx_hash'])
+            create_token_reward(data['donor_address'], token_amount, reward_type, data['tx_hash'])
             
             return JsonResponse({
                 'success': True,
@@ -699,7 +704,7 @@ def calculate_points_and_tokens(amount_eth, donation_type='standard', cause_type
         base_tokens *= 2.5  # Emergency 2.5x
         base_points *= 2.5
     
-    return max(int(base_points), 1), max(int(base_tokens), 1)
+    return max(int(base_points), 1)  # Return only points as integer
 
 def update_user_profile(wallet_address, donated_amount, points_earned, is_donor=True, received_amount=None):
     """Update or create user profile"""
@@ -734,13 +739,13 @@ def update_user_profile(wallet_address, donated_amount, points_earned, is_donor=
     
     return profile
 
-def create_token_reward(wallet_address, points_earned, reason, tx_hash):
+def create_token_reward(wallet_address, token_amount_raw, reason, tx_hash):
     """Create token reward for future airdrop"""
     try:
         profile = UserProfile.objects.get(wallet_address=wallet_address.lower())
         
-        # Calculate token amount (1 point = 0.1 tokens)
-        token_amount = Decimal(points_earned) * Decimal('0.1')
+        # Token amount is already calculated, just convert to Decimal
+        token_amount = Decimal(str(token_amount_raw))
         
         # Apply multipliers
         multiplier = Decimal('1.0')
