@@ -681,10 +681,25 @@ def record_legacy_donation(request):
 
 # HELPER FUNCTIONS
 
-def calculate_points(amount_eth):
-    """Calculate points with bonuses"""
-    base_points = int(amount_eth * 1000)
-    return max(base_points, 1)
+def calculate_points_and_tokens(amount_eth, donation_type='standard', cause_type='standard'):
+    """Updated calculation using new tokenomics"""
+    # Convert to USD (assuming $2500 per ETH)
+    usd_amount = float(amount_eth) * 2500
+    
+    # Base rates
+    base_tokens = usd_amount * 100  # 100 $UMAN per $1
+    base_points = usd_amount * 1000  # 1000 points per $1
+    
+    # Apply multipliers
+    if donation_type == 'p2p':
+        base_tokens *= 1.2  # 20% P2P bonus
+        base_points *= 1.2
+    
+    if cause_type == 'emergency':
+        base_tokens *= 2.5  # Emergency 2.5x
+        base_points *= 2.5
+    
+    return max(int(base_points), 1), max(int(base_tokens), 1)
 
 def update_user_profile(wallet_address, donated_amount, points_earned, is_donor=True, received_amount=None):
     """Update or create user profile"""
