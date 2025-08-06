@@ -76,7 +76,7 @@ def donate_to_pool(request):
             
             # Create donation record
             donation_amount = Decimal(data['amount'])
-            points_earned = calculate_points(donation_amount)
+            points_earned = calculate_points_and_tokens(donation_amount)
             
             donation = PoolDonation.objects.create(
                 donor_address=data['donor_address'].lower(),
@@ -129,7 +129,7 @@ def donate_to_user(request):
             
             # Create social donation record  
             donation_amount = Decimal(data['amount'])
-            points_earned = calculate_points(donation_amount)
+            points_earned = calculate_points_and_tokens(donation_amount)
             
             # Social bonus for frame interactions
             if data.get('frame_interaction', False):
@@ -647,7 +647,7 @@ def record_legacy_donation(request):
             
             # Create donation record
             donation_amount = Decimal(data['amount'])
-            points_earned = calculate_points(donation_amount)
+            points_earned = calculate_points_and_tokens(donation_amount)
             
             donation = Donation.objects.create(
                 donor_address=data['donor_address'].lower(),
@@ -1053,7 +1053,7 @@ def record_farcaster_donation(request):
                     amount=amount_eth,
                     tx_hash=data['tx_hash'],
                     block_number=data.get('block_number'),
-                    points_earned=calculate_points(amount_eth)
+                    points_earned=calculate_points_and_tokens(amount_eth)
                 )
                 
                 # Update pool stats
@@ -1075,7 +1075,7 @@ def record_farcaster_donation(request):
                         amount=amount_eth,
                         tx_hash=data['tx_hash'],
                         block_number=data.get('block_number'),
-                        points_earned=calculate_points(amount_eth)
+                        points_earned=calculate_points_and_tokens(amount_eth)
                     )
                     
                     # Update recipient raised amount
@@ -1088,7 +1088,7 @@ def record_farcaster_donation(request):
                     return JsonResponse({'error': 'Recipient not found'}, status=404)
             
             # Update user profile
-            points_earned = calculate_points(amount_eth)
+            points_earned = calculate_points_and_tokens(amount_eth)
             update_user_profile(donor_address, amount_eth, points_earned, is_donor=True)
             
             # Create token reward
