@@ -656,8 +656,7 @@
                                     <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
                                     <div class="text-red-700">
                                         This will use <strong>real ETH</strong> from Base Mainnet.
-                                        Verify recipient address carefully - transactions are
-                                        <strong>irreversible</strong>.
+                                        Minimum: $0.50 • Gas fees: ~$0.01-0.05 • <strong>Irreversible</strong>.
                                     </div>
                                 </div>
                             </div>
@@ -673,7 +672,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Amount (ETH)</label>
-                                <input type="number" id="p2pAmount" step="0.001" min="0.001" placeholder="0.01"
+                                <input type="number" id="p2pAmount" step="0.0001" min="0.0002" placeholder="0.001"
                                     class="form-input w-full rounded-xl px-4 py-4 text-sm">
                                 <div class="mt-2 text-sm text-gray-600">
                                     <span id="p2pEstimatedUSD" class="text-green-600 font-bold">$0.00</span> •
@@ -951,7 +950,7 @@
                         <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
                         <div class="text-red-700">
                             This will use <strong>real ETH</strong> from Base Mainnet.
-                            Transaction fees apply (~$0.01-0.05) and donations are <strong>irreversible</strong>.
+                            Minimum: $0.50 • Gas fees: ~$0.01-0.05 • <strong>Irreversible</strong>.
                         </div>
                     </div>
                 </div>
@@ -959,10 +958,10 @@
 
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Donation Amount (ETH)</label>
-                <input type="number" id="poolDonationAmount" step="0.001" min="0.001" placeholder="0.01"
+                <input type="number" id="poolDonationAmount" step="0.0001" min="0.0002" placeholder="0.001"
                     class="form-input w-full rounded-xl px-4 py-4 text-sm">
                 <div class="mt-3 text-sm text-gray-600">
-                    Minimum: 0.001 ETH (<span id="poolMinUSD" class="text-green-600 font-medium">$3.00</span>) •
+                    Minimum: 0.0002 ETH (<span id="poolMinUSD" class="text-green-600 font-medium">$0.50</span>) •
                     <span id="poolEstimatedUSD" class="text-green-600 font-bold">$0.00</span>
                 </div>
                 <div class="mt-2 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-3">
@@ -1007,7 +1006,7 @@
                         <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
                         <div class="text-red-700">
                             This will use <strong>real ETH</strong> from Base Mainnet.
-                            Transaction fees apply (~$0.01-0.05) and donations are <strong>irreversible</strong>.
+                            Minimum: $0.50 • Gas fees: ~$0.01-0.05 • <strong>Irreversible</strong>.
                         </div>
                     </div>
                 </div>
@@ -1015,10 +1014,10 @@
 
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Donation Amount (ETH)</label>
-                <input type="number" id="donationAmount" step="0.001" min="0.001" placeholder="0.01"
+                <input type="number" id="donationAmount" step="0.0001" min="0.0002" placeholder="0.001"
                     class="form-input w-full rounded-xl px-4 py-4 text-sm">
                 <div class="mt-3 text-sm text-gray-600">
-                    Minimum: 0.001 ETH (<span id="legacyMinUSD" class="text-green-600 font-medium">$3.00</span>) •
+                    Minimum: 0.0002 ETH (<span id="legacyMinUSD" class="text-green-600 font-medium">$0.50</span>) •
                     <span id="legacyEstimatedUSD" class="text-green-600 font-bold">$0.00</span>
                 </div>
                 <div class="mt-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3">
@@ -1081,9 +1080,51 @@
         let hasMoreSocialFeed = false;
         let currentDonationType = 'pools';
 
+        // Contract addresses on Base Mainnet
+        const UMANITY_TOKEN_ADDRESS = '0x20fDd5980e83F47b5a9288E0EDCB6B0B8dF3B308';
+        const UMANITY_POOLS_ADDRESS = '0x4B64e2D191903a6caFbB7E226f03d457edC9B8c2';
         const BASE_MAINNET_CHAIN_ID = '0x2105'; // 8453 in decimal
-        const CONTRACT_ADDRESS = '{{ contract_address }}';
 
+        // Contract ABIs (simplified)
+        const POOLS_ABI = [
+            {
+                "inputs": [{ "type": "uint256", "name": "_poolId" }],
+                "name": "donateToPool",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getPlatformStats",
+                "outputs": [
+                    { "type": "uint256", "name": "_totalDonatedETH" },
+                    { "type": "uint256", "name": "_totalDonatedUSD" },
+                    { "type": "uint256", "name": "_totalDonors" },
+                    { "type": "uint256", "name": "_totalPools" },
+                    { "type": "uint256", "name": "_activePools" }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{ "type": "address", "name": "user" }],
+                "name": "getUserImpactStats",
+                "outputs": [
+                    { "type": "bool", "name": "hasImpactNFT" },
+                    { "type": "uint256", "name": "totalPoints" },
+                    { "type": "uint256", "name": "totalDonatedUSD" },
+                    { "type": "uint256", "name": "donationCount" },
+                    { "type": "uint256", "name": "nftTokenId" }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // Initialize contracts
+        let poolsContract;
+        let tokenContract;
         // New $UMAN Tokenomics System
         let ethPriceUSD = 0; // Will be fetched from API
 
@@ -1386,6 +1427,7 @@
                         userAccount = accounts[0];
                         await checkAndSwitchNetwork();
                         updateWalletUI();
+                        await initializeContracts(); // Add this line
                         await loadUserStats();
                         await loadUserProfile();
                     }
@@ -1419,10 +1461,8 @@
                 // Check and switch to Base Sepolia
                 await checkAndSwitchNetwork();
 
-                // Update UI
                 updateWalletUI();
-
-                // Load user-specific data
+                await initializeContracts(); // Add this line
                 await loadUserStats();
                 await loadUserProfile();
 
@@ -1746,27 +1786,45 @@
         // Load platform stats
         async function loadStats() {
             try {
-                const url = userAccount ? `/api/stats/?user=${userAccount}` : '/api/stats/';
-                const response = await fetch(url);
+                // Initialize contract if not done
+                if (!poolsContract) {
+                    poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
+                }
+
+                // Get stats from smart contract
+                const stats = await poolsContract.methods.getPlatformStats().call();
+
+                // Convert from Wei to ETH
+                const totalDonatedETH = web3.utils.fromWei(stats._totalDonatedETH, 'ether');
+                const totalDonatedUSD = stats._totalDonatedUSD;
+
+                // Update UI
+                document.getElementById('totalDonated').textContent = `${parseFloat(totalDonatedETH).toFixed(4)} ETH`;
+                document.getElementById('activePools').textContent = stats._activePools;
+                document.getElementById('totalDonors').textContent = stats._totalDonors;
+
+                // Get user-specific stats if connected
+                if (userAccount) {
+                    const userStats = await poolsContract.methods.getUserImpactStats(userAccount).call();
+
+                    if (userStats.hasImpactNFT) {
+                        document.getElementById('userPoints').textContent = userStats.totalPoints;
+
+                        // Get token balance from token contract
+                        const tokenBalance = await getTokenBalance(userAccount);
+                        document.getElementById('userTokens').textContent = `${parseFloat(tokenBalance).toFixed(2)} $UMAN`;
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error loading contract stats:', error);
+                // Fallback to API if contract fails
+                const response = await fetch('/api/stats/');
                 const data = await response.json();
 
                 document.getElementById('totalDonated').textContent = `${parseFloat(data.total_donated).toFixed(4)} ETH`;
                 document.getElementById('activePools').textContent = data.active_pools || '0';
                 document.getElementById('totalDonors').textContent = data.total_donors;
-                document.getElementById('userPoints').textContent = data.user_points || '0';
-
-                // Show user rank if available
-                if (data.user_stats && data.user_stats.rank) {
-                    document.getElementById('userRank').textContent = `Rank #${data.user_stats.rank}`;
-                }
-
-                // Show user tokens if available
-                if (data.user_stats && data.user_stats.tokens_earned) {
-                    document.getElementById('userTokens').textContent = `${parseFloat(data.user_stats.tokens_earned).toFixed(2)} $UMANITY`;
-                }
-
-            } catch (error) {
-                console.error('Error loading stats:', error);
             }
         }
 
@@ -2288,7 +2346,7 @@
             const amount = parseFloat(document.getElementById('donationAmount').value) || 0;
             const usdValue = formatUSD(amount);
             document.getElementById('legacyEstimatedUSD').textContent = usdValue;
-            document.getElementById('legacyMinUSD').textContent = formatUSD(0.001);
+            document.getElementById('legacyMinUSD').textContent = formatUSD(0.0002);
             document.getElementById('legacyEthPrice').textContent = ethPriceUSD.toFixed(0);
         }
 
@@ -2296,7 +2354,7 @@
             const amount = parseFloat(document.getElementById('poolDonationAmount').value) || 0;
             const usdValue = formatUSD(amount);
             document.getElementById('poolEstimatedUSD').textContent = usdValue;
-            document.getElementById('poolMinUSD').textContent = formatUSD(0.001);
+            document.getElementById('poolMinUSD').textContent = formatUSD(0.0002);
             document.getElementById('poolEthPrice').textContent = ethPriceUSD.toFixed(0);
         }
 
@@ -2309,8 +2367,8 @@
         async function processPoolDonation() {
             const amount = document.getElementById('poolDonationAmount').value;
 
-            if (!amount || parseFloat(amount) < 0.001) {
-                alert('Minimum donation is 0.001 ETH');
+            if (!amount || parseFloat(amount) < 0.0002) {
+                alert('Minimum donation is 0.0002 ETH (~$0.50)');
                 return;
             }
 
@@ -2320,88 +2378,65 @@
             donateBtn.textContent = 'Processing...';
 
             try {
-                // Check user balance first
+                // Initialize contract if not done
+                if (!poolsContract) {
+                    poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
+                }
+
+                // Check user balance
                 const balanceWei = await web3.eth.getBalance(userAccount);
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
 
-                // Account for gas fees (roughly 0.0001 ETH for simple transfer)
-                if (balanceEth < donationAmount + 0.0001) {
-                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0001).toFixed(4)} ETH (including gas fees).`);
+                if (balanceEth < donationAmount + 0.005) { // Smaller buffer for gas
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.01).toFixed(4)} ETH (including gas fees).`);
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
 
-                // Get pool wallet
-                const response = await fetch('/api/pools/');
-                const data = await response.json();
-                const pool = data.pools.find(p => p.id === selectedPoolId);
-
-                if (!pool) {
-                    alert('Pool not found');
-                    donateBtn.textContent = 'Donate Now';
-                    return;
-                }
-
-                // Send transaction directly to pool wallet
+                // Call smart contract donateToPool function
                 const amountWei = web3.utils.toWei(amount, 'ether');
 
-                console.log('Sending pool donation:', {
-                    from: userAccount,
-                    to: pool.wallet_address,
-                    value: amountWei
+                console.log('Calling smart contract donateToPool:', {
+                    poolId: selectedPoolId,
+                    amount: amountWei,
+                    from: userAccount
                 });
 
-                // Estimate gas dynamically
-                const gasEstimate = await web3.eth.estimateGas({
+                const tx = await poolsContract.methods.donateToPool(selectedPoolId).send({
                     from: userAccount,
-                    to: recipientAddress,
                     value: amountWei,
+                    gas: 300000 // Adequate gas for pool donation
                 });
 
-                const tx = await web3.eth.sendTransaction({
-                    from: userAccount,
-                    to: recipientAddress,
-                    value: amountWei,
-                    gas: Math.floor(gasEstimate * 1.2), // Add 20% buffer
-                });
+                console.log('Smart contract donation successful:', tx);
 
-                console.log('Pool donation successful:', tx);
+                // The contract automatically:
+                // - Updates pool balances
+                // - Mints $UMANITY tokens as rewards  
+                // - Creates Impact Points NFT
+                // - Tracks user statistics
 
-                // Record donation in backend
-                await fetch('/api/donate-to-pool/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        donor_address: userAccount,
-                        pool_id: selectedPoolId,
-                        amount: amount,
-                        tx_hash: tx.transactionHash,
-                        block_number: tx.blockNumber,
-                    }),
-                });
-
-                // Calculate and show success rewards
-                const usdAmount = calculateUSDAmount(parseFloat(amount));
-                const causeType = getCauseType(selectedRecipient); // or determine based on pool type
-                const rewards = calculateRewards(usdAmount, 'pool', false, causeType);
-
+                // Show success with transaction hash
                 document.getElementById('txHash').textContent = tx.transactionHash;
+
+                // Calculate rewards for display (contract already gave them)
+                const usdAmount = calculateUSDAmount(parseFloat(amount));
+                const rewards = calculateRewards(usdAmount, 'pool', false, 'emergency');
+
                 document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
                 document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
 
                 closePoolDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
 
-                // Refresh data
+                // Refresh UI data
                 await loadStats();
                 await loadPools();
                 await loadUserStats();
 
             } catch (error) {
-                console.error('Pool donation error:', error);
+                console.error('Smart contract donation error:', error);
                 alert(handleMainnetError(error));
             } finally {
                 donateBtn.textContent = 'Donate Now';
@@ -2434,8 +2469,8 @@
                 return;
             }
 
-            if (!amount || parseFloat(amount) < 0.001) {
-                alert('Minimum donation is 0.001 ETH');
+            if (!amount || parseFloat(amount) < 0.0002) {
+                alert('Minimum donation is 0.0002 ETH (~$0.50)');
                 return;
             }
 
@@ -2481,32 +2516,28 @@
                     value: amountWei,
                 });
 
+                // For P2P, we'll use direct wallet-to-wallet for now
+                // Later we can create a P2P contract function
+
                 const tx = await web3.eth.sendTransaction({
                     from: userAccount,
                     to: recipientAddress,
                     value: amountWei,
-                    gas: Math.floor(gasEstimate * 1.2), // Add 20% buffer
+                    gas: 21000 // Standard ETH transfer
                 });
 
-                console.log('P2P donation successful:', tx);
-
-                // Record donation in backend
+                // Record in backend for tracking
                 await fetch('/api/donate-to-user/', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         donor_address: userAccount,
                         recipient_address: recipientAddress,
-                        recipient_username: recipientUsername,
                         amount: amount,
                         message: message,
                         tx_hash: tx.transactionHash,
-                        block_number: tx.blockNumber,
-                        is_public: isPublic,
-                        frame_interaction: false,
-                    }),
+                        is_public: isPublic
+                    })
                 });
 
                 // Calculate and show success rewards
@@ -2602,8 +2633,8 @@
         async function processDonation() {
             const amount = document.getElementById('donationAmount').value;
 
-            if (!amount || parseFloat(amount) < 0.001) {
-                alert('Minimum donation is 0.001 ETH');
+            if (!amount || parseFloat(amount) < 0.0002) {
+                alert('Minimum donation is 0.0002 ETH (~$0.50)');
                 return;
             }
 
@@ -2851,7 +2882,41 @@
                 document.getElementById('walletDropdown').classList.add('hidden');
             }
         });
+        // Get user's token balance
+        async function getTokenBalance(address) {
+            try {
+                if (!tokenContract) {
+                    const TOKEN_ABI = [
+                        {
+                            "inputs": [{ "type": "address", "name": "account" }],
+                            "name": "balanceOf",
+                            "outputs": [{ "type": "uint256", "name": "" }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        }
+                    ];
+                    tokenContract = new web3.eth.Contract(TOKEN_ABI, UMANITY_TOKEN_ADDRESS);
+                }
 
+                const balance = await tokenContract.methods.balanceOf(address).call();
+                return web3.utils.fromWei(balance, 'ether'); // $UMAN has 18 decimals
+            } catch (error) {
+                console.error('Error getting token balance:', error);
+                return '0';
+            }
+        }
+
+        // Initialize contracts when wallet connects
+        async function initializeContracts() {
+            if (!web3) return;
+
+            try {
+                poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
+                console.log('✅ Contracts initialized successfully');
+            } catch (error) {
+                console.error('❌ Error initializing contracts:', error);
+            }
+        }
         // Auto-refresh data every 30 seconds when tab is active
         let refreshInterval;
 

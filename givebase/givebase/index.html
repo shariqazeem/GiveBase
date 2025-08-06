@@ -12,6 +12,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -776,13 +777,13 @@
                     <div class="mb-6">
                         <h3 class="font-bold mb-3">Select Amount (ETH)</h3>
                         <div class="grid grid-cols-4 gap-2 mb-4">
+                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.0002">0.0002</button>
                             <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.001">0.001</button>
                             <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.005">0.005</button>
                             <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.01">0.01</button>
-                            <button class="amount-btn quick-donate-btn py-3 rounded-xl font-medium" data-amount="0.02">0.02</button>
                         </div>
                         <div class="relative">
-                            <input type="number" id="customAmount" placeholder="Custom amount in ETH" step="0.0001" min="0.0001" class="form-input w-full px-4 py-3 rounded-xl pr-20">
+                            <input type="number" id="customAmount" placeholder="Custom amount in ETH" step="0.0001" min="0.0002" class="form-input w-full px-4 py-3 rounded-xl pr-20">
                             <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-600">ETH</span>
                         </div>
                         <div class="mt-2 text-center">
@@ -855,6 +856,38 @@
         const BASE_TOKENS_PER_USD = 100; // 100 $UMAN per $1 USD
         const BASE_POINTS_PER_USD = 1000; // 1000 Impact Points per $1 USD
 
+        // Smart Contract Configuration - Base Mainnet
+        const UMANITY_TOKEN_ADDRESS = '0x20fDd5980e83F47b5a9288E0EDCB6B0B8dF3B308';
+        const UMANITY_POOLS_ADDRESS = '0x4B64e2D191903a6caFbB7E226f03d457edC9B8c2';
+        const BASE_MAINNET_CHAIN_ID = '0x2105'; // 8453 in decimal
+
+        // Contract ABIs (simplified for miniapp)
+        const POOLS_ABI = [
+            {
+                "inputs": [{ "type": "uint256", "name": "_poolId" }],
+                "name": "donateToPool",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getPlatformStats",
+                "outputs": [
+                    { "type": "uint256", "name": "_totalDonatedETH" },
+                    { "type": "uint256", "name": "_totalDonatedUSD" },
+                    { "type": "uint256", "name": "_totalDonors" },
+                    { "type": "uint256", "name": "_totalPools" },
+                    { "type": "uint256", "name": "_activePools" }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // Initialize contracts
+        let poolsContract;
+        let tokenContract;
         // Multiplier system for verified/underfunded causes
         const CAUSE_MULTIPLIERS = {
             verified: 1.5,        // 50% bonus (150 $UMAN per $1)
@@ -947,7 +980,7 @@
             }
         }
 
-        // Initialize wallet
+        // Initialize wallet and contracts
         async function initializeWallet() {
             try {
                 farcasterProvider = await sdk.wallet.getEthereumProvider();
@@ -962,6 +995,10 @@
                     userAccount = accounts[0];
                     isConnected = true;
                     updateWalletUI();
+
+                    // Initialize smart contracts
+                    await initializeContracts(); // Add this line
+
                     loadUserProfile();
                 }
 
@@ -971,6 +1008,7 @@
                         userAccount = accounts[0];
                         isConnected = true;
                         updateWalletUI();
+                        initializeContracts(); // Add this line
                         loadUserProfile();
                     } else {
                         userAccount = null;
@@ -983,7 +1021,26 @@
                 console.error('Wallet init error:', error);
             }
         }
+        // Initialize smart contracts
+        async function initializeContracts() {
+            if (!farcasterProvider) return;
 
+            try {
+                // Use Web3 from CDN or import
+                const Web3 = window.Web3 || (await import('web3')).default;
+                const web3 = new Web3(farcasterProvider);
+
+                poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
+                console.log('✅ Smart contracts initialized successfully');
+
+                // Load stats from contract
+                loadStats();
+
+            } catch (error) {
+                console.error('❌ Error initializing contracts:', error);
+                // Continue without contracts - will fallback to API
+            }
+        }
         // Connect wallet
         async function connectWallet() {
             if (!farcasterProvider) {
@@ -1000,6 +1057,10 @@
                     userAccount = accounts[0];
                     isConnected = true;
                     updateWalletUI();
+
+                    // Initialize contracts
+                    await initializeContracts(); // Add this line
+
                     loadUserProfile();
                 }
             } catch (error) {
@@ -1027,7 +1088,18 @@
                 walletBtn.classList.add('secondary-button');
             }
         }
-
+        // Handle mainnet transaction errors
+        function handleMainnetError(error) {
+            if (error.code === 4001) {
+                return 'Transaction cancelled by user.';
+            } else if (error.code === -32000) {
+                return 'Insufficient funds for gas. You need Base ETH to pay for transaction fees (~$0.01-0.05).';
+            } else if (error.message && error.message.includes('insufficient funds')) {
+                return 'Insufficient ETH balance. Please add more Base ETH to your wallet.';
+            } else {
+                return `Transaction failed: ${error.message || 'Unknown error'}. Please try again.`;
+            }
+        }
         // Load recipients
         async function loadRecipients(page = 1, filter = 'all', append = false) {
             try {
@@ -1418,17 +1490,43 @@
             return item;
         }
 
-        // Load stats
+        // Load stats from smart contract
         async function loadStats() {
             try {
+                // Try smart contract first
+                if (poolsContract) {
+                    const stats = await poolsContract.methods.getPlatformStats().call();
+
+                    // Convert from Wei to ETH and format
+                    const totalDonatedETH = parseFloat(stats._totalDonatedETH) / 1e18;
+                    const totalDonatedUSD = parseFloat(stats._totalDonatedUSD) / 100; // Convert cents to dollars
+
+                    document.getElementById('totalRaised').textContent = `$${totalDonatedUSD.toLocaleString()}`;
+                    document.getElementById('peopleHelped').textContent = stats._totalDonors;
+
+                    console.log('✅ Stats loaded from smart contract');
+                    return;
+                }
+
+                // Fallback to API
                 const response = await fetch(`${API_BASE}/api/farcaster-stats/`);
                 const data = await response.json();
 
-                document.getElementById('totalRaised').textContent = `${data.total_raised.toLocaleString()}`;
+                document.getElementById('totalRaised').textContent = `$${data.total_raised.toLocaleString()}`;
                 document.getElementById('peopleHelped').textContent = data.active_recipients.toLocaleString();
 
             } catch (error) {
                 console.error('Load stats error:', error);
+
+                // Final fallback to API
+                try {
+                    const response = await fetch(`${API_BASE}/api/farcaster-stats/`);
+                    const data = await response.json();
+                    document.getElementById('totalRaised').textContent = `$${data.total_raised.toLocaleString()}`;
+                    document.getElementById('peopleHelped').textContent = data.active_recipients.toLocaleString();
+                } catch (apiError) {
+                    console.error('API fallback failed:', apiError);
+                }
             }
         }
 
@@ -1548,7 +1646,7 @@
             document.getElementById('usdEquivalent').textContent = '0.00';
         }
 
-        // Process donation
+        // Process donation with smart contracts
         async function processDonation() {
             if (!selectedRecipient || !farcasterProvider) return;
 
@@ -1558,8 +1656,8 @@
             const presetAmount = selectedBtn ? parseFloat(selectedBtn.dataset.amount) : 0;
             const ethAmount = Math.max(customAmount, presetAmount);
 
-            if (ethAmount < 0.0001) {
-                alert('Minimum donation is 0.0001 ETH');
+            if (ethAmount < 0.0002) {
+                alert('Minimum donation is 0.0002 ETH (~$0.50)');
                 return;
             }
 
@@ -1571,41 +1669,62 @@
             donateBtn.disabled = true;
 
             try {
-                // Send transaction
-                const weiAmount = '0x' + Math.floor(ethAmount * 1e18).toString(16);
+                // Initialize contract if needed
+                if (!poolsContract) {
+                    const Web3 = window.Web3 || (await import('web3')).default;
+                    const web3 = new Web3(farcasterProvider);
+                    poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
+                }
 
-                const txHash = await farcasterProvider.request({
-                    method: 'eth_sendTransaction',
-                    params: [{
+                // Check if it's a pool donation
+                if (selectedRecipient.id && typeof selectedRecipient.id === 'number') {
+                    // Pool donation - use smart contract
+                    const weiAmount = Math.floor(ethAmount * 1e18).toString();
+
+                    const txHash = await poolsContract.methods.donateToPool(selectedRecipient.id).send({
                         from: userAccount,
-                        to: selectedRecipient.wallet_address,
                         value: weiAmount,
-                        gas: '0x5208',
-                    }]
-                });
+                        gas: 300000 // Adequate gas for pool donation
+                    });
 
-                // Record donation
-                await fetch(`${API_BASE}/api/record-farcaster-donation/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        donor_address: userAccount,
-                        recipient_id: selectedRecipient.id,
-                        amount_usd: usdAmount,
-                        amount_eth: ethAmount,
-                        message: message,
-                        tx_hash: txHash,
-                        platform: 'farcaster'
-                    }),
-                });
+                    console.log('Smart contract pool donation successful:', txHash);
+
+                } else {
+                    // P2P or legacy donation - direct transfer
+                    const weiAmount = '0x' + Math.floor(ethAmount * 1e18).toString(16);
+
+                    const txHash = await farcasterProvider.request({
+                        method: 'eth_sendTransaction',
+                        params: [{
+                            from: userAccount,
+                            to: selectedRecipient.wallet_address,
+                            value: weiAmount,
+                            gas: '0x5208',
+                        }]
+                    });
+
+                    // Record P2P donation
+                    await fetch(`${API_BASE}/api/donate-to-user/`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            donor_address: userAccount,
+                            recipient_address: selectedRecipient.wallet_address,
+                            amount: ethAmount,
+                            message: message,
+                            tx_hash: txHash,
+                            is_public: true,
+                            frame_interaction: true
+                        })
+                    });
+                }
 
                 // Calculate and show rewards
-                const donationType = selectedRecipient.id === 'p2p' ? 'p2p' : 'standard';
+                const donationType = selectedRecipient.id === 'p2p' ? 'p2p' : 'pool';
                 const causeType = getCauseType(selectedRecipient);
                 const rewards = calculateRewards(ethAmount, donationType, false, causeType);
-                document.getElementById('txHash').textContent = txHash;
+
+                document.getElementById('txHash').textContent = txHash.transactionHash || txHash;
                 document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
                 document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
 
@@ -1619,7 +1738,7 @@
 
             } catch (error) {
                 console.error('Donation error:', error);
-                alert(error.code === 4001 ? 'Transaction cancelled' : 'Transaction failed');
+                alert(error.code === 4001 ? 'Transaction cancelled' : `Transaction failed: ${error.message || 'Unknown error'}`);
             } finally {
                 donateBtn.textContent = 'Send Donation';
                 donateBtn.disabled = false;
