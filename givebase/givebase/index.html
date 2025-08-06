@@ -1027,7 +1027,6 @@
 
             try {
                 // Use Web3 from CDN or import
-                const Web3 = window.Web3 || (await import('web3')).default;
                 const web3 = new Web3(farcasterProvider);
 
                 poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
@@ -1671,7 +1670,6 @@
             try {
                 // Initialize contract if needed
                 if (!poolsContract) {
-                    const Web3 = window.Web3 || (await import('web3')).default;
                     const web3 = new Web3(farcasterProvider);
                     poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
                 }
