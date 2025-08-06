@@ -676,256 +676,264 @@
                                     class="form-input w-full rounded-xl px-4 py-4 text-sm">
                                 <div class="mt-2 text-sm text-gray-600">
                                     <span id="p2pEstimatedUSD" class="text-green-600 font-bold">$0.00</span> •
-                                    Gas fees: ~$0.001-0.003 additional
+                                    Gas fees: < $0.001 additional </div>
+                                        <div class="mt-2 text-xs text-gray-500">
+                                            Rewards: <span id="p2pEstimatedPoints"
+                                                class="text-purple-600 font-medium">0</span>
+                                            pts •
+                                            <span id="p2pEstimatedTokens" class="text-blue-600 font-medium">0
+                                                $UMANITY</span> •
+                                            Epoch <span id="p2pCurrentEpoch" class="font-medium">0</span>
+                                        </div>
                                 </div>
-                                <div class="mt-2 text-xs text-gray-500">
-                                    Rewards: <span id="p2pEstimatedPoints" class="text-purple-600 font-medium">0</span>
-                                    pts •
-                                    <span id="p2pEstimatedTokens" class="text-blue-600 font-medium">0 $UMANITY</span> •
-                                    Epoch <span id="p2pCurrentEpoch" class="font-medium">0</span>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Message
+                                        (optional)</label>
+                                    <input type="text" id="p2pMessage" placeholder="Thanks for being awesome!"
+                                        maxlength="280" class="form-input w-full rounded-xl px-4 py-4 text-sm">
                                 </div>
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="p2pPublic" checked class="rounded">
+                                    <label for="p2pPublic" class="text-sm text-gray-600">Make donation public (earn
+                                        social
+                                        bonus)</label>
+                                </div>
+                                <button onclick="processP2PDonation()"
+                                    class="primary-button w-full py-4 rounded-xl text-white font-bold">
+                                    <span id="p2pDonateButtonText">Send Donation</span>
+                                </button>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Message (optional)</label>
-                                <input type="text" id="p2pMessage" placeholder="Thanks for being awesome!"
-                                    maxlength="280" class="form-input w-full rounded-xl px-4 py-4 text-sm">
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <input type="checkbox" id="p2pPublic" checked class="rounded">
-                                <label for="p2pPublic" class="text-sm text-gray-600">Make donation public (earn social
-                                    bonus)</label>
-                            </div>
-                            <button onclick="processP2PDonation()"
-                                class="primary-button w-full py-4 rounded-xl text-white font-bold">
-                                <span id="p2pDonateButtonText">Send Donation</span>
-                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Popular Recipients -->
+                    <div class="max-w-5xl mx-auto">
+                        <h3 class="text-2xl font-bold mb-8 text-center">💫 Popular Recipients</h3>
+                        <div id="popularRecipients" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Popular recipients will be loaded here -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Popular Recipients -->
-                <div class="max-w-5xl mx-auto">
-                    <h3 class="text-2xl font-bold mb-8 text-center">💫 Popular Recipients</h3>
-                    <div id="popularRecipients" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Popular recipients will be loaded here -->
+                <!-- Legacy Recipients Section -->
+                <div id="legacySection" class="donation-section hidden">
+                    <div class="text-center mb-12">
+                        <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Verified Recipients</h2>
+                        <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
+                            Support individuals who have been verified and need immediate help.
+                        </p>
+                    </div>
+                    <div id="recipientsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Recipients will be loaded here -->
                     </div>
                 </div>
             </div>
 
-            <!-- Legacy Recipients Section -->
-            <div id="legacySection" class="donation-section hidden">
+            <!-- Social Feed Tab -->
+            <div id="socialTab" class="tab-content hidden">
                 <div class="text-center mb-12">
-                    <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Verified Recipients</h2>
+                    <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Social Donation Feed</h2>
                     <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
-                        Support individuals who have been verified and need immediate help.
+                        See the latest public donations and join the community of givers.
                     </p>
                 </div>
-                <div id="recipientsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Recipients will be loaded here -->
-                </div>
-            </div>
-        </div>
 
-        <!-- Social Feed Tab -->
-        <div id="socialTab" class="tab-content hidden">
-            <div class="text-center mb-12">
-                <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Social Donation Feed</h2>
-                <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
-                    See the latest public donations and join the community of givers.
-                </p>
-            </div>
-
-            <div class="max-w-3xl mx-auto">
-                <div id="socialFeed" class="space-y-6">
-                    <!-- Loading state -->
-                    <div class="flex justify-center py-12">
-                        <div class="loading-spinner"></div>
-                    </div>
-                </div>
-
-                <!-- Load More Button -->
-                <div id="loadMoreSocialContainer" class="text-center mt-8 hidden">
-                    <button onclick="loadMoreSocialFeed()"
-                        class="secondary-button px-8 py-3 rounded-xl font-medium transition-all hover-lift">
-                        Load More
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Leaderboard Tab -->
-        <div id="leaderboardTab" class="tab-content hidden">
-            <div class="text-center mb-12">
-                <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Top Donors Leaderboard</h2>
-                <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
-                    Celebrate the most generous members of our community.
-                </p>
-            </div>
-
-            <!-- User Position Card (if not in top 10) -->
-            <div id="userPositionCard" class="hidden mb-8">
-                <div class="glass-card max-w-3xl mx-auto rounded-3xl">
-                    <div class="p-6">
-                        <div class="text-center text-sm text-gray-500 mb-3">Your Position</div>
-                        <div id="userPositionInfo" class="flex items-center justify-between">
-                            <!-- User position will be shown here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-card max-w-5xl mx-auto rounded-3xl">
-                <div class="p-8">
-                    <div id="leaderboardList" class="space-y-4">
+                <div class="max-w-3xl mx-auto">
+                    <div id="socialFeed" class="space-y-6">
                         <!-- Loading state -->
                         <div class="flex justify-center py-12">
                             <div class="loading-spinner"></div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- My Donations Tab -->
-        <div id="my-donationsTab" class="tab-content hidden">
-            <div class="text-center mb-12">
-                <h2 class="text-5xl font-black mb-6 gradient-text hero-text">My Donation History</h2>
-                <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
-                    Track your giving journey and impact on the world.
-                </p>
-            </div>
-
-            <!-- User Stats -->
-            <div id="userStatsCards" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-                <div class="stats-card rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-black text-black mb-2" id="userTotalDonated">0 ETH</div>
-                    <div class="text-sm text-gray-500">Total Donated</div>
-                </div>
-                <div class="stats-card rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-black text-black mb-2" id="userDonationCount">0</div>
-                    <div class="text-sm text-gray-500">Total Donations</div>
-                </div>
-                <div class="stats-card rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-black text-black mb-2" id="userTotalPoints">0</div>
-                    <div class="text-sm text-gray-500">Points Earned</div>
-                </div>
-                <div class="token-highlight rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-black text-white mb-2" id="userCurrentRank">#--</div>
-                    <div class="text-sm text-gray-300">Current Rank</div>
+                    <!-- Load More Button -->
+                    <div id="loadMoreSocialContainer" class="text-center mt-8 hidden">
+                        <button onclick="loadMoreSocialFeed()"
+                            class="secondary-button px-8 py-3 rounded-xl font-medium transition-all hover-lift">
+                            Load More
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Donation History -->
-            <div id="donationHistory" class="space-y-6">
-                <div class="text-center py-12 text-gray-500">
-                    Connect wallet to view your donation history
-                </div>
-            </div>
-
-            <!-- Load More Button -->
-            <div id="loadMoreContainer" class="text-center mt-8 hidden">
-                <button onclick="loadMoreDonations()"
-                    class="secondary-button px-8 py-3 rounded-xl font-medium transition-all hover-lift">
-                    Load More
-                </button>
-            </div>
-        </div>
-
-        <!-- Profile Tab -->
-        <div id="profileTab" class="tab-content hidden">
-            <div class="max-w-3xl mx-auto">
+            <!-- Leaderboard Tab -->
+            <div id="leaderboardTab" class="tab-content hidden">
                 <div class="text-center mb-12">
-                    <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Your Profile</h2>
-                    <p class="text-xl text-gray-600 max-w-2xl mx-auto subtitle-text">
-                        Customize your giving profile and manage your preferences.
+                    <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Top Donors Leaderboard</h2>
+                    <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
+                        Celebrate the most generous members of our community.
                     </p>
                 </div>
 
-                <!-- Profile Form -->
-                <div class="glass-card rounded-3xl">
+                <!-- User Position Card (if not in top 10) -->
+                <div id="userPositionCard" class="hidden mb-8">
+                    <div class="glass-card max-w-3xl mx-auto rounded-3xl">
+                        <div class="p-6">
+                            <div class="text-center text-sm text-gray-500 mb-3">Your Position</div>
+                            <div id="userPositionInfo" class="flex items-center justify-between">
+                                <!-- User position will be shown here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card max-w-5xl mx-auto rounded-3xl">
                     <div class="p-8">
-                        <div class="space-y-8">
-                            <!-- Basic Info -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
-                                    <input type="text" id="profileDisplayName" placeholder="Your name"
-                                        class="form-input w-full rounded-xl px-4 py-4 text-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Farcaster
-                                        Username</label>
-                                    <input type="text" id="profileFarcaster" placeholder="@username"
-                                        class="form-input w-full rounded-xl px-4 py-4 text-sm">
-                                </div>
+                        <div id="leaderboardList" class="space-y-4">
+                            <!-- Loading state -->
+                            <div class="flex justify-center py-12">
+                                <div class="loading-spinner"></div>
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                                <textarea id="profileBio" rows="4" placeholder="Tell us about yourself..."
-                                    maxlength="280"
-                                    class="form-input w-full rounded-xl px-4 py-4 text-sm resize-none"></textarea>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Donation Message</label>
-                                <input type="text" id="profileDonationMessage" placeholder="Thanks for your support! 💙"
-                                    maxlength="100" class="form-input w-full rounded-xl px-4 py-4 text-sm">
-                                <div class="text-xs text-gray-500 mt-2">This message shows when people donate to you
-                                </div>
-                            </div>
-
-                            <!-- Privacy Settings -->
-                            <div class="border-t border-gray-200 pt-8">
-                                <h3 class="text-xl font-bold mb-6">Privacy Settings</h3>
-                                <div class="space-y-4">
-                                    <div class="flex items-center justify-between p-4 bg-black/5 rounded-xl">
-                                        <div>
-                                            <div class="font-medium text-black">Public Profile</div>
-                                            <div class="text-sm text-gray-600">Show your profile on leaderboards</div>
-                                        </div>
-                                        <input type="checkbox" id="profilePublic" class="rounded">
-                                    </div>
-                                    <div class="flex items-center justify-between p-4 bg-black/5 rounded-xl">
-                                        <div>
-                                            <div class="font-medium text-black">Accept Donations</div>
-                                            <div class="text-sm text-gray-600">Allow others to send you donations</div>
-                                        </div>
-                                        <input type="checkbox" id="profileAcceptDonations" class="rounded">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Token Rewards Section -->
-                            <div class="border-t border-gray-200 pt-8">
-                                <h3 class="text-xl font-bold mb-6">🪙 Token Rewards</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                    <div class="stats-card rounded-xl p-6">
-                                        <div class="text-3xl font-black text-black" id="profileTokensEarned">0 $UMANITY
-                                        </div>
-                                        <div class="text-sm text-gray-500">Total Earned</div>
-                                    </div>
-                                    <div class="token-highlight rounded-xl p-6">
-                                        <div class="text-3xl font-black text-white" id="profileTokensPending">0 $UMANITY
-                                        </div>
-                                        <div class="text-sm text-gray-300">Pending Claim</div>
-                                    </div>
-                                </div>
-                                <button onclick="checkAirdropEligibility()"
-                                    class="primary-button w-full py-4 rounded-xl text-white font-bold">
-                                    Check Airdrop Eligibility
-                                </button>
-                            </div>
-
-                            <button onclick="updateProfile()"
-                                class="primary-button w-full py-4 rounded-xl text-white font-bold">
-                                <span id="updateProfileButtonText">Update Profile</span>
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <!-- My Donations Tab -->
+            <div id="my-donationsTab" class="tab-content hidden">
+                <div class="text-center mb-12">
+                    <h2 class="text-5xl font-black mb-6 gradient-text hero-text">My Donation History</h2>
+                    <p class="text-xl text-gray-600 max-w-4xl mx-auto subtitle-text">
+                        Track your giving journey and impact on the world.
+                    </p>
+                </div>
+
+                <!-- User Stats -->
+                <div id="userStatsCards" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                    <div class="stats-card rounded-2xl p-6 hover-lift">
+                        <div class="text-3xl font-black text-black mb-2" id="userTotalDonated">0 ETH</div>
+                        <div class="text-sm text-gray-500">Total Donated</div>
+                    </div>
+                    <div class="stats-card rounded-2xl p-6 hover-lift">
+                        <div class="text-3xl font-black text-black mb-2" id="userDonationCount">0</div>
+                        <div class="text-sm text-gray-500">Total Donations</div>
+                    </div>
+                    <div class="stats-card rounded-2xl p-6 hover-lift">
+                        <div class="text-3xl font-black text-black mb-2" id="userTotalPoints">0</div>
+                        <div class="text-sm text-gray-500">Points Earned</div>
+                    </div>
+                    <div class="token-highlight rounded-2xl p-6 hover-lift">
+                        <div class="text-3xl font-black text-white mb-2" id="userCurrentRank">#--</div>
+                        <div class="text-sm text-gray-300">Current Rank</div>
+                    </div>
+                </div>
+
+                <!-- Donation History -->
+                <div id="donationHistory" class="space-y-6">
+                    <div class="text-center py-12 text-gray-500">
+                        Connect wallet to view your donation history
+                    </div>
+                </div>
+
+                <!-- Load More Button -->
+                <div id="loadMoreContainer" class="text-center mt-8 hidden">
+                    <button onclick="loadMoreDonations()"
+                        class="secondary-button px-8 py-3 rounded-xl font-medium transition-all hover-lift">
+                        Load More
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profileTab" class="tab-content hidden">
+                <div class="max-w-3xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h2 class="text-5xl font-black mb-6 gradient-text hero-text">Your Profile</h2>
+                        <p class="text-xl text-gray-600 max-w-2xl mx-auto subtitle-text">
+                            Customize your giving profile and manage your preferences.
+                        </p>
+                    </div>
+
+                    <!-- Profile Form -->
+                    <div class="glass-card rounded-3xl">
+                        <div class="p-8">
+                            <div class="space-y-8">
+                                <!-- Basic Info -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
+                                        <input type="text" id="profileDisplayName" placeholder="Your name"
+                                            class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Farcaster
+                                            Username</label>
+                                        <input type="text" id="profileFarcaster" placeholder="@username"
+                                            class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                                    <textarea id="profileBio" rows="4" placeholder="Tell us about yourself..."
+                                        maxlength="280"
+                                        class="form-input w-full rounded-xl px-4 py-4 text-sm resize-none"></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Donation Message</label>
+                                    <input type="text" id="profileDonationMessage"
+                                        placeholder="Thanks for your support! 💙" maxlength="100"
+                                        class="form-input w-full rounded-xl px-4 py-4 text-sm">
+                                    <div class="text-xs text-gray-500 mt-2">This message shows when people donate to you
+                                    </div>
+                                </div>
+
+                                <!-- Privacy Settings -->
+                                <div class="border-t border-gray-200 pt-8">
+                                    <h3 class="text-xl font-bold mb-6">Privacy Settings</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between p-4 bg-black/5 rounded-xl">
+                                            <div>
+                                                <div class="font-medium text-black">Public Profile</div>
+                                                <div class="text-sm text-gray-600">Show your profile on leaderboards
+                                                </div>
+                                            </div>
+                                            <input type="checkbox" id="profilePublic" class="rounded">
+                                        </div>
+                                        <div class="flex items-center justify-between p-4 bg-black/5 rounded-xl">
+                                            <div>
+                                                <div class="font-medium text-black">Accept Donations</div>
+                                                <div class="text-sm text-gray-600">Allow others to send you donations
+                                                </div>
+                                            </div>
+                                            <input type="checkbox" id="profileAcceptDonations" class="rounded">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Token Rewards Section -->
+                                <div class="border-t border-gray-200 pt-8">
+                                    <h3 class="text-xl font-bold mb-6">🪙 Token Rewards</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div class="stats-card rounded-xl p-6">
+                                            <div class="text-3xl font-black text-black" id="profileTokensEarned">0
+                                                $UMANITY
+                                            </div>
+                                            <div class="text-sm text-gray-500">Total Earned</div>
+                                        </div>
+                                        <div class="token-highlight rounded-xl p-6">
+                                            <div class="text-3xl font-black text-white" id="profileTokensPending">0
+                                                $UMANITY
+                                            </div>
+                                            <div class="text-sm text-gray-300">Pending Claim</div>
+                                        </div>
+                                    </div>
+                                    <button onclick="checkAirdropEligibility()"
+                                        class="primary-button w-full py-4 rounded-xl text-white font-bold">
+                                        Check Airdrop Eligibility
+                                    </button>
+                                </div>
+
+                                <button onclick="updateProfile()"
+                                    class="primary-button w-full py-4 rounded-xl text-white font-bold">
+                                    <span id="updateProfileButtonText">Update Profile</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </main>
 
     <!-- Pool Donation Modal -->
@@ -974,7 +982,7 @@
                     <div class="text-xs text-gray-600 mt-1">Emergency pools get +150% bonus</div>
                 </div>
                 <div class="text-xs text-gray-500 mt-2">
-                    Gas fees: ~$0.001-0.003 additional • ETH Price: $<span id="poolEthPrice">0</span>
+                    Gas fees: < $0.001 additional • ETH Price: $<span id="poolEthPrice">0</span>
                 </div>
             </div>
 
@@ -2393,8 +2401,10 @@
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
 
-                if (balanceEth < donationAmount + 0.001) { // Minimal buffer for Base's low gas
-                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.001).toFixed(4)} ETH (including gas fees).`);
+                // Only check if user has enough for the donation itself
+                // Base gas is so cheap we don't need to check for it
+                if (balanceEth < donationAmount) {
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${donationAmount.toFixed(4)} ETH for the donation.`);
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
@@ -2488,8 +2498,8 @@
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
 
-                if (balanceEth < donationAmount + 0.0005) { // Slightly higher for safety on Base
-                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0005).toFixed(4)} ETH (including gas fees).`);
+                if (balanceEth < donationAmount + 0.00005) { // Base L2 has minimal gas costs
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.00005).toFixed(4)} ETH (including gas fees).`);
                     donateBtn.textContent = 'Send Donation';
                     return;
                 }
@@ -2670,13 +2680,13 @@
                 const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
                 const donationAmount = parseFloat(amount);
 
-                // Account for gas fees (Base has very low fees)
-                if (balanceEth < donationAmount + 0.0005) {
-                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${(donationAmount + 0.0005).toFixed(4)} ETH (including gas fees).`);
+                // Only check if user has enough for the donation itself
+                // Base gas is so cheap we don't need to check for it
+                if (balanceEth < donationAmount) {
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${donationAmount.toFixed(4)} ETH for the donation.`);
                     donateBtn.textContent = 'Donate Now';
                     return;
                 }
-
                 // Get recipient wallet
                 const response = await fetch('/api/recipients/');
                 const data = await response.json();
