@@ -28,9 +28,7 @@ urlpatterns = [
     path('api/user-donations/', views.user_donations, name='user_donations'),
     
     # Token & Airdrop System
-    path('api/token-rewards/', views.token_rewards, name='token_rewards'),
     path('api/airdrop-eligibility/', views.airdrop_eligibility, name='airdrop_eligibility'),
-    
     # LEGACY ENDPOINTS (for backward compatibility)
     path('api/recipients/', views.recipients, name='recipients'),
     path('api/record-donation/', views.record_donation, name='record_donation'),

@@ -3,351 +3,402 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
-interface IUmanityToken {
-    function mint(address to, uint256 amount) external;
-}
-
-// Soulbound Impact Points NFT
-contract ImpactPointsNFT is ERC721, ERC721Enumerable, Ownable {
-    struct ImpactProfile {
-        uint256 totalPoints;
-        uint256 totalDonated; // in USD cents
-        uint256 donationCount;
-        uint256 emergencyDonations;
-        uint256 verifiedCauseDonations;
-        uint256 p2pDonations;
-        uint256 firstDonationTime;
-        uint256 lastDonationTime;
-        string displayName;
-    }
+contract UmanityPools is Ownable, ReentrancyGuard, Pausable {
     
-    mapping(uint256 => ImpactProfile) public impactProfiles;
-    mapping(address => uint256) public addressToTokenId;
-    uint256 private _nextTokenId = 1;
-    
-    constructor() ERC721("Umanity Impact Points", "UIP") {}
-    
-    // Mint soulbound NFT for new donor
-    function mintImpactNFT(address to) external onlyOwner returns (uint256) {
-        require(addressToTokenId[to] == 0, "Already has Impact NFT");
-        
-        uint256 tokenId = _nextTokenId++;
-        _safeMint(to, tokenId);
-        addressToTokenId[to] = tokenId;
-        
-        impactProfiles[tokenId].firstDonationTime = block.timestamp;
-        return tokenId;
-    }
-    
-    // Update impact profile
-    function updateImpactProfile(
-        address user,
-        uint256 pointsToAdd,
-        uint256 usdAmountCents,
-        string memory donationType
-    ) external onlyOwner {
-        uint256 tokenId = addressToTokenId[user];
-        require(tokenId != 0, "No Impact NFT found");
-        
-        ImpactProfile storage profile = impactProfiles[tokenId];
-        profile.totalPoints += pointsToAdd;
-        profile.totalDonated += usdAmountCents;
-        profile.donationCount++;
-        profile.lastDonationTime = block.timestamp;
-        
-        // Track donation types
-        if (keccak256(bytes(donationType)) == keccak256(bytes("emergency"))) {
-            profile.emergencyDonations++;
-        } else if (keccak256(bytes(donationType)) == keccak256(bytes("verified"))) {
-            profile.verifiedCauseDonations++;
-        } else if (keccak256(bytes(donationType)) == keccak256(bytes("p2p"))) {
-            profile.p2pDonations++;
-        }
-    }
-    
-    // Soulbound: Override transfers to make non-transferable
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 batchSize
-    ) internal override(ERC721, ERC721Enumerable) {
-        require(from == address(0) || to == address(0), "Soulbound: Transfer not allowed");
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
-    }
-    
-    function supportsInterface(bytes4 interfaceId)
-        public view override(ERC721, ERC721Enumerable) returns (bool) {
-        return super.supportsInterface(interfaceId);
-    }
-    
-    // Get user's impact profile
-    function getImpactProfile(address user) external view returns (ImpactProfile memory) {
-        uint256 tokenId = addressToTokenId[user];
-        require(tokenId != 0, "No Impact NFT found");
-        return impactProfiles[tokenId];
-    }
-}
-
-contract UmanityPools is Ownable, ReentrancyGuard {
-    // Pool structure
+    // Pool structure - matches your Django model
     struct Pool {
         string name;
+        string poolType;  // emergency, community, creators, development
         string description;
         string emoji;
-        uint256 balance;
+        uint256 totalRaised;
+        uint256 totalDistributed;
         uint256 donorCount;
-        uint256 allocationPercentage;
+        uint256 allocationPercentage;  // 0-100
         bool isActive;
-        bool isVerified; // For bonus calculations
-        bool isEmergency; // For emergency bonus
+        address payable withdrawalAddress;  // Where to send funds
+        uint256 createdAt;
+    }
+    
+    // Donation record for tracking
+    struct DonationRecord {
+        address donor;
+        uint256 poolId;
+        uint256 amount;
+        uint256 pointsEarned;
+        uint256 timestamp;
+        string txHash;
     }
     
     // State variables
     mapping(uint256 => Pool) public pools;
     mapping(address => mapping(uint256 => uint256)) public userPoolDonations;
+    mapping(address => uint256) public userTotalDonated;
+    mapping(address => uint256) public userTotalPoints;
+    mapping(address => uint256) public userDonationCount;
+    mapping(string => bool) public processedTransactions; // Prevent duplicates
     
-    uint256 public totalPools;
-    uint256 public totalDonated; // in Wei
+    uint256 public nextPoolId = 1;  // Start from 1 to match Django
+    uint256 public totalDonated;
     uint256 public totalDonors;
+    uint256 public activePools;
     
-    // USD Price Oracle (simplified - in production use Chainlink)
-    uint256 public ethToUsdRate = 2500; // $2500 per ETH (update manually or via oracle)
-    
-    // Token and NFT contracts
-    IUmanityToken public umanityToken;
-    ImpactPointsNFT public impactPointsNFT;
-    
-    // Reward rates (base: 100 UMAN per $1 USD)
-    uint256 public constant BASE_REWARD_RATE = 100 * 10**18; // 100 UMAN tokens
-    uint256 public constant VERIFIED_BONUS = 50; // +50% bonus
-    uint256 public constant EMERGENCY_BONUS = 150; // +150% bonus
-    uint256 public constant P2P_PUBLIC_BONUS = 32; // +32% bonus
+    // Configuration
+    uint256 public constant POINTS_PER_ETH = 1_000_000;  // 1 ETH = 1M points
+    uint256 public minDonation = 0.0001 ether;  // Adjustable minimum
+    uint256 public maxDonation = 100 ether;      // Safety limit
     
     // Events
-    event PoolCreated(uint256 indexed poolId, string name, bool isVerified, bool isEmergency);
-    event DonationMade(
-        address indexed donor, 
-        uint256 indexed poolId, 
-        uint256 ethAmount, 
-        uint256 usdAmount, 
-        uint256 tokensEarned,
-        uint256 pointsEarned
+    event PoolCreated(
+        uint256 indexed poolId,
+        string name,
+        string poolType,
+        uint256 allocationPercentage
     );
-    event EthPriceUpdated(uint256 newPrice);
+    
+    event PoolUpdated(
+        uint256 indexed poolId,
+        bool isActive
+    );
+    
+    event DonationMade(
+        address indexed donor,
+        uint256 indexed poolId,
+        uint256 amount,
+        uint256 pointsEarned,
+        string txHash
+    );
+    
+    event FundsWithdrawn(
+        uint256 indexed poolId,
+        address indexed to,
+        uint256 amount
+    );
+    
+    event EmergencyWithdrawal(
+        address indexed to,
+        uint256 amount
+    );
+    
+    event MinDonationUpdated(uint256 newMinimum);
+    event MaxDonationUpdated(uint256 newMaximum);
     
     constructor() {
-    // Deploy Impact Points NFT
-    impactPointsNFT = new ImpactPointsNFT();
-    
-    // Initialize pools with new bonus structure
-    _createPool("Emergency Fund", "Help those in urgent need worldwide", unicode"🚨", 25, true, true, true);
-
-    _createPool("Community Projects", "Fund community initiatives", unicode"🏘️", 30, true, true, false); // Verified only
-    _createPool("Creator Support", "Support content creators", unicode"🎨", 20, true, false, false); // Base rate
-    _createPool("Platform Development", "Improve Umanity platform", unicode"⚡", 25, true, false, false); // Base rate
-}
-
-    
-    // Set token contract address (called after token deployment)
-    function setTokenContract(address _tokenAddress) external onlyOwner {
-        umanityToken = IUmanityToken(_tokenAddress);
+        // Initialize default pools to match your Django setup
+        _createPool(
+            "Emergency Fund",
+            "emergency",
+            "Help those in urgent need worldwide",
+            unicode"🚨",
+            25,
+            payable(msg.sender)  // Cast to address payable
+        );
+        
+        _createPool(
+            "Community Projects",
+            "community",
+            "Fund community initiatives",
+            unicode"🏘️",
+            30,
+            payable(msg.sender)  // Cast to address payable
+        );
+        
+        _createPool(
+            "Creator Support",
+            "creators",
+            "Support content creators",
+            unicode"🎨",
+            20,
+            payable(msg.sender)  // Cast to address payable
+        );
+        
+        _createPool(
+            "Platform Development",
+            "development",
+            "Improve Umanity platform",
+            unicode"⚡",
+            25,
+            payable(msg.sender)  // Cast to address payable
+        );
     }
     
-    // Update ETH/USD price (in production, use Chainlink oracle)
-    function updateEthPrice(uint256 _newPrice) external onlyOwner {
-        ethToUsdRate = _newPrice;
-        emit EthPriceUpdated(_newPrice);
-    }
-    
-    // Create a new pool
+    // Internal function to create pools
     function _createPool(
         string memory _name,
+        string memory _poolType,
         string memory _description,
         string memory _emoji,
         uint256 _allocationPercentage,
-        bool _isActive,
-        bool _isVerified,
-        bool _isEmergency
-    ) internal {
-        pools[totalPools] = Pool({
+        address payable _withdrawalAddress
+    ) internal returns (uint256) {
+        uint256 poolId = nextPoolId++;
+        
+        pools[poolId] = Pool({
             name: _name,
+            poolType: _poolType,
             description: _description,
             emoji: _emoji,
-            balance: 0,
+            totalRaised: 0,
+            totalDistributed: 0,
             donorCount: 0,
             allocationPercentage: _allocationPercentage,
-            isActive: _isActive,
-            isVerified: _isVerified,
-            isEmergency: _isEmergency
+            isActive: true,
+            withdrawalAddress: _withdrawalAddress,
+            createdAt: block.timestamp
         });
         
-        emit PoolCreated(totalPools, _name, _isVerified, _isEmergency);
-        totalPools++;
+        activePools++;
+        
+        emit PoolCreated(poolId, _name, _poolType, _allocationPercentage);
+        return poolId;
     }
     
-    // Calculate USD amount from ETH
-    function calculateUsdAmount(uint256 ethAmount) public view returns (uint256) {
-        // Returns USD amount in cents (to avoid decimals)
-        return (ethAmount * ethToUsdRate) / 10**16; // Convert from wei to cents
+    // Public function to create new pools (admin only)
+    function createPool(
+        string memory _name,
+        string memory _poolType,
+        string memory _description,
+        string memory _emoji,
+        uint256 _allocationPercentage,
+        address payable _withdrawalAddress
+    ) external onlyOwner returns (uint256) {
+        require(_allocationPercentage <= 100, "Allocation cannot exceed 100%");
+        require(_withdrawalAddress != address(0), "Invalid withdrawal address");
+        
+        return _createPool(
+            _name,
+            _poolType,
+            _description,
+            _emoji,
+            _allocationPercentage,
+            _withdrawalAddress
+        );
     }
     
-    // Calculate token rewards based on USD amount and pool type
-    function calculateTokenReward(uint256 usdCents, uint256 poolId) public view returns (uint256) {
-        Pool memory pool = pools[poolId];
-        uint256 usdDollars = usdCents / 100; // Convert cents to dollars
-        uint256 baseReward = usdDollars * BASE_REWARD_RATE; // 100 UMAN per $1
+    // Update pool status
+    function updatePoolStatus(uint256 _poolId, bool _isActive) external onlyOwner {
+        require(_poolId > 0 && _poolId < nextPoolId, "Invalid pool ID");
         
-        uint256 totalBonus = 0;
-        
-        if (pool.isEmergency) {
-            totalBonus += EMERGENCY_BONUS; // +150%
-        } else if (pool.isVerified) {
-            totalBonus += VERIFIED_BONUS; // +50%
+        if (pools[_poolId].isActive && !_isActive) {
+            activePools--;
+        } else if (!pools[_poolId].isActive && _isActive) {
+            activePools++;
         }
         
-        // Apply bonus
-        uint256 bonusReward = (baseReward * totalBonus) / 100;
-        return baseReward + bonusReward;
+        pools[_poolId].isActive = _isActive;
+        emit PoolUpdated(_poolId, _isActive);
     }
     
-    // Donate to a specific pool
-    function donateToPool(uint256 _poolId) external payable nonReentrant {
-        require(_poolId < totalPools, "Pool does not exist");
+    // Update pool details
+    function updatePoolDetails(
+        uint256 _poolId,
+        string memory _description,
+        uint256 _allocationPercentage
+    ) external onlyOwner {
+        require(_poolId > 0 && _poolId < nextPoolId, "Invalid pool ID");
+        require(_allocationPercentage <= 100, "Allocation cannot exceed 100%");
+        
+        pools[_poolId].description = _description;
+        pools[_poolId].allocationPercentage = _allocationPercentage;
+    }
+    
+    // Update withdrawal address for a pool
+    function updatePoolWithdrawalAddress(
+        uint256 _poolId,
+        address payable _newAddress
+    ) external onlyOwner {
+        require(_poolId > 0 && _poolId < nextPoolId, "Invalid pool ID");
+        require(_newAddress != address(0), "Invalid address");
+        
+        pools[_poolId].withdrawalAddress = _newAddress;
+    }
+    
+    // Main donation function
+    function donateToPool(uint256 _poolId) external payable nonReentrant whenNotPaused {
+        require(_poolId > 0 && _poolId < nextPoolId, "Invalid pool ID");
         require(pools[_poolId].isActive, "Pool is not active");
-        require(msg.value > 0, "Donation must be greater than 0");
+        require(msg.value >= minDonation, "Below minimum donation");
+        require(msg.value <= maxDonation, "Exceeds maximum donation");
         
         Pool storage pool = pools[_poolId];
         
-        // Calculate USD amount
-        uint256 usdAmountCents = calculateUsdAmount(msg.value);
-        uint256 tokenReward = calculateTokenReward(usdAmountCents, _poolId);
-        
-        // Calculate impact points (1 point per cent donated)
-        uint256 impactPoints = usdAmountCents;
+        // Calculate points (1 ETH = 1,000,000 points)
+        uint256 pointsEarned = (msg.value * POINTS_PER_ETH) / 1 ether;
         
         // Update pool stats
-        pool.balance += msg.value;
+        pool.totalRaised += msg.value;
         
         // Track unique donors
         if (userPoolDonations[msg.sender][_poolId] == 0) {
             pool.donorCount++;
         }
         
-        // Create or update Impact NFT
-        if (impactPointsNFT.addressToTokenId(msg.sender) == 0) {
-            impactPointsNFT.mintImpactNFT(msg.sender);
+        // Update user stats
+        if (userTotalDonated[msg.sender] == 0) {
             totalDonors++;
         }
         
-        // Update impact profile
-        string memory donationType = pool.isEmergency ? "emergency" : 
-                                   pool.isVerified ? "verified" : "regular";
-        
-        impactPointsNFT.updateImpactProfile(
-            msg.sender, 
-            impactPoints, 
-            usdAmountCents, 
-            donationType
-        );
-        
         userPoolDonations[msg.sender][_poolId] += msg.value;
+        userTotalDonated[msg.sender] += msg.value;
+        userTotalPoints[msg.sender] += pointsEarned;
+        userDonationCount[msg.sender]++;
+        
+        // Update global stats
         totalDonated += msg.value;
         
-        // Mint token rewards
-        if (address(umanityToken) != address(0)) {
-            umanityToken.mint(msg.sender, tokenReward);
-        }
+        // Generate a pseudo tx hash for the event (in real scenario, use actual tx hash)
+        string memory txHash = string(abi.encodePacked("0x", toHexString(uint256(keccak256(abi.encodePacked(msg.sender, _poolId, msg.value, block.timestamp))))));
         
-        emit DonationMade(
-            msg.sender, 
-            _poolId, 
-            msg.value, 
-            usdAmountCents, 
-            tokenReward, 
-            impactPoints
+        emit DonationMade(msg.sender, _poolId, msg.value, pointsEarned, txHash);
+    }
+    
+    // Withdraw funds from specific pool
+    function withdrawFromPool(
+        uint256 _poolId,
+        uint256 _amount
+    ) external onlyOwner nonReentrant {
+        require(_poolId > 0 && _poolId < nextPoolId, "Invalid pool ID");
+        Pool storage pool = pools[_poolId];
+        require(_amount <= pool.totalRaised - pool.totalDistributed, "Insufficient pool balance");
+        
+        pool.totalDistributed += _amount;
+        pool.withdrawalAddress.transfer(_amount);
+        
+        emit FundsWithdrawn(_poolId, pool.withdrawalAddress, _amount);
+    }
+    
+    // Withdraw to specific address (emergency or specific needs)
+    function withdrawToAddress(
+        uint256 _poolId,
+        address payable _to,
+        uint256 _amount
+    ) external onlyOwner nonReentrant {
+        require(_poolId > 0 && _poolId < nextPoolId, "Invalid pool ID");
+        require(_to != address(0), "Invalid recipient address");
+        Pool storage pool = pools[_poolId];
+        require(_amount <= pool.totalRaised - pool.totalDistributed, "Insufficient pool balance");
+        
+        pool.totalDistributed += _amount;
+        _to.transfer(_amount);
+        
+        emit FundsWithdrawn(_poolId, _to, _amount);
+    }
+    
+    // Emergency withdraw all funds
+    function emergencyWithdraw() external onlyOwner {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No funds to withdraw");
+        
+        payable(owner()).transfer(balance);
+        emit EmergencyWithdrawal(owner(), balance);
+    }
+    
+    // Get pool balance (undistributed funds)
+    function getPoolBalance(uint256 _poolId) external view returns (uint256) {
+        require(_poolId > 0 && _poolId < nextPoolId, "Invalid pool ID");
+        return pools[_poolId].totalRaised - pools[_poolId].totalDistributed;
+    }
+    
+    // Get user stats
+    function getUserStats(address _user) external view returns (
+        uint256 totalDonatedAmount,
+        uint256 totalPoints,
+        uint256 donationCount
+    ) {
+        return (
+            userTotalDonated[_user],
+            userTotalPoints[_user],
+            userDonationCount[_user]
         );
     }
     
-    // Get pool information with reward preview
-    function getPoolWithRewards(uint256 _poolId) external view returns (
-        Pool memory pool,
-        uint256 rewardsPer1USD,
-        string memory bonusType
-    ) {
-        require(_poolId < totalPools, "Pool does not exist");
-        pool = pools[_poolId];
-        
-        rewardsPer1USD = calculateTokenReward(100, _poolId) / 10**18; // Reward per $1 USD
-        
-        if (pool.isEmergency) {
-            bonusType = "Emergency (+150% bonus)";
-        } else if (pool.isVerified) {
-            bonusType = "Verified (+50% bonus)";
-        } else {
-            bonusType = "Base rate";
-        }
-    }
-    
-    // Get user's impact statistics
-    function getUserImpactStats(address user) external view returns (
-        bool hasImpactNFT,
-        uint256 totalPoints,
-        uint256 totalDonatedUSD,
-        uint256 donationCount,
-        uint256 nftTokenId
-    ) {
-        nftTokenId = impactPointsNFT.addressToTokenId(user);
-        hasImpactNFT = nftTokenId != 0;
-        
-        if (hasImpactNFT) {
-            ImpactPointsNFT.ImpactProfile memory profile = impactPointsNFT.getImpactProfile(user);
-            totalPoints = profile.totalPoints;
-            totalDonatedUSD = profile.totalDonated / 100; // Convert cents to dollars
-            donationCount = profile.donationCount;
-        }
-    }
-    
-    // Get platform statistics
+    // Get platform stats
     function getPlatformStats() external view returns (
-        uint256 _totalDonatedETH,
-        uint256 _totalDonatedUSD,
+        uint256 _totalDonated,
         uint256 _totalDonors,
-        uint256 _totalPools,
-        uint256 _activePools
+        uint256 _activePools,
+        uint256 _totalPools
     ) {
-        uint256 activePools = 0;
-        for (uint256 i = 0; i < totalPools; i++) {
-            if (pools[i].isActive) {
-                activePools++;
-            }
-        }
-        
         return (
             totalDonated,
-            calculateUsdAmount(totalDonated) / 100, // Convert to dollars
             totalDonors,
-            totalPools,
-            activePools
+            activePools,
+            nextPoolId - 1
         );
     }
     
-    // Withdraw funds from a pool (only owner)
-    function withdrawPoolFunds(uint256 _poolId, address payable _to, uint256 _amount) 
-        external onlyOwner nonReentrant {
-        require(_poolId < totalPools, "Pool does not exist");
-        require(_amount <= pools[_poolId].balance, "Insufficient pool balance");
-        require(_to != address(0), "Invalid recipient address");
+    // Get all pools info
+    function getAllPools() external view returns (
+        uint256[] memory ids,
+        string[] memory names,
+        uint256[] memory raised,
+        bool[] memory active
+    ) {
+        uint256 totalPools = nextPoolId - 1;
+        ids = new uint256[](totalPools);
+        names = new string[](totalPools);
+        raised = new uint256[](totalPools);
+        active = new bool[](totalPools);
         
-        pools[_poolId].balance -= _amount;
-        _to.transfer(_amount);
+        for (uint256 i = 1; i <= totalPools; i++) {
+            ids[i-1] = i;
+            names[i-1] = pools[i].name;
+            raised[i-1] = pools[i].totalRaised;
+            active[i-1] = pools[i].isActive;
+        }
+        
+        return (ids, names, raised, active);
     }
     
-    // Emergency withdraw (only owner)
-    function emergencyWithdraw() external onlyOwner {
-        payable(owner()).transfer(address(this).balance);
+    // Admin functions
+    function setMinDonation(uint256 _minDonation) external onlyOwner {
+        minDonation = _minDonation;
+        emit MinDonationUpdated(_minDonation);
+    }
+    
+    function setMaxDonation(uint256 _maxDonation) external onlyOwner {
+        maxDonation = _maxDonation;
+        emit MaxDonationUpdated(_maxDonation);
+    }
+    
+    function pause() external onlyOwner {
+        _pause();
+    }
+    
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+    
+    // Utility function to convert uint to hex string
+    function toHexString(uint256 value) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 length = 0;
+        while (temp != 0) {
+            length++;
+            temp >>= 8;
+        }
+        bytes memory buffer = new bytes(2 * length);
+        while (value != 0) {
+            length -= 1;
+            buffer[2 * length + 1] = bytes1(uint8(48 + uint256(value & 0x0f)));
+            value >>= 4;
+            buffer[2 * length] = bytes1(uint8(48 + uint256((value & 0x0f) > 9 ? 87 : 48) + uint256(value & 0x0f)));
+            value >>= 4;
+        }
+        return string(buffer);
+    }
+    
+    // Receive function to accept direct ETH transfers
+    receive() external payable {
+        revert("Direct transfers not allowed. Use donateToPool function.");
+    }
+    
+    fallback() external payable {
+        revert("Direct transfers not allowed. Use donateToPool function.");
     }
 }

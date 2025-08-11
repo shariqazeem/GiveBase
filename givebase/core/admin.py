@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from .models import (
     DonationPool, UserProfile, SocialDonation, PoolDonation, 
-    TokenReward, Recipient, Donation, DonorProfile
+     Recipient, Donation, DonorProfile
 )
 
 
@@ -67,14 +67,14 @@ class DonationPoolAdmin(admin.ModelAdmin):
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = [
-        'display_identifier', 'total_donated_display', 'total_received_display', 
-        'total_points', 'tokens_earned_display', 'donation_count', 'is_public_profile'
-    ]
+    'display_identifier', 'total_donated_display', 'total_received_display', 
+     'donation_count', 'is_public_profile'  
+]
     list_filter = ['is_public_profile', 'accepts_donations', 'created_at']
     search_fields = ['wallet_address', 'display_name', 'farcaster_username', 'ens_name']
     readonly_fields = [
-        'wallet_address', 'total_donated', 'total_received', 'total_points', 
-        'donation_count', 'tokens_earned', 'tokens_claimed', 
+        'wallet_address', 'total_donated', 'total_received', 
+        'donation_count',  
         'first_donation_date', 'last_donation_date', 'created_at'
     ]
     
@@ -89,11 +89,7 @@ class UserProfileAdmin(admin.ModelAdmin):
             'fields': ('is_public_profile', 'accepts_donations', 'donation_message')
         }),
         ('Statistics (Read-only)', {
-            'fields': ('total_donated', 'total_received', 'total_points', 'donation_count'),
-            'classes': ('collapse',)
-        }),
-        ('Token Rewards (Read-only)', {
-            'fields': ('tokens_earned', 'tokens_claimed'),
+            'fields': ('total_donated', 'total_received', 'donation_count'),
             'classes': ('collapse',)
         }),
         ('Timestamps (Read-only)', {
@@ -112,20 +108,16 @@ class UserProfileAdmin(admin.ModelAdmin):
     total_received_display.short_description = "Total Received"
     total_received_display.admin_order_field = 'total_received'
     
-    def tokens_earned_display(self, obj):
-        return f"{obj.tokens_earned:.2f} $GIVE"
-    tokens_earned_display.short_description = "Tokens Earned"
-    tokens_earned_display.admin_order_field = 'tokens_earned'
 
 @admin.register(PoolDonation)
 class PoolDonationAdmin(admin.ModelAdmin):
     list_display = [
         'donor_short', 'pool_name', 'amount_display', 
-        'points_earned', 'created_at', 'tx_hash_short'
+         'created_at', 'tx_hash_short'
     ]
     list_filter = ['pool', 'created_at']
     search_fields = ['donor_address', 'tx_hash', 'pool__name']
-    readonly_fields = ['donor_address', 'pool', 'amount', 'tx_hash', 'block_number', 'points_earned', 'created_at']
+    readonly_fields = ['donor_address', 'pool', 'amount', 'tx_hash', 'block_number',  'created_at']
     
     def donor_short(self, obj):
         return f"{obj.donor_address[:6]}...{obj.donor_address[-4:]}"
@@ -148,13 +140,13 @@ class PoolDonationAdmin(admin.ModelAdmin):
 class SocialDonationAdmin(admin.ModelAdmin):
     list_display = [
         'donor_short', 'recipient_short', 'amount_display', 
-        'points_earned', 'is_public', 'frame_interaction', 'created_at'
+         'is_public', 'frame_interaction', 'created_at'
     ]
     list_filter = ['is_public', 'frame_interaction', 'created_at']
     search_fields = ['donor_address', 'recipient_address', 'message', 'tx_hash']
     readonly_fields = [
         'donor_address', 'recipient_address', 'amount', 'tx_hash', 
-        'block_number', 'points_earned', 'created_at'
+        'block_number',  'created_at'
     ]
     
     def donor_short(self, obj):
@@ -170,24 +162,6 @@ class SocialDonationAdmin(admin.ModelAdmin):
     amount_display.short_description = "Amount"
     amount_display.admin_order_field = 'amount'
 
-@admin.register(TokenReward)
-class TokenRewardAdmin(admin.ModelAdmin):
-    list_display = [
-        'user_short', 'amount_display', 'reason', 'multiplier', 
-        'is_claimed', 'frame_interaction', 'created_at'
-    ]
-    list_filter = ['reason', 'is_claimed', 'frame_interaction', 'created_at']
-    search_fields = ['user__wallet_address', 'reason', 'related_donation_tx']
-    readonly_fields = ['user', 'amount', 'reason', 'multiplier', 'related_donation_tx', 'created_at']
-    
-    def user_short(self, obj):
-        return obj.user.display_identifier
-    user_short.short_description = "User"
-    
-    def amount_display(self, obj):
-        return f"{obj.amount:.2f} $GIVE"
-    amount_display.short_description = "Amount"
-    amount_display.admin_order_field = 'amount'
 
 # LEGACY MODELS (for backward compatibility)
 
@@ -225,11 +199,11 @@ class RecipientAdmin(admin.ModelAdmin):
 class DonationAdmin(admin.ModelAdmin):
     list_display = [
         'donor_short', 'recipient_name', 'amount_display', 
-        'points_earned', 'created_at', 'tx_hash_short'
+        'created_at', 'tx_hash_short'
     ]
     list_filter = ['recipient', 'created_at']
     search_fields = ['donor_address', 'tx_hash', 'recipient__name']
-    readonly_fields = ['donor_address', 'recipient', 'amount', 'tx_hash', 'block_number', 'points_earned', 'created_at']
+    readonly_fields = ['donor_address', 'recipient', 'amount', 'tx_hash', 'block_number',  'created_at']
     
     def donor_short(self, obj):
         return f"{obj.donor_address[:6]}...{obj.donor_address[-4:]}"
@@ -251,13 +225,13 @@ class DonationAdmin(admin.ModelAdmin):
 @admin.register(DonorProfile)
 class DonorProfileAdmin(admin.ModelAdmin):
     list_display = [
-        'wallet_short', 'total_donated_display', 'total_points', 
+        'wallet_short', 'total_donated_display', 
         'donation_count', 'is_public', 'last_donation_date'
     ]
     list_filter = ['is_public', 'created_at']
     search_fields = ['wallet_address', 'ens_name']
     readonly_fields = [
-        'wallet_address', 'total_donated', 'total_points', 'donation_count',
+        'wallet_address', 'total_donated', 'donation_count',
         'first_donation_date', 'last_donation_date', 'created_at'
     ]
     

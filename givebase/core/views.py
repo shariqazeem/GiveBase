@@ -9,7 +9,7 @@ import json
 from datetime import datetime, timedelta
 from .models import (
     DonationPool, SocialDonation, PoolDonation, UserProfile, 
-    TokenReward, Donation, Recipient, DonorProfile  # Legacy models
+     Donation, Recipient, DonorProfile  # Legacy models
 )
 
 # Main pages
@@ -20,7 +20,7 @@ def index(request):
 def app(request):
     """Main dapp interface"""
     context = {
-        'contract_address': '0x0000000000000000000000000000000000000000',
+        'contract_address': '0x0FC4FaAdc66B2E9fc36BB0c7C2c73FECbD8c91bB',
         'base_sepolia_rpc': 'https://sepolia.base.org',
         'chain_id': '0x14A34',
     }
@@ -76,32 +76,32 @@ def donate_to_pool(request):
             
             # Create donation record
             donation_amount = Decimal(data['amount'])
-            points_earned = calculate_points_and_tokens(donation_amount)
-            
+
             donation = PoolDonation.objects.create(
                 donor_address=data['donor_address'].lower(),
                 pool=pool,
                 amount=donation_amount,
                 tx_hash=data['tx_hash'],
                 block_number=data.get('block_number'),
-                points_earned=points_earned
             )
-            
+            # Calculate points (1 ETH = 1,000,000 points)
+            points_earned = int(donation_amount * 1_000_000)
+            donation.points_earned = points_earned
+            donation.save()
+
             # Update pool stats
             pool.total_raised += donation_amount
             pool.donor_count = pool.donations.values('donor_address').distinct().count()
             pool.save()
             
             # Update user profile
-            update_user_profile(data['donor_address'], donation_amount, points_earned, is_donor=True)
-            
-            # Create token reward
-            create_token_reward(data['donor_address'], points_earned, 'pool_donation', data['tx_hash'])
+            profile = update_user_profile(data['donor_address'], donation_amount, is_donor=True)
+            profile.total_points += points_earned
+            profile.save()            
             
             return JsonResponse({
                 'success': True,
                 'donation_id': donation.id,
-                'points_earned': points_earned,
                 'pool_name': pool.name,
             })
             
@@ -129,12 +129,7 @@ def donate_to_user(request):
                         
             # Create social donation record  
             donation_amount = Decimal(data['amount'])
-            points_earned = calculate_points_and_tokens(donation_amount, donation_type='p2p')
-            
-            # Social bonus for frame interactions
-            if data.get('frame_interaction', False):
-                points_earned = int(points_earned * 1.2)  # 20% bonus
-            
+
             donation = SocialDonation.objects.create(
                 donor_address=data['donor_address'].lower(),
                 recipient_address=data['recipient_address'].lower(),
@@ -146,26 +141,22 @@ def donate_to_user(request):
                 block_number=data.get('block_number'),
                 is_public=data.get('is_public', True),
                 frame_interaction=data.get('frame_interaction', False),
-                points_earned=points_earned
             )
             
-            # Update user profiles
-            update_user_profile(data['donor_address'], donation_amount, points_earned, is_donor=True)
-            update_user_profile(data['recipient_address'], Decimal('0'), 0, received_amount=donation_amount)
-            
-            # Calculate token amount separately for token rewards
-            token_amount = int(float(donation_amount) * 2500 * 100 * 1.2)  # USD * 100 tokens/USD * P2P bonus
-            if data.get('frame_interaction', False):
-                token_amount = int(token_amount * 1.1)  # Additional 10% for frame
+            # Calculate points (1 ETH = 1,000,000 points)
+            points_earned = int(donation_amount * 1_000_000)
+            donation.points_earned = points_earned
+            donation.save()
 
-            # Create token rewards with proper token amount
-            reward_type = 'social_donation_frame' if data.get('frame_interaction') else 'social_donation'
-            create_token_reward(data['donor_address'], token_amount, reward_type, data['tx_hash'])
-            
+            # Update donor profile points
+            donor_profile = update_user_profile(data['donor_address'], donation_amount, is_donor=True)
+            donor_profile.total_points += points_earned
+            donor_profile.save()
+
+
             return JsonResponse({
                 'success': True,
                 'donation_id': donation.id,
-                'points_earned': points_earned,
                 'social_bonus': data.get('frame_interaction', False),
             })
             
@@ -208,8 +199,8 @@ def social_feed(request):
             },
             'amount': str(donation.amount),
             'message': donation.message,
-            'points_earned': donation.points_earned,
             'frame_interaction': donation.frame_interaction,
+            'points_earned': donation.points_earned if hasattr(donation, 'points_earned') else int(float(donation.amount) * 1_000_000),
             'time_ago': get_time_ago(donation.created_at),
             'tx_hash': donation.tx_hash,
         })
@@ -253,8 +244,6 @@ def user_profile_api(request):
             'donation_message': profile.donation_message,
             'total_donated': str(profile.total_donated),
             'total_received': str(profile.total_received),
-            'total_points': profile.total_points,
-            'tokens_earned': str(profile.tokens_earned),
             'accepts_donations': profile.accepts_donations,
             'is_public': profile.is_public_profile,
             'stats': {
@@ -351,20 +340,17 @@ def stats(request):
                       SocialDonation.objects.count())
     
     # User-specific stats
-    user_points = 0
     user_stats = None
     
     if user_address:
         try:
             user_profile = UserProfile.objects.get(wallet_address=user_address)
-            user_points = user_profile.total_points
             user_stats = {
                 'total_donated': str(user_profile.total_donated),
                 'total_received': str(user_profile.total_received),
-                'total_points': user_profile.total_points,
                 'donation_count': user_profile.donation_count,
-                'tokens_earned': str(user_profile.tokens_earned),
-                'rank': get_user_rank(user_address)
+                'total_points': user_profile.total_points,
+
             }
         except UserProfile.DoesNotExist:
             pass
@@ -375,7 +361,6 @@ def stats(request):
         'total_recipients': total_recipients_legacy + active_pools,  # Legacy recipients + pools
         'total_donations': total_donations,
         'active_pools': active_pools,
-        'user_points': user_points,
         'user_stats': user_stats,
     })
 
@@ -387,8 +372,7 @@ def leaderboard(request):
     top_donors = UserProfile.objects.filter(
         is_public_profile=True,
         total_points__gt=0
-    ).order_by('-total_points', '-total_donated')[:100]
-    
+    ).order_by('-total_points')[:100]    
     leaderboard_data = []
     user_position = None
     
@@ -401,9 +385,9 @@ def leaderboard(request):
             'avatar_url': donor.avatar_url,
             'total_donated': str(donor.total_donated),
             'total_received': str(donor.total_received),
-            'total_points': donor.total_points,
             'donation_count': donor.donation_count,
-            'is_current_user': False
+            'is_current_user': False,
+            'total_points': donor.total_points,
         }
         
         if user_address and donor.wallet_address.lower() == user_address:
@@ -416,7 +400,7 @@ def leaderboard(request):
     if user_address and not user_position:
         try:
             user_profile = UserProfile.objects.get(wallet_address=user_address)
-            rank = get_user_rank(user_address)
+            rank = UserProfile.objects.filter(total_donated__gt=user_profile.total_donated).count() + 1
             
             user_position = {
                 'rank': rank,
@@ -473,7 +457,7 @@ def user_donations(request):
             'recipient_name': donation.pool.name,
             'recipient_category': donation.pool.pool_type,
             'amount': str(donation.amount),
-            'points_earned': donation.points_earned,
+            'points_earned': donation.points_earned if hasattr(donation, 'points_earned') else int(float(donation.amount) * 1_000_000),
             'tx_hash': donation.tx_hash,
             'created_at': donation.created_at,
             'emoji': donation.pool.emoji,
@@ -493,7 +477,6 @@ def user_donations(request):
             'recipient_category': 'user',
             'recipient_address': donation.recipient_address,
             'amount': str(donation.amount),
-            'points_earned': donation.points_earned,
             'tx_hash': donation.tx_hash,
             'created_at': donation.created_at,
             'message': donation.message,
@@ -509,7 +492,6 @@ def user_donations(request):
             'recipient_name': donation.recipient.name if donation.recipient else 'Unknown',
             'recipient_category': donation.recipient.category if donation.recipient else 'unknown',
             'amount': str(donation.amount),
-            'points_earned': donation.points_earned,
             'tx_hash': donation.tx_hash,
             'created_at': donation.created_at,
             'emoji': '📍',
@@ -535,7 +517,7 @@ def user_donations(request):
             'recipient_category': donation['recipient_category'],
             'recipient_address': donation.get('recipient_address'),
             'amount': donation['amount'],
-            'points_earned': donation['points_earned'],
+            'points_earned': donation.get('points_earned', int(float(donation['amount']) * 1_000_000)),
             'tx_hash': donation['tx_hash'],
             'time_ago': get_time_ago(donation['created_at']),
             'message': donation.get('message', ''),
@@ -652,7 +634,6 @@ def record_legacy_donation(request):
             
             # Create donation record
             donation_amount = Decimal(data['amount'])
-            points_earned = calculate_points_and_tokens(donation_amount)
             
             donation = Donation.objects.create(
                 donor_address=data['donor_address'].lower(),
@@ -660,23 +641,25 @@ def record_legacy_donation(request):
                 amount=donation_amount,
                 tx_hash=data['tx_hash'],
                 block_number=data.get('block_number'),
-                points_earned=points_earned
             )
-            
+            # Calculate points
+            points_earned = int(donation_amount * 1_000_000)
+            donation.points_earned = points_earned
+            donation.save()
             # Update recipient raised amount
             recipient.raised_amount += donation_amount
             recipient.save()
             
-            # Update user profile
-            update_user_profile(data['donor_address'], donation_amount, points_earned, is_donor=True)
+            # Update user profile points
+            profile = update_user_profile(data['donor_address'], donation_amount, is_donor=True)
+            profile.total_points += points_earned
+            profile.save()
             
             # Create token reward
-            create_token_reward(data['donor_address'], points_earned, 'legacy_donation', data['tx_hash'])
             
             return JsonResponse({
                 'success': True,
                 'donation_id': donation.id,
-                'points_earned': points_earned,
             })
             
         except Exception as e:
@@ -686,28 +669,9 @@ def record_legacy_donation(request):
 
 # HELPER FUNCTIONS
 
-def calculate_points_and_tokens(amount_eth, donation_type='standard', cause_type='standard'):
-    """Updated calculation using new tokenomics"""
-    # Convert to USD (assuming $2500 per ETH)
-    usd_amount = float(amount_eth) * 2500
-    
-    # Base rates
-    base_tokens = usd_amount * 100  # 100 $UMAN per $1
-    base_points = usd_amount * 1000  # 1000 points per $1
-    
-    # Apply multipliers
-    if donation_type == 'p2p':
-        base_tokens *= 1.2  # 20% P2P bonus
-        base_points *= 1.2
-    
-    if cause_type == 'emergency':
-        base_tokens *= 2.5  # Emergency 2.5x
-        base_points *= 2.5
-    
-    return max(int(base_points), 1)  # Return only points as integer
 
-def update_user_profile(wallet_address, donated_amount, points_earned, is_donor=True, received_amount=None):
-    """Update or create user profile"""
+def update_user_profile(wallet_address, donated_amount, is_donor=True, received_amount=None):
+    """Update or create user profile - NO POINTS OR TOKENS"""
     wallet_address = wallet_address.lower()
     
     profile, created = UserProfile.objects.get_or_create(
@@ -715,7 +679,6 @@ def update_user_profile(wallet_address, donated_amount, points_earned, is_donor=
         defaults={
             'total_donated': donated_amount if is_donor else Decimal('0'),
             'total_received': received_amount or Decimal('0'),
-            'total_points': points_earned,
             'donation_count': 1 if is_donor else 0,
             'first_donation_date': datetime.now() if is_donor else None,
             'last_donation_date': datetime.now() if is_donor else None,
@@ -725,7 +688,6 @@ def update_user_profile(wallet_address, donated_amount, points_earned, is_donor=
     if not created:
         if is_donor:
             profile.total_donated += donated_amount
-            profile.total_points += points_earned
             profile.donation_count += 1
             profile.last_donation_date = datetime.now()
             
@@ -739,38 +701,6 @@ def update_user_profile(wallet_address, donated_amount, points_earned, is_donor=
     
     return profile
 
-def create_token_reward(wallet_address, token_amount_raw, reason, tx_hash):
-    """Create token reward for future airdrop"""
-    try:
-        profile = UserProfile.objects.get(wallet_address=wallet_address.lower())
-        
-        # Token amount is already calculated, just convert to Decimal
-        token_amount = Decimal(str(token_amount_raw))
-        
-        # Apply multipliers
-        multiplier = Decimal('1.0')
-        if reason == 'social_donation_frame':
-            multiplier = Decimal('1.2')  # 20% bonus for frame interactions
-        elif reason == 'early_adopter':
-            multiplier = Decimal('2.0')  # 100% bonus for early adopters
-        
-        final_amount = token_amount * multiplier
-        
-        TokenReward.objects.create(
-            user=profile,
-            amount=final_amount,
-            reason=reason,
-            multiplier=multiplier,
-            related_donation_tx=tx_hash,
-            frame_interaction=(reason == 'social_donation_frame')
-        )
-        
-        # Update user's total tokens earned
-        profile.tokens_earned += final_amount
-        profile.save()
-        
-    except UserProfile.DoesNotExist:
-        pass  # Profile will be created on next donation
 
 def get_user_stats(wallet_address):
     """Get comprehensive user stats"""
@@ -778,14 +708,12 @@ def get_user_stats(wallet_address):
     
     try:
         profile = UserProfile.objects.get(wallet_address=wallet_address)
-        rank = get_user_rank(wallet_address)
+        rank = UserProfile.objects.filter(total_donated__gt=profile.total_donated).count() + 1
         
         return {
             'total_donated': str(profile.total_donated),
             'total_received': str(profile.total_received),
-            'total_points': profile.total_points,
             'donation_count': profile.donation_count,
-            'tokens_earned': str(profile.tokens_earned),
             'rank': rank,
             'first_donation': profile.first_donation_date.isoformat() if profile.first_donation_date else None,
             'last_donation': profile.last_donation_date.isoformat() if profile.last_donation_date else None,
@@ -794,25 +722,12 @@ def get_user_stats(wallet_address):
         return {
             'total_donated': '0',
             'total_received': '0',
-            'total_points': 0,
             'donation_count': 0,
-            'tokens_earned': '0',
             'rank': None,
             'first_donation': None,
             'last_donation': None,
         }
-
-def get_user_rank(user_address):
-    """Get user's current rank"""
-    try:
-        user_profile = UserProfile.objects.get(wallet_address=user_address.lower())
-        higher_ranked = UserProfile.objects.filter(
-            is_public_profile=True,
-            total_points__gt=user_profile.total_points
-        ).count()
-        return higher_ranked + 1
-    except UserProfile.DoesNotExist:
-        return None
+    
 
 def get_time_ago(timestamp):
     """Convert timestamp to human-readable time ago"""
@@ -830,113 +745,6 @@ def get_time_ago(timestamp):
         return "just now"
 
 # TOKEN AND AIRDROP ENDPOINTS
-
-def token_rewards(request):
-    """Get user's token rewards for airdrop"""
-    wallet_address = request.GET.get('address', '').lower()
-    
-    if not wallet_address:
-        return JsonResponse({'error': 'Address required'}, status=400)
-    
-    try:
-        profile = UserProfile.objects.get(wallet_address=wallet_address)
-        rewards = TokenReward.objects.filter(user=profile).order_by('-created_at')
-        
-        rewards_data = []
-        for reward in rewards:
-            rewards_data.append({
-                'id': reward.id,
-                'amount': str(reward.amount),
-                'reason': reward.reason,
-                'multiplier': str(reward.multiplier),
-                'is_claimed': reward.is_claimed,
-                'frame_interaction': reward.frame_interaction,
-                'created_at': reward.created_at.isoformat(),
-            })
-        
-        return JsonResponse({
-            'total_earned': str(profile.tokens_earned),
-            'total_claimed': str(profile.tokens_claimed),
-            'pending_claim': str(profile.tokens_earned - profile.tokens_claimed),
-            'rewards': rewards_data
-        })
-        
-    except UserProfile.DoesNotExist:
-        return JsonResponse({
-            'total_earned': '0',
-            'total_claimed': '0',
-            'pending_claim': '0',
-            'rewards': []
-        })
-
-def airdrop_eligibility(request):
-    """Check airdrop eligibility"""
-    wallet_address = request.GET.get('address', '').lower()
-    min_points = int(request.GET.get('min_points', 100))
-    
-    if not wallet_address:
-        return JsonResponse({'error': 'Address required'}, status=400)
-    
-    try:
-        profile = UserProfile.objects.get(wallet_address=wallet_address)
-        
-        is_eligible = profile.total_points >= min_points
-        multiplier = Decimal('1.0')
-        
-        # Early adopter bonus
-        if profile.first_donation_date and profile.first_donation_date < datetime.now() - timedelta(days=30):
-            multiplier = Decimal('2.0')
-        
-        # Active user bonus
-        if profile.donation_count >= 10:
-            multiplier = max(multiplier, Decimal('1.5'))
-        
-        # Frame interaction bonus
-        frame_donations = TokenReward.objects.filter(
-            user=profile,
-            frame_interaction=True
-        ).count()
-        
-        if frame_donations >= 5:
-            multiplier = max(multiplier, Decimal('1.2'))
-        
-        final_tokens = profile.tokens_earned * multiplier
-        
-        return JsonResponse({
-            'eligible': is_eligible,
-            'total_points': profile.total_points,
-            'base_tokens': str(profile.tokens_earned),
-            'multiplier': str(multiplier),
-            'final_tokens': str(final_tokens),
-            'reason': get_multiplier_reason(profile, frame_donations),
-            'rank': get_user_rank(wallet_address),
-        })
-        
-    except UserProfile.DoesNotExist:
-        return JsonResponse({
-            'eligible': False,
-            'total_points': 0,
-            'base_tokens': '0',
-            'multiplier': '1.0',
-            'final_tokens': '0',
-            'reason': 'No donation history',
-            'rank': None,
-        })
-
-def get_multiplier_reason(profile, frame_donations):
-    """Get reason for token multiplier"""
-    reasons = []
-    
-    if profile.first_donation_date and profile.first_donation_date < datetime.now() - timedelta(days=30):
-        reasons.append("Early Adopter (2x)")
-    
-    if profile.donation_count >= 10:
-        reasons.append("Active Donor (1.5x)")
-    
-    if frame_donations >= 5:
-        reasons.append("Frame User (1.2x)")
-    
-    return " + ".join(reasons) if reasons else "Base multiplier"
 
 
 # Add these new endpoints to your existing views.py
@@ -1058,7 +866,6 @@ def record_farcaster_donation(request):
                     amount=amount_eth,
                     tx_hash=data['tx_hash'],
                     block_number=data.get('block_number'),
-                    points_earned=calculate_points_and_tokens(amount_eth)
                 )
                 
                 # Update pool stats
@@ -1080,7 +887,6 @@ def record_farcaster_donation(request):
                         amount=amount_eth,
                         tx_hash=data['tx_hash'],
                         block_number=data.get('block_number'),
-                        points_earned=calculate_points_and_tokens(amount_eth)
                     )
                     
                     # Update recipient raised amount
@@ -1093,16 +899,13 @@ def record_farcaster_donation(request):
                     return JsonResponse({'error': 'Recipient not found'}, status=404)
             
             # Update user profile
-            points_earned = calculate_points_and_tokens(amount_eth)
-            update_user_profile(donor_address, amount_eth, points_earned, is_donor=True)
+            update_user_profile(donor_address, amount_eth, is_donor=True)
+
             
-            # Create token reward
-            create_token_reward(donor_address, points_earned, f'{recipient_type}_donation', data['tx_hash'])
             
             return JsonResponse({
                 'success': True,
                 'donation_id': donation.id,
-                'points_earned': points_earned,
                 'recipient_type': recipient_type,
             })
             
@@ -1159,3 +962,57 @@ def pools_landing_data(request):
         })
     
     return JsonResponse({'pools': pools_data})
+
+def airdrop_eligibility(request):
+    """Check user's airdrop eligibility based on points"""
+    wallet_address = request.GET.get('address', '').lower()
+    
+    if not wallet_address:
+        return JsonResponse({'error': 'Address required'}, status=400)
+    
+    try:
+        profile = UserProfile.objects.get(wallet_address=wallet_address)
+        
+        # Calculate airdrop allocation based on points
+        # This is a simple example - adjust based on your tokenomics
+        base_allocation = profile.total_points * 0.1  # 0.1 tokens per point
+        
+        # Bonus multipliers
+        multiplier = 1.0
+        reason = "Standard allocation"
+        
+        if profile.total_points >= 10_000_000:  # 10+ ETH donated
+            multiplier = 1.5
+            reason = "Whale bonus (10+ ETH)"
+        elif profile.total_points >= 1_000_000:  # 1+ ETH donated
+            multiplier = 1.2
+            reason = "Major donor bonus (1+ ETH)"
+        elif profile.total_points >= 100_000:  # 0.1+ ETH donated
+            multiplier = 1.1
+            reason = "Active donor bonus (0.1+ ETH)"
+        
+        final_allocation = base_allocation * multiplier
+        
+        # Get user rank
+        rank = UserProfile.objects.filter(total_points__gt=profile.total_points).count() + 1
+        
+        return JsonResponse({
+            'eligible': profile.total_points > 0,
+            'total_points': profile.total_points,
+            'base_tokens': int(base_allocation),
+            'multiplier': multiplier,
+            'final_tokens': int(final_allocation),
+            'rank': rank,
+            'reason': reason
+        })
+        
+    except UserProfile.DoesNotExist:
+        return JsonResponse({
+            'eligible': False,
+            'total_points': 0,
+            'base_tokens': 0,
+            'multiplier': 1,
+            'final_tokens': 0,
+            'rank': None,
+            'reason': 'No donations found'
+        })

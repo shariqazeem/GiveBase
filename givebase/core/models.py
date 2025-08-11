@@ -63,7 +63,6 @@ class UserProfile(models.Model):
     # Donation stats (denormalized for performance)
     total_donated = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal('0'))
     total_received = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal('0'))
-    total_points = models.IntegerField(default=0)
     donation_count = models.IntegerField(default=0)
     
     # Social features
@@ -71,10 +70,8 @@ class UserProfile(models.Model):
     accepts_donations = models.BooleanField(default=True)
     donation_message = models.CharField(max_length=100, blank=True, default="Thanks for your support! 💙")
     
-    # Token rewards
-    tokens_earned = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal('0'))
-    tokens_claimed = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal('0'))
-    
+    total_points = models.BigIntegerField(default=0)
+
     # Timestamps
     first_donation_date = models.DateTimeField(null=True, blank=True)
     last_donation_date = models.DateTimeField(null=True, blank=True)
@@ -117,8 +114,8 @@ class SocialDonation(models.Model):
     frame_interaction = models.BooleanField(default=False)
     
     # Points and rewards
-    points_earned = models.IntegerField(default=0)
-    
+    points_earned = models.BigIntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -146,8 +143,8 @@ class PoolDonation(models.Model):
     block_number = models.BigIntegerField(null=True, blank=True)
     
     # Points and rewards
-    points_earned = models.IntegerField(default=0)
-    
+    points_earned = models.BigIntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -160,29 +157,6 @@ class PoolDonation(models.Model):
     def __str__(self):
         return f"{self.donor_address[:8]}... → {self.pool.name} ({self.amount} ETH)"
 
-
-class TokenReward(models.Model):
-    """Track token rewards for future airdrops"""
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    
-    # Reward details
-    amount = models.DecimalField(max_digits=18, decimal_places=8)
-    reason = models.CharField(max_length=100)  # 'donation', 'social_share', 'early_adopter'
-    multiplier = models.DecimalField(max_digits=3, decimal_places=2, default=1.0)
-    
-    # Social context
-    related_donation_tx = models.CharField(max_length=66, blank=True)
-    frame_interaction = models.BooleanField(default=False)
-    
-    # Status
-    is_claimed = models.BooleanField(default=False)
-    claimed_at = models.DateTimeField(null=True, blank=True)
-    claim_tx_hash = models.CharField(max_length=66, blank=True)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.user} - {self.amount} $GIVE ({self.reason})"
 
 
 # Keep the original models for migration compatibility
@@ -218,9 +192,9 @@ class Donation(models.Model):
     amount = models.DecimalField(max_digits=18, decimal_places=8)
     tx_hash = models.CharField(max_length=66, unique=True)
     block_number = models.BigIntegerField(null=True, blank=True)
-    points_earned = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+    points_earned = models.BigIntegerField(default=0)
+
     # Migration helper fields
     migrated_to_pool = models.BooleanField(default=False)
     migrated_to_social = models.BooleanField(default=False)
@@ -237,7 +211,6 @@ class DonorProfile(models.Model):
     wallet_address = models.CharField(max_length=42, unique=True, primary_key=True)
     ens_name = models.CharField(max_length=100, blank=True)
     total_donated = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal('0'))
-    total_points = models.IntegerField(default=0)
     donation_count = models.IntegerField(default=0)
     is_public = models.BooleanField(default=True)
     first_donation_date = models.DateTimeField(null=True, blank=True)

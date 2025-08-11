@@ -533,7 +533,7 @@
                     <div id="networkInfo"
                         class="hidden md:flex items-center space-x-2 px-3 py-2 bg-black/5 rounded-xl border border-black/10">
                         <div class="w-2 h-2 bg-black rounded-full pulse-dot"></div>
-                        <span class="text-sm font-medium">Base Mainnet</span>
+                        <span class="text-sm font-medium" id="networkDisplayName">Base Mainnet</span>
                     </div>
                     <div class="relative">
                         <button id="connectWallet" onclick="handleWalletButton()"
@@ -568,6 +568,21 @@
             </div>
         </div>
     </header>
+    <!-- Testnet Warning Banner -->
+    <div id="testnetWarning" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 hidden">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium">
+                    ⚠️ TESTNET MODE - Using Base Sepolia. Donations use test ETH only.
+                    <a href="https://www.alchemy.com/faucets/base-sepolia" target="_blank" class="underline ml-2">Get
+                        test ETH</a>
+                </p>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-8">
@@ -590,11 +605,6 @@
                 <div class="text-sm text-gray-500 mb-2">Your Points</div>
                 <div class="text-3xl font-black text-black" id="userPoints">0</div>
                 <div class="text-sm text-gray-500" id="userRank"></div>
-            </div>
-            <div class="token-highlight rounded-2xl p-6 hover-lift">
-                <div class="text-sm text-gray-300 mb-2">Tokens Earned</div>
-                <div class="text-3xl font-black text-white" id="userTokens">0 $UMANITY</div>
-                <div class="text-sm text-gray-300">Unclaimed</div>
             </div>
         </div>
 
@@ -653,12 +663,15 @@
                             <div class="flex items-start space-x-3">
                                 <i class="fas fa-exclamation-triangle text-red-500 mt-1"></i>
                                 <div class="text-sm">
-                                    <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
-                                    <div class="text-red-700">
+                                    <div class="font-bold text-red-800 mb-1" id="p2pWarningTitle">
+                                        ⚠️ Mainnet Transaction
+                                    </div>
+                                    <div class="text-red-700" id="p2pWarningText">
                                         This will use <strong>real ETH</strong> from Base Mainnet.
                                         Minimum: $0.50 • Gas fees: ~$0.001-0.003 • <strong>Irreversible</strong>.
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -679,11 +692,7 @@
                                     Gas fees: < $0.001 additional </div>
                                         <div class="mt-2 text-xs text-gray-500">
                                             Rewards: <span id="p2pEstimatedPoints"
-                                                class="text-purple-600 font-medium">0</span>
-                                            pts •
-                                            <span id="p2pEstimatedTokens" class="text-blue-600 font-medium">0
-                                                $UMANITY</span> •
-                                            Epoch <span id="p2pCurrentEpoch" class="font-medium">0</span>
+                                                class="text-purple-600 font-medium">0</span> points
                                         </div>
                                 </div>
                                 <div>
@@ -902,38 +911,22 @@
                                     </div>
                                 </div>
 
-                                <!-- Token Rewards Section -->
-                                <div class="border-t border-gray-200 pt-8">
-                                    <h3 class="text-xl font-bold mb-6">🪙 Token Rewards</h3>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                        <div class="stats-card rounded-xl p-6">
-                                            <div class="text-3xl font-black text-black" id="profileTokensEarned">0
-                                                $UMANITY
-                                            </div>
-                                            <div class="text-sm text-gray-500">Total Earned</div>
-                                        </div>
-                                        <div class="token-highlight rounded-xl p-6">
-                                            <div class="text-3xl font-black text-white" id="profileTokensPending">0
-                                                $UMANITY
-                                            </div>
-                                            <div class="text-sm text-gray-300">Pending Claim</div>
-                                        </div>
-                                    </div>
-                                    <button onclick="checkAirdropEligibility()"
-                                        class="primary-button w-full py-4 rounded-xl text-white font-bold">
-                                        Check Airdrop Eligibility
-                                    </button>
-                                </div>
 
-                                <button onclick="updateProfile()"
+                                <button onclick="checkAirdropEligibility()"
                                     class="primary-button w-full py-4 rounded-xl text-white font-bold">
-                                    <span id="updateProfileButtonText">Update Profile</span>
+                                    Check Airdrop Eligibility
                                 </button>
                             </div>
+
+                            <button onclick="updateProfile()"
+                                class="primary-button w-full py-4 rounded-xl text-white font-bold">
+                                <span id="updateProfileButtonText">Update Profile</span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
     </main>
 
     <!-- Pool Donation Modal -->
@@ -955,8 +948,8 @@
                 <div class="flex items-start space-x-3">
                     <i class="fas fa-exclamation-triangle text-red-500 mt-1"></i>
                     <div class="text-sm">
-                        <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
-                        <div class="text-red-700">
+                        <div class="font-bold text-red-800 mb-1" id="poolWarningTitle">⚠️ Mainnet Transaction</div>
+                        <div class="text-red-700" id="poolWarningText">
                             This will use <strong>real ETH</strong> from Base Mainnet.
                             Minimum: $0.50 • Gas fees: ~$0.001-0.003 • <strong>Irreversible</strong>.
                         </div>
@@ -972,14 +965,13 @@
                     Minimum: 0.0002 ETH (<span id="poolMinUSD" class="text-green-600 font-medium">$0.50</span>) •
                     <span id="poolEstimatedUSD" class="text-green-600 font-bold">$0.00</span>
                 </div>
-                <div class="mt-2 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-3">
-                    <div class="text-sm font-medium text-gray-700 mb-2">💰 Estimated Rewards:</div>
-                    <div class="flex justify-between text-sm">
-                        <span>Points: <span id="poolEstimatedPoints" class="font-bold text-blue-600">0</span></span>
-                        <span>Tokens: <span id="poolEstimatedTokens" class="font-bold text-green-600">0
-                                $UMAN</span></span>
+                <div class="mt-2 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-3">
+                    <div class="text-sm font-medium text-gray-700 mb-2">💰 Points Reward:</div>
+                    <div class="text-center">
+                        <span class="text-lg font-bold text-purple-600">+<span id="poolEstimatedPoints">0</span>
+                            Points</span>
                     </div>
-                    <div class="text-xs text-gray-600 mt-1">Emergency pools get +150% bonus</div>
+                    <div class="text-xs text-gray-600 mt-1">1 ETH = 1,000,000 Points</div>
                 </div>
                 <div class="text-xs text-gray-500 mt-2">
                     Gas fees: < $0.001 additional • ETH Price: $<span id="poolEthPrice">0</span>
@@ -1011,8 +1003,8 @@
                 <div class="flex items-start space-x-3">
                     <i class="fas fa-exclamation-triangle text-red-500 mt-1"></i>
                     <div class="text-sm">
-                        <div class="font-bold text-red-800 mb-1">⚠️ Mainnet Transaction</div>
-                        <div class="text-red-700">
+                        <div class="font-bold text-red-800 mb-1" id="legacyWarningTitle">⚠️ Mainnet Transaction</div>
+                        <div class="text-red-700" id="legacyWarningText">
                             This will use <strong>real ETH</strong> from Base Mainnet.
                             Minimum: $0.50 • Gas fees: ~$0.001-0.003 • <strong>Irreversible</strong>.
                         </div>
@@ -1059,15 +1051,10 @@
                 <div id="txHash" class="font-mono text-xs break-all text-black font-medium"></div>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="stats-card rounded-2xl p-4 bg-gradient-to-br from-purple-50 to-purple-100">
-                    <div class="text-2xl font-black text-purple-600">+<span id="pointsEarned">0</span></div>
-                    <div class="text-sm text-purple-500">Points Earned</div>
-                    <div class="text-xs text-purple-400 mt-1">Impact Points Earned!</div>
-                </div>
-                <div class="token-highlight rounded-2xl p-4 bg-gradient-to-br from-blue-600 to-green-600">
-                    <div class="text-2xl font-black text-white">+<span id="tokensEarned">0</span></div>
-                    <div class="text-sm text-blue-100">$UMANITY Tokens</div>
-                    <div class="text-xs text-blue-200 mt-1">$UMANITY Tokens!</div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 mb-8">
+                    <div class="text-3xl font-black text-purple-600 mb-2">+<span id="pointsEarned">0</span></div>
+                    <div class="text-lg font-medium text-purple-500">Points Earned</div>
+                    <div class="text-xs text-purple-400 mt-1">Impact Points Added!</div>
                 </div>
             </div>
             <button onclick="closeSuccessModal()" class="primary-button py-4 px-8 rounded-xl text-white font-bold">
@@ -1077,6 +1064,7 @@
     </div>
 
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
         // Web3 and contract setup
         let web3;
         let userAccount;
@@ -1088,10 +1076,41 @@
         let hasMoreSocialFeed = false;
         let currentDonationType = 'pools';
 
-        // Contract addresses on Base Mainnet
-        const UMANITY_TOKEN_ADDRESS = '0x20fDd5980e83F47b5a9288E0EDCB6B0B8dF3B308';
-        const UMANITY_POOLS_ADDRESS = '0x4B64e2D191903a6caFbB7E226f03d457edC9B8c2';
-        const BASE_MAINNET_CHAIN_ID = '0x2105'; // 8453 in decimal
+        // Network Configuration Toggle
+        const NETWORK_MODE = urlParams.get('network') || 'testnet'; // Default to testnet
+
+        const NETWORKS = {
+            testnet: {
+                chainId: '0x14A34', // Base Sepolia (84532 in decimal)
+                chainName: 'Base Sepolia',
+                rpcUrl: 'https://sepolia.base.org',
+                explorerUrl: 'https://sepolia.basescan.org',
+                poolsContract: '0x7b9A9DFBe70505E1eDA6A71dc7a74a1848DeDd34', // Your Sepolia contract
+                tokenContract: '0x0FC4FaAdc66B2E9fc36BB0c7C2c73FECbD8c91bB', // Your Sepolia token
+                minDonation: 0.0001, // Lower for testnet
+                displayName: 'Base Sepolia Testnet'
+            },
+            mainnet: {
+                chainId: '0x2105', // Base Mainnet (8453 in decimal)
+                chainName: 'Base',
+                rpcUrl: 'https://mainnet.base.org',
+                explorerUrl: 'https://basescan.org',
+                poolsContract: '0x4B64e2D191903a6caFbB7E226f03d457edC9B8c2', // Your mainnet contract
+                tokenContract: '0x20fDd5980e83F47b5a9288E0EDCB6B0B8dF3B308', // Your mainnet token
+                minDonation: 0.0002, // Original for mainnet
+                displayName: 'Base Mainnet'
+            }
+        };
+
+        // Get current network config
+        const CURRENT_NETWORK = NETWORKS[NETWORK_MODE];
+
+        // Replace the hardcoded contract addresses (around line 495-497)
+        const UMANITY_TOKEN_ADDRESS = CURRENT_NETWORK.tokenContract;
+        const UMANITY_POOLS_ADDRESS = CURRENT_NETWORK.poolsContract;
+        const BASE_CHAIN_ID = CURRENT_NETWORK.chainId;
+
+        // Remove the old BASE_MAINNET_CHAIN_ID constant
 
         // Contract ABIs (simplified)
         const POOLS_ABI = [
@@ -1185,42 +1204,9 @@
         }
 
 
-        function calculateRewards(usdAmount, donationType = 'pool', isPublic = false, causeType = 'standard') {
-            // Base calculations using USD amount
-            const baseTokens = usdAmount * BASE_TOKENS_PER_USD;
-            const basePoints = usdAmount * BASE_POINTS_PER_USD;
-
-            // Apply cause multiplier
-            let causeMultiplier = CAUSE_MULTIPLIERS[causeType] || CAUSE_MULTIPLIERS.standard;
-
-            // Apply donation type bonus
-            let typeMultiplier = 1.0;
-            if (donationType === 'p2p') {
-                typeMultiplier = P2P_BONUS_MULTIPLIER;
-            }
-
-            // Apply public donation bonus (only for P2P)
-            let publicMultiplier = 1.0;
-            if (donationType === 'p2p' && isPublic) {
-                publicMultiplier = PUBLIC_DONATION_BONUS;
-            }
-
-            // Calculate final rewards
-            const finalTokens = Math.floor(baseTokens * causeMultiplier * typeMultiplier * publicMultiplier);
-            const finalPoints = Math.floor(basePoints * causeMultiplier * typeMultiplier * publicMultiplier);
-
-            return {
-                tokens: finalTokens,
-                points: finalPoints,
-                usdAmount: usdAmount,
-                baseRate: BASE_TOKENS_PER_USD,
-                multipliers: {
-                    cause: causeMultiplier,
-                    type: typeMultiplier,
-                    public: publicMultiplier,
-                    total: causeMultiplier * typeMultiplier * publicMultiplier
-                }
-            };
+        function calculateRewards(ethAmount) {
+            // Simple: 1 ETH = 1,000,000 points
+            return Math.floor(ethAmount * 1_000_000);
         }
 
         // Convert ETH amount to USD for calculations
@@ -1251,9 +1237,37 @@
             return Math.floor(num).toString();
         }
 
+        // Update network-specific UI elements
+        function updateNetworkUI() {
+            // Update network display name
+            document.getElementById('networkDisplayName').textContent = CURRENT_NETWORK.displayName;
 
-        // Initialize
+            // Show/hide testnet warning
+            const testnetWarning = document.getElementById('testnetWarning');
+            if (NETWORK_MODE === 'testnet') {
+                testnetWarning.classList.remove('hidden');
+            } else {
+                testnetWarning.classList.add('hidden');
+            }
+
+            // Update warning messages
+            const warningTitle = `⚠️ ${NETWORK_MODE === 'mainnet' ? 'Mainnet' : 'Testnet'} Transaction`;
+            const warningText = `This will use <strong>${NETWORK_MODE === 'mainnet' ? 'real' : 'test'} ETH</strong> from ${CURRENT_NETWORK.displayName}.
+        Minimum: $${(CURRENT_NETWORK.minDonation * (ethPriceUSD || 3000)).toFixed(2)} • Gas fees: ~$0.001-0.003 • 
+        <strong>${NETWORK_MODE === 'mainnet' ? 'Irreversible' : 'Test transaction'}</strong>.`;
+
+            // Update all warning sections
+            ['p2p', 'pool', 'legacy'].forEach(type => {
+                const titleEl = document.getElementById(`${type}WarningTitle`);
+                const textEl = document.getElementById(`${type}WarningText`);
+                if (titleEl) titleEl.innerHTML = warningTitle;
+                if (textEl) textEl.innerHTML = warningText;
+            });
+        }
+
+        // Call this function after network is determined
         window.addEventListener('load', async () => {
+            updateNetworkUI(); // Add this line
             // Check if MetaMask is installed
             if (typeof window.ethereum !== 'undefined') {
                 console.log('MetaMask is installed!');
@@ -1371,10 +1385,9 @@
         // View on block explorer
         function viewOnExplorer() {
             if (userAccount) {
-                window.open(`https://basescan.org/address/${userAccount}`, '_blank');
+                window.open(`${CURRENT_NETWORK.explorerUrl}/address/${userAccount}`, '_blank');
             }
         }
-
         // Disconnect wallet
         function disconnectWallet() {
             userAccount = null;
@@ -1493,54 +1506,52 @@
                 const currentChainId = '0x' + chainId.toString(16);
 
                 console.log('Current chain ID:', currentChainId);
-                console.log('Expected chain ID:', BASE_MAINNET_CHAIN_ID);
+                console.log('Expected chain ID:', CURRENT_NETWORK.chainId);
 
-                if (currentChainId !== BASE_MAINNET_CHAIN_ID) {
-                    console.log('Wrong network, switching to Base Mainnet...');
-                    await switchToBaseMainnet();
+                if (currentChainId !== CURRENT_NETWORK.chainId) {
+                    console.log(`Wrong network, switching to ${CURRENT_NETWORK.chainName}...`);
+                    await switchToNetwork();
                 } else {
-                    console.log('Already on Base Mainnet');
+                    console.log(`Already on ${CURRENT_NETWORK.chainName}`);
                 }
             } catch (error) {
                 console.error('Error checking network:', error);
             }
         }
 
-        async function switchToBaseMainnet() {
+        async function switchToNetwork() {
             try {
-                // Try to switch to Base Mainnet
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: BASE_MAINNET_CHAIN_ID }],
+                    params: [{ chainId: CURRENT_NETWORK.chainId }],
                 });
-                console.log('Switched to Base Mainnet');
+                console.log(`Switched to ${CURRENT_NETWORK.chainName}`);
             } catch (switchError) {
-                // This error code indicates that the chain has not been added to MetaMask
                 if (switchError.code === 4902) {
-                    console.log('Base Mainnet not found, adding network...');
+                    console.log(`${CURRENT_NETWORK.chainName} not found, adding network...`);
                     try {
                         await window.ethereum.request({
                             method: 'wallet_addEthereumChain',
                             params: [{
-                                chainId: BASE_MAINNET_CHAIN_ID,
-                                chainName: 'Base',
+                                chainId: CURRENT_NETWORK.chainId,
+                                chainName: CURRENT_NETWORK.chainName,
                                 nativeCurrency: {
                                     name: 'Ethereum',
                                     symbol: 'ETH',
                                     decimals: 18
                                 },
-                                rpcUrls: ['https://mainnet.base.org'],
-                                blockExplorerUrls: ['https://basescan.org']
+                                rpcUrls: [CURRENT_NETWORK.rpcUrl],
+                                blockExplorerUrls: [CURRENT_NETWORK.explorerUrl]
                             }]
                         });
-                        console.log('Base Mainnet network added successfully');
+                        console.log(`${CURRENT_NETWORK.chainName} network added successfully`);
                     } catch (addError) {
-                        console.error('Error adding Base Mainnet network:', addError);
-                        alert('Failed to add Base Mainnet network. Please add it manually in MetaMask.');
+                        console.error(`Error adding ${CURRENT_NETWORK.chainName} network:`, addError);
+                        alert(`Failed to add ${CURRENT_NETWORK.chainName} network. Please add it manually in MetaMask.`);
                     }
                 } else {
                     console.error('Error switching network:', switchError);
-                    alert('Failed to switch network. Please switch to Base Mainnet manually in MetaMask.');
+                    alert(`Failed to switch network. Please switch to ${CURRENT_NETWORK.chainName} manually in MetaMask.`);
                 }
             }
         }
@@ -1844,8 +1855,7 @@
                 const response = await fetch(`/api/stats/?user=${userAccount}`);
                 const data = await response.json();
 
-                document.getElementById('userPoints').textContent = data.user_points || '0';
-
+                document.getElementById('userPoints').textContent = formatLargeNumber(data.user_stats?.total_points || data.user_points || '0');
                 if (data.user_stats && data.user_stats.rank) {
                     document.getElementById('userRank').textContent = `Rank #${data.user_stats.rank}`;
                 }
@@ -2019,7 +2029,7 @@
                                     <span>${donation.time_ago}</span>
                                     <div class="flex items-center space-x-4">
                                         <span class="text-black font-medium">+${donation.points_earned} pts</span>
-                                        <a href="https://basescan.org/tx/${donation.tx_hash}" target="_blank" class="text-black hover:text-gray-700">
+                                        <a href="${CURRENT_NETWORK.explorerUrl}/tx/${donation.tx_hash}" target="_blank" class="text-black hover:text-gray-700">
                                             <i class="fas fa-external-link-alt"></i>
                                         </a>
                                     </div>
@@ -2230,7 +2240,7 @@
                         ${donation.message ? `<div class="text-sm text-gray-700 mb-4 italic bg-black/5 p-3 rounded-xl">"${donation.message}"</div>` : ''}
                         <div class="flex justify-between items-center text-sm text-gray-500">
                             <span>${donation.time_ago || 'Unknown time'}</span>
-                            ${donation.tx_hash ? `<a href="https://basescan.org/tx/${donation.tx_hash}" target="_blank" class="text-black hover:text-gray-700 font-medium">
+                            ${donation.tx_hash ? `<a href="${CURRENT_NETWORK.explorerUrl}/tx/${donation.tx_hash}" target="_blank" class="text-black hover:text-gray-700 font-medium">
                                 View Transaction <i class="fas fa-external-link-alt ml-1"></i>
                             </a>` : '<span class="text-gray-500">No transaction hash</span>'}
                         </div>
@@ -2320,11 +2330,8 @@
 
         function updatePoolEstimatedRewards() {
             const ethAmount = parseFloat(document.getElementById('poolDonationAmount').value) || 0;
-            const usdAmount = calculateUSDAmount(ethAmount);
-            const rewards = calculateRewards(usdAmount, 'pool', false, 'emergency'); // Assuming emergency pool
-
-            document.getElementById('poolEstimatedPoints').textContent = formatLargeNumber(rewards.points);
-            document.getElementById('poolEstimatedTokens').textContent = formatLargeNumber(rewards.tokens) + ' $UMAN';
+            const points = Math.floor(ethAmount * 1_000_000);
+            document.getElementById('poolEstimatedPoints').textContent = formatLargeNumber(points);
         }
 
         // Enhanced error handling for mainnet transactions
@@ -2375,8 +2382,8 @@
         async function processPoolDonation() {
             const amount = document.getElementById('poolDonationAmount').value;
 
-            if (!amount || parseFloat(amount) < 0.0002) {
-                alert('Minimum donation is 0.0002 ETH (~$0.50)');
+            if (!amount || parseFloat(amount) < CURRENT_NETWORK.minDonation) {
+                alert('Minimum donation is ${CURRENT_NETWORK.minDonation} ETH (~$0.50)');
                 return;
             }
 
@@ -2453,12 +2460,27 @@
                 // Show success with transaction hash
                 document.getElementById('txHash').textContent = tx.transactionHash;
 
-                // Calculate rewards for display (contract already gave them)
-                const usdAmount = calculateUSDAmount(parseFloat(amount));
-                const rewards = calculateRewards(usdAmount, 'pool', false, 'emergency');
+                // Calculate points correctly (1 ETH = 1,000,000 points)
+                const points = Math.floor(parseFloat(amount) * 1_000_000);
+                document.getElementById('pointsEarned').textContent = formatLargeNumber(points);
 
-                document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
-                document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
+                // Record donation in backend
+                try {
+                    await fetch('/api/donate-to-pool/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            donor_address: userAccount,
+                            pool_id: selectedPoolId,
+                            amount: amount,
+                            tx_hash: tx.transactionHash,
+                            block_number: tx.blockNumber
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error recording pool donation:', error);
+                }
+
 
                 closePoolDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
@@ -2479,16 +2501,8 @@
         // P2P donation functions
         function updateP2PEstimatedRewards() {
             const ethAmount = parseFloat(document.getElementById('p2pAmount').value) || 0;
-            const isPublic = document.getElementById('p2pPublic').checked;
-            const usdAmount = calculateUSDAmount(ethAmount);
-            const rewards = calculateRewards(usdAmount, 'p2p', isPublic, 'standard');
-
-            // Update UI elements
-            const pointsElement = document.getElementById('p2pEstimatedPoints');
-            const tokensElement = document.getElementById('p2pEstimatedTokens');
-
-            if (pointsElement) pointsElement.textContent = formatLargeNumber(rewards.points);
-            if (tokensElement) tokensElement.textContent = formatLargeNumber(rewards.tokens) + ' $UMAN';
+            const points = Math.floor(ethAmount * 1_000_000);
+            document.getElementById('p2pEstimatedPoints').textContent = formatLargeNumber(points);
         }
 
         async function processP2PDonation() {
@@ -2502,8 +2516,8 @@
                 return;
             }
 
-            if (!amount || parseFloat(amount) < 0.0002) {
-                alert('Minimum donation is 0.0002 ETH (~$0.50)');
+            if (!amount || parseFloat(amount) < CURRENT_NETWORK.minDonation) {
+                alert('Minimum donation is ${CURRENT_NETWORK.minDonation} ETH (~$0.50)');
                 return;
             }
 
@@ -2578,17 +2592,15 @@
                     throw new Error(backendData.error || 'Failed to record donation');
                 }
 
-                // Use the actual points/tokens from backend
-                const actualPoints = backendData.points_earned || rewards.points;
-                const actualTokens = Math.floor(actualPoints * 0.1 * 1.2); // Approximate token calculation
+                // Calculate points first (1 ETH = 1,000,000 points)
+                const points = Math.floor(parseFloat(amount) * 1_000_000);
 
-                // Calculate and show success rewards
-                const usdAmount = calculateUSDAmount(parseFloat(amount));
-                const rewards = calculateRewards(usdAmount, 'p2p', isPublic, 'standard');
+                // Use the actual points from backend if available
+                const actualPoints = backendData.points_earned || points;
 
+                // Show success
                 document.getElementById('txHash').textContent = tx.transactionHash;
                 document.getElementById('pointsEarned').textContent = formatLargeNumber(actualPoints);
-                document.getElementById('tokensEarned').textContent = formatLargeNumber(actualTokens);
 
                 // Clear form
                 document.getElementById('p2pRecipient').value = '';
@@ -2670,20 +2682,17 @@
 
         function updateEstimatedPoints() {
             const ethAmount = parseFloat(document.getElementById('donationAmount').value) || 0;
-            const usdAmount = calculateUSDAmount(ethAmount);
-            const rewards = calculateRewards(usdAmount, 'legacy', false, 'verified'); // Assuming verified recipient
-
-            document.getElementById('estimatedPoints').textContent = formatLargeNumber(rewards.points);
+            const points = calculateRewards(ethAmount);
+            document.getElementById('estimatedPoints').textContent = formatLargeNumber(points);
         }
-
 
 
         // Process legacy donation
         async function processDonation() {
             const amount = document.getElementById('donationAmount').value;
 
-            if (!amount || parseFloat(amount) < 0.0002) {
-                alert('Minimum donation is 0.0002 ETH (~$0.50)');
+            if (!amount || parseFloat(amount) < CURRENT_NETWORK.minDonation) {
+                alert('Minimum donation is ${CURRENT_NETWORK.minDonation} ETH (~$0.50)');
                 return;
             }
 
@@ -2761,14 +2770,12 @@
                     }),
                 });
 
-                // Calculate and show success rewards
-                const usdAmount = calculateUSDAmount(parseFloat(amount));
-                const causeType = getCauseType(selectedRecipient); // or determine based on pool type
-                const rewards = calculateRewards(usdAmount, 'pool', false, causeType);
+                // Calculate points correctly
+                const points = Math.floor(parseFloat(amount) * 1_000_000);
 
+                // Show success
                 document.getElementById('txHash').textContent = tx.transactionHash;
-                document.getElementById('pointsEarned').textContent = formatLargeNumber(rewards.points);
-                document.getElementById('tokensEarned').textContent = formatLargeNumber(rewards.tokens);
+                document.getElementById('pointsEarned').textContent = formatLargeNumber(points);
 
                 closeDonationModal();
                 document.getElementById('successModal').classList.remove('hidden');
