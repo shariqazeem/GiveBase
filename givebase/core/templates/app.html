@@ -1077,7 +1077,7 @@
         let currentDonationType = 'pools';
 
         // Network Configuration Toggle
-        const NETWORK_MODE = urlParams.get('network') || 'testnet'; // Default to testnet
+        const NETWORK_MODE = urlParams.get('network') || 'mainnet'; // Default to testnet
 
         const NETWORKS = {
             testnet: {
@@ -1095,7 +1095,7 @@
                 chainName: 'Base',
                 rpcUrl: 'https://mainnet.base.org',
                 explorerUrl: 'https://basescan.org',
-                poolsContract: '0x4B64e2D191903a6caFbB7E226f03d457edC9B8c2', // Your mainnet contract
+                poolsContract: '0x1A51b64F0af8180EC12f19Fd665f05c917996626', // Your mainnet contract
                 tokenContract: '0x20fDd5980e83F47b5a9288E0EDCB6B0B8dF3B308', // Your mainnet token
                 minDonation: 0.0002, // Original for mainnet
                 displayName: 'Base Mainnet'
