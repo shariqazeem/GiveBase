@@ -1,15 +1,15 @@
 {
   "miniapp": {
     "version": "1",
-    "name": "Umanity",
+    "name": "Umanity - Help People in Need",
     "iconUrl": "https://miniapp.umanity.xyz/icon.png",
     "homeUrl": "https://miniapp.umanity.xyz/",
-    "splashImageUrl": "https://miniapp..xyz/splash.png", 
+    "splashImageUrl": "https://miniapp.umanity.xyz/splash.png",
     "splashBackgroundColor": "#ffffff",
-    "subtitle": "Help people in need",
-    "description": "Donate to verified individuals using crypto. Make a real difference in someone's life.",
+    "subtitle": "Global donation platform powered by crypto",
+    "description": "Support verified individuals worldwide with crypto donations. Earn rewards, track impact, and join a community making real change happen.",
     "primaryCategory": "social",
-    "tags": ["donations", "charity", "crypto", "help"],
+    "tags": ["donations", "charity", "crypto", "help", "ethereum", "base", "social-good", "humanitarian", "crowdfunding", "blockchain"],
     "requiredChains": ["eip155:8453"],
     "requiredCapabilities": [
       "wallet.getEthereumProvider"
