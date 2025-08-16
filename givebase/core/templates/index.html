@@ -1,10 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Umanity - Global Donation Ecosystem | Earn $UMANITY Tokens</title>
+    
+    <!-- Primary Title & Description -->
+    <title>Umanity - Global Crypto Donation Platform | Earn $UMANITY Tokens While Helping People</title>
+    <meta name="description" content="Join the future of giving with Umanity - donate crypto to verified individuals & global pools on Base blockchain. Earn $UMANITY tokens, track impact, build your reputation. No KYC required.">
+    <meta name="keywords" content="crypto donations, Base blockchain, $UMANITY token, global donation pools, verified recipients, peer-to-peer giving, social impact, DeFi charity, Ethereum donations, Farcaster miniapp, humanitarian aid, emergency fund, community support">
+    <meta name="author" content="Umanity Team">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://umanity.xyz/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://umanity.xyz/">
+    <meta property="og:site_name" content="Umanity">
+    <meta property="og:title" content="Umanity - The Future of Giving is Here | Crypto Donations + $UMANITY Rewards">
+    <meta property="og:description" content="Revolutionary donation platform on Base blockchain. Support verified individuals worldwide, earn $UMANITY tokens, and make real impact. Global pools • Direct P2P • Instant rewards.">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://umanity.xyz/">
+    <meta name="twitter:site" content="@umanity_xyz">
+    <meta name="twitter:creator" content="@umanity_xyz">
+    <meta name="twitter:title" content="Umanity - Future of Crypto Donations | Earn $UMANITY Tokens">
+    <meta name="twitter:description" content="Revolutionary Web3 donation platform. Support verified individuals, earn rewards, make global impact. Built on Base blockchain.">
+
+    <!-- Farcaster Frame Meta -->
+    <meta name="fc:frame" content="vNext">
+    <meta name="fc:frame:button:1" content="🚀 Launch App">
+    <meta name="fc:frame:button:1:action" content="link">
+    <meta name="fc:frame:button:1:target" content="https://miniapp.umanity.xyz/">
+    <meta name="fc:frame:button:2" content="💰 Learn About $UMANITY">
+    <meta name="fc:frame:button:2:action" content="link">
+    <meta name="fc:frame:button:2:target" content="https://umanity.xyz/#tokenomics">
+
+    <!-- Favicons & App Icons -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'manifest/site.webmanifest' %}">
+
+    <!-- PWA Meta -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Umanity">
+    <meta name="application-name" content="Umanity">
+    <meta name="msapplication-TileColor" content="#000000">
+
+    <!-- Structured Data - Landing Page -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://umanity.xyz/#organization",
+          "name": "Umanity",
+          "url": "https://umanity.xyz/",
+          "description": "Revolutionary crypto donation platform built on Base blockchain with $UMANITY token rewards",
+          "foundingDate": "2024",
+          "industry": "Blockchain Technology, Social Impact, Decentralized Finance"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://umanity.xyz/#website",
+          "url": "https://umanity.xyz/",
+          "name": "Umanity - Global Crypto Donation Platform",
+          "description": "Support verified individuals and global causes with crypto donations. Earn $UMANITY tokens while making real-world impact.",
+          "publisher": {
+            "@id": "https://umanity.xyz/#organization"
+          }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://umanity.xyz/#webapp",
+          "name": "Umanity Donation Platform",
+          "url": "https://miniapp.umanity.xyz/",
+          "description": "Decentralized donation platform with global pools, P2P giving, and $UMANITY token rewards",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "Web Browser, Mobile Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Global donation pools",
+            "Peer-to-peer crypto donations", 
+            "$UMANITY token rewards",
+            "Impact tracking with NFTs",
+            "Verified recipient support",
+            "Farcaster integration",
+            "Base blockchain powered"
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <!-- Crypto/Blockchain specific meta -->
+    <meta name="web3" content="enabled">
+    <meta name="blockchain" content="Base, Ethereum">
+    <meta name="token" content="$UMANITY">
+    <meta name="defi-category" content="Social Impact, Donations, Rewards">
+
+    <!-- Performance & Security -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://api.coingecko.com">
+    <link rel="dns-prefetch" href="https://miniapp.umanity.xyz">
+    <link rel="dns-prefetch" href="https://base.org">
+
+    <!-- Stylesheets (keep your existing ones) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Stylesheets (keep your existing ones) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script>

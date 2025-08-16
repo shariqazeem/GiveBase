@@ -1,13 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Umanity - Global Donation Ecosystem</title>
+    
+    <!-- Primary Title & Description -->
+    <title>Umanity App - Make Crypto Donations & Earn $UMANITY Tokens | Global Impact Platform</title>
+    <meta name="description" content="Donate cryptocurrency to verified individuals and global pools. Earn $UMANITY tokens, build impact reputation with NFTs. Connect wallet to start making a difference on Base blockchain.">
+    <meta name="keywords" content="crypto donation app, $UMANITY tokens, Base blockchain donations, global donation pools, P2P crypto giving, impact NFTs, verified recipients, Ethereum donations, MetaMask wallet, social impact platform">
+    <meta name="author" content="Umanity Team">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://umanity.xyz/app/">
+
+    <!-- App-specific meta -->
+    <meta name="application-name" content="Umanity Donation App">
+    <meta name="mobile-web-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://umanity.xyz/app/">
+    <meta property="og:site_name" content="Umanity">
+    <meta property="og:title" content="Umanity Donation App - Connect Wallet & Start Giving">
+    <meta property="og:description" content="Full-featured crypto donation platform. Support global causes, earn $UMANITY tokens, track your impact. Connect MetaMask to get started on Base blockchain.">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://umanity.xyz/app/">
+    <meta name="twitter:site" content="@umanity_xyz">
+    <meta name="twitter:title" content="Umanity App - Crypto Donations Made Simple">
+    <meta name="twitter:description" content="Connect wallet → Choose cause → Earn rewards. The easiest way to make crypto donations with $UMANITY token benefits.">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="{% static 'manifest/app.webmanifest' %}">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">
+
+    <!-- PWA Meta -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Umanity App">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="msapplication-tap-highlight" content="no">
+
+    <!-- Web3/Wallet Detection -->
+    <meta name="wallet-detection" content="ethereum, metamask, coinbase, walletconnect">
+    <meta name="blockchain-network" content="base-mainnet, base-sepolia">
+    <meta name="dapp-category" content="donations, social-impact, defi">
+
+    <!-- Structured Data - WebApp -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Umanity Donation App",
+      "url": "https://umanity.xyz/app/",
+      "description": "Full-featured crypto donation platform with global pools, P2P giving, and $UMANITY token rewards",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web Browser",
+      "browserRequirements": "Requires Web3 wallet (MetaMask, Coinbase Wallet, etc.)",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Connect Web3 wallet (MetaMask, Coinbase)",
+        "Donate to global impact pools",
+        "Send peer-to-peer crypto donations",
+        "Support verified individuals in need",
+        "Earn $UMANITY token rewards automatically",
+        "Track donation history and impact",
+        "Build reputation with Impact Point NFTs",
+        "View donation leaderboards",
+        "Social donation feed",
+        "Base blockchain integration"
+      ],
+      "publisher": {
+        "@type": "Organization",
+        "name": "Umanity",
+        "url": "https://umanity.xyz/"
+      },
+      "softwareRequirements": "Web3 wallet extension, Base network support",
+      "permissions": "wallet connection, transaction signing"
+    }
+    </script>
+
+    <!-- Preconnect to critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://api.coingecko.com">
+    <link rel="dns-prefetch" href="https://base.org">
+    <link rel="dns-prefetch" href="https://basescan.org">
+
+    <!-- Critical CSS and Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Network-specific meta based on current environment -->
+    {% if request.GET.network == 'testnet' %}
+    <meta name="blockchain-env" content="testnet">
+    <meta name="network-warning" content="This is a testnet environment using Base Sepolia">
+    {% else %}
+    <meta name="blockchain-env" content="mainnet">
+    <meta name="network-warning" content="This uses real ETH on Base Mainnet">
+    {% endif %}
     <script>
         tailwind.config = {
             theme: {
