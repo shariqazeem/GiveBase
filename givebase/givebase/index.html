@@ -976,7 +976,7 @@
         // Initialize contracts
         let poolsContract;
         let tokenContract;
-        
+
 
         // API Configuration
         const API_BASE = import.meta.env.DEV ? 'http://localhost:8000' : 'https://umanity.xyz';
@@ -1096,23 +1096,31 @@
         }
         // Initialize smart contracts
         async function initializeContracts() {
-            if (!farcasterProvider) return;
+            if (!web3) return;
 
             try {
-                // Use Web3 from CDN or import
-                const web3 = new Web3(farcasterProvider);
-
                 poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
-                console.log('✅ Smart contracts initialized successfully');
 
-                // Load stats from contract
-                loadStats();
+                // Initialize token contract for balance checking
+                const TOKEN_ABI = [
+                    {
+                        "inputs": [{ "type": "address", "name": "account" }],
+                        "name": "balanceOf",
+                        "outputs": [{ "type": "uint256", "name": "" }],
+                        "stateMutability": "view",
+                        "type": "function"
+                    }
+                ];
+                tokenContract = new web3.eth.Contract(TOKEN_ABI, UMANITY_TOKEN_ADDRESS);
+
+                console.log('✅ Smart contracts initialized successfully');
 
             } catch (error) {
                 console.error('❌ Error initializing contracts:', error);
-                // Continue without contracts - will fallback to API
             }
         }
+
+
         // Connect wallet
         async function connectWallet() {
             if (!farcasterProvider) {
@@ -1565,12 +1573,12 @@
         // Load stats from smart contract
         async function loadStats() {
             try {
-                // Try smart contract first
+                // Try smart contract first if available
                 if (poolsContract) {
                     const stats = await poolsContract.methods.getPlatformStats().call();
 
-                    // Convert from Wei to ETH and format
-                    const totalDonatedETH = parseFloat(stats._totalDonatedETH) / 1e18;
+                    // Convert from Wei to ETH
+                    const totalDonatedETH = web3.utils.fromWei(stats._totalDonatedETH, 'ether');
                     const totalDonatedUSD = parseFloat(stats._totalDonatedUSD) / 100; // Convert cents to dollars
 
                     document.getElementById('totalRaised').textContent = `$${totalDonatedUSD.toLocaleString()}`;
@@ -1589,19 +1597,23 @@
 
             } catch (error) {
                 console.error('Load stats error:', error);
-
-                // Final fallback to API
-                try {
-                    const response = await fetch(`${API_BASE}/api/farcaster-stats/`);
-                    const data = await response.json();
-                    document.getElementById('totalRaised').textContent = `$${data.total_raised.toLocaleString()}`;
-                    document.getElementById('peopleHelped').textContent = data.active_recipients.toLocaleString();
-                } catch (apiError) {
-                    console.error('API fallback failed:', apiError);
-                }
+                // Use default values
+                document.getElementById('totalRaised').textContent = '$0';
+                document.getElementById('peopleHelped').textContent = '0';
             }
         }
+        // Get user's token balance
+        async function getTokenBalance(address) {
+            try {
+                if (!tokenContract) return '0';
 
+                const balance = await tokenContract.methods.balanceOf(address).call();
+                return web3.utils.fromWei(balance, 'ether');
+            } catch (error) {
+                console.error('Error getting token balance:', error);
+                return '0';
+            }
+        }
         // Fetch ETH price
         async function fetchETHPrice() {
             try {
@@ -1613,7 +1625,7 @@
             }
         }
 
-       
+
 
         // Calculate USD amount from ETH
         function calculateUSDAmount(ethAmount) {
@@ -1677,7 +1689,7 @@
 
         // Process donation with smart contracts
         async function processDonation() {
-            if (!selectedRecipient || !farcasterProvider) return;
+            if (!selectedRecipient || !web3) return;
 
             // Get amount in ETH
             const customAmount = parseFloat(document.getElementById('customAmount').value) || 0;
@@ -1690,7 +1702,6 @@
                 return;
             }
 
-            const usdAmount = ethAmount * ethPrice;
             const message = document.getElementById('donationMessage').value;
 
             const donateBtn = document.getElementById('donateBtn');
@@ -1698,38 +1709,64 @@
             donateBtn.disabled = true;
 
             try {
-                // Initialize contract if needed
-                if (!poolsContract) {
-                    const web3 = new Web3(farcasterProvider);
-                    poolsContract = new web3.eth.Contract(POOLS_ABI, UMANITY_POOLS_ADDRESS);
+                // Check user balance
+                const balanceWei = await web3.eth.getBalance(userAccount);
+                const balanceEth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
+
+                if (balanceEth < ethAmount) {
+                    alert(`Insufficient balance. You have ${balanceEth.toFixed(4)} ETH but need at least ${ethAmount.toFixed(4)} ETH.`);
+                    donateBtn.textContent = 'Send Donation';
+                    donateBtn.disabled = false;
+                    return;
                 }
 
-                // Check if it's a pool donation
+                let txHash;
+
+                // Check if it's a pool donation (has numeric id)
                 if (selectedRecipient.id && typeof selectedRecipient.id === 'number') {
                     // Pool donation - use smart contract
-                    const weiAmount = Math.floor(ethAmount * 1e18).toString();
+                    const amountWei = web3.utils.toWei(ethAmount.toString(), 'ether');
 
-                    const txHash = await poolsContract.methods.donateToPool(selectedRecipient.id).send({
+                    // Estimate gas
+                    const gasEstimate = await poolsContract.methods.donateToPool(selectedRecipient.id).estimateGas({
                         from: userAccount,
-                        value: weiAmount,
-                        gas: 300000 // Adequate gas for pool donation
+                        value: amountWei
                     });
 
-                    console.log('Smart contract pool donation successful:', txHash);
+                    const gasLimit = Math.floor(gasEstimate * 1.2);
+
+                    const tx = await poolsContract.methods.donateToPool(selectedRecipient.id).send({
+                        from: userAccount,
+                        value: amountWei,
+                        gas: gasLimit
+                    });
+
+                    txHash = tx.transactionHash;
+
+                    // Record pool donation in backend
+                    await fetch(`${API_BASE}/api/donate-to-pool/`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            donor_address: userAccount,
+                            pool_id: selectedRecipient.id,
+                            amount: ethAmount,
+                            tx_hash: txHash,
+                            block_number: tx.blockNumber
+                        })
+                    });
 
                 } else {
                     // P2P or legacy donation - direct transfer
-                    const weiAmount = '0x' + Math.floor(ethAmount * 1e18).toString(16);
+                    const amountWei = web3.utils.toWei(ethAmount.toString(), 'ether');
 
-                    const txHash = await farcasterProvider.request({
-                        method: 'eth_sendTransaction',
-                        params: [{
-                            from: userAccount,
-                            to: selectedRecipient.wallet_address,
-                            value: weiAmount,
-                            gas: '0x5208',
-                        }]
+                    const tx = await web3.eth.sendTransaction({
+                        from: userAccount,
+                        to: selectedRecipient.wallet_address,
+                        value: amountWei
                     });
+
+                    txHash = tx.transactionHash;
 
                     // Record P2P donation
                     await fetch(`${API_BASE}/api/donate-to-user/`, {
@@ -1747,30 +1784,40 @@
                     });
                 }
 
-                // Calculate and show rewards
-                const points = calculateRewards(ethAmount);
+                // Calculate points (1 ETH = 1,000,000 points)
+                const points = Math.floor(ethAmount * 1_000_000);
 
-                document.getElementById('txHash').textContent = txHash.transactionHash || txHash;
+                // Show success
+                document.getElementById('txHash').textContent = txHash;
                 document.getElementById('pointsEarned').textContent = formatLargeNumber(points);
-                document.getElementById('tokensEarned').textContent = '0'; // No tokens anymore
+                document.getElementById('tokensEarned').textContent = '0'; // No tokens
 
                 closeDonationSheet();
                 document.getElementById('successModal').classList.remove('hidden');
 
                 // Refresh data
-                loadStats();
-                loadRecipients(1, currentFilter);
-                loadUserProfile();
+                await loadStats();
+                await loadRecipients(1, currentFilter);
+                await loadUserProfile();
 
             } catch (error) {
                 console.error('Donation error:', error);
-                alert(error.code === 4001 ? 'Transaction cancelled' : `Transaction failed: ${error.message || 'Unknown error'}`);
+
+                let errorMessage = 'Transaction failed. Please try again.';
+                if (error.code === 4001) {
+                    errorMessage = 'Transaction cancelled by user.';
+                } else if (error.code === -32000) {
+                    errorMessage = 'Insufficient funds for gas. You need Base ETH for transaction fees.';
+                } else if (error.message && error.message.includes('insufficient funds')) {
+                    errorMessage = 'Insufficient ETH balance. Please add more Base ETH to your wallet.';
+                }
+
+                alert(errorMessage);
             } finally {
                 donateBtn.textContent = 'Send Donation';
                 donateBtn.disabled = false;
             }
         }
-
         // Quick send
         async function quickSend() {
             const recipient = document.getElementById('recipientUsername').value;
